@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circuit Playground ⚡ | Smart Workbench</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+/* ============================================================================
+   CIRCUIT PLAYGROUND - COMPLETE STYLES
+   ============================================================================ */
+:root {
+  --bg-app: #0a0d14;
+  --bg-surface: #0f1420;
+  --bg-card: #141924;
+  --bg-card-hover: #1a2030;
+  --bg-input: #0c1018;
+  --border-color: #1e2a3a;
+  --border-bright: #2a3a52;
+  --border-focus: #38bdf8;
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-bright: #ffffff;
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --accent-glow: rgba(56, 189, 248, 0.25);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --purple: #a855f7;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-app);
+  color: var(--text-main);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ---- PARTICLE CANVAS ---- */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---- TOP NAVBAR ---- */
+.pg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(14, 18, 28, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  z-index: 20;
+  gap: 12px;
+}
+.pg-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pg-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.pg-back-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.pg-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+}
+.pg-logo svg { filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.4)); }
+
+/* ---- TOOLBAR ---- */
+.pg-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.tb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.tb-btn:hover { color: var(--text-bright); border-color: var(--border-bright); background: var(--bg-card-hover); }
+.tb-btn.accent { color: var(--accent); border-color: rgba(56,189,248,0.3); }
+.tb-btn.accent:hover { background: rgba(56,189,248,0.1); }
+.tb-btn.success { color: var(--success); border-color: rgba(16,185,129,0.3); }
+.tb-btn.success:hover { background: rgba(16,185,129,0.1); }
+.tb-sep { width: 1px; height: 20px; background: var(--border-color); margin: 0 4px; }
+.pg-header-right { display: flex; align-items: center; gap: 8px; }
+.pg-stats {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 12px;
+}
+.pg-stats span { display: flex; align-items: center; gap: 4px; }
+
+/* ---- MAIN LAYOUT ---- */
+.pg-main {
+  display: flex;
+  height: calc(100vh - 49px);
+  position: relative;
+  z-index: 10;
+}
+
+/* ---- LEFT SIDEBAR: COMPONENT PALETTE ---- */
+.pg-sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: rgba(14, 20, 32, 0.95);
+  backdrop-filter: blur(8px);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+.component-group {
+  border-bottom: 1px solid var(--border-color);
+}
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.group-header:hover { background: var(--bg-card-hover); }
+.group-header .arrow { transition: transform 0.2s; font-size: 10px; }
+.group-header.collapsed .arrow { transform: rotate(-90deg); }
+.group-items { padding: 4px 8px 8px; }
+.group-items.hidden { display: none; }
+.comp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: grab;
+  font-size: 12px;
+  color: var(--text-main);
+  transition: all 0.15s;
+  user-select: none;
+}
+.comp-item:hover { background: rgba(56, 189, 248, 0.08); }
+.comp-item:active { cursor: grabbing; }
+.comp-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.comp-icon svg { width: 16px; height: 16px; }
+
+/* ---- CENTER: CIRCUIT CANVAS ---- */
+.pg-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.03), transparent 70%),
+    var(--bg-app);
+}
+#circuit-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+.canvas-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+.canvas-info {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: rgba(14, 20, 32, 0.85);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  z-index: 5;
+}
+.zoom-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+  z-index: 5;
+}
+.zoom-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 20, 32, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.zoom-btn:hover { color: var(--text-bright); border-color: var(--accent); }
+
+/* ---- PLACED COMPONENTS ON CANVAS (SVG overlays) ---- */
+.circuit-component {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+}
+.circuit-component.selected {
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+}
+.component-label {
+  font-size: 10px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  pointer-events: none;
+}
+.component-value {
+  font-size: 9px;
+  fill: var(--accent);
+  text-anchor: middle;
+  pointer-events: none;
+}
+.pin-dot {
+  fill: var(--accent);
+  stroke: var(--bg-app);
+  stroke-width: 2;
+  cursor: pointer;
+  transition: r 0.15s;
+}
+.pin-dot:hover { r: 5; fill: var(--accent-hover); }
+
+/* ---- WIRE ---- */
+.wire-path {
+  stroke: #38bdf8;
+  stroke-width: 2;
+  fill: none;
+  cursor: pointer;
+}
+.wire-path:hover { stroke-width: 3; stroke: #7dd3fc; }
+.wire-path.selected { stroke: #f59e0b; stroke-width: 3; }
+.wire-path.simulating {
+  stroke-dasharray: 8 4;
+  animation: current-flow 0.6s linear infinite;
+}
+@keyframes current-flow {
+  to { stroke-dashoffset: -12; }
+}
+
+/* ---- RIGHT PANEL: AI ASSISTANT ---- */
+.pg-ai-panel {
+  width: 340px;
+  min-width: 340px;
+  background: rgba(14, 20, 32, 0.95);
+  backdrop-filter: blur(8px);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+.ai-panel-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ai-panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-panel-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+}
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ai-msg {
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 95%;
+  word-wrap: break-word;
+}
+.ai-msg.user {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  align-self: flex-end;
+  color: var(--accent-hover);
+}
+.ai-msg.assistant {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  align-self: flex-start;
+  color: var(--text-main);
+}
+.ai-msg.assistant h1, .ai-msg.assistant h2, .ai-msg.assistant h3 { color: var(--accent); margin: 8px 0 4px; font-size: 14px; }
+.ai-msg.assistant code {
+  background: rgba(0,0,0,0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+.ai-msg.assistant pre {
+  background: rgba(0,0,0,0.4);
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 6px 0;
+  font-size: 12px;
+}
+.ai-msg.assistant ul, .ai-msg.assistant ol { padding-left: 18px; }
+.ai-msg.system {
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  align-self: center;
+  color: var(--purple);
+  font-size: 11px;
+  text-align: center;
+}
+.ai-typing {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  align-self: flex-start;
+}
+.ai-typing span {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: typing-bounce 1.2s infinite;
+}
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* AI input area */
+.ai-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 8px;
+}
+.ai-input-area input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.ai-input-area input:focus { border-color: var(--accent); }
+.ai-input-area input::placeholder { color: var(--text-muted); }
+.ai-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.ai-send-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
+.ai-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* AI quick actions */
+.ai-quick-actions {
+  padding: 8px 12px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-color);
+}
+.quick-action-btn {
+  padding: 4px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.quick-action-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ---- EXAMPLE CIRCUITS DROPDOWN ---- */
+.examples-dropdown {
+  position: relative;
+}
+.examples-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 240px;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.examples-menu.open { display: block; }
+.example-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.example-item:hover { background: var(--bg-card-hover); }
+.example-item .ex-name { font-weight: 600; }
+.example-item .ex-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* ---- PROPERTY PANEL (floating) ---- */
+.prop-panel {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(14, 20, 32, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 14px;
+  min-width: 200px;
+  z-index: 15;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.prop-panel.show { display: block; }
+.prop-panel h4 {
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.prop-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.prop-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.prop-input {
+  width: 100px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: var(--text-main);
+  font-size: 11px;
+  outline: none;
+}
+.prop-input:focus { border-color: var(--accent); }
+
+/* ---- SIMULATION GLOW ---- */
+.led-glow { filter: drop-shadow(0 0 12px currentColor); transition: filter 0.3s; }
+.node-voltage {
+  font-size: 9px;
+  fill: var(--warning);
+  font-family: var(--font-mono);
+  pointer-events: none;
+}
+
+/* ---- FOOTER ---- */
+.pg-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 16px;
+  background: rgba(14, 18, 28, 0.9);
+  border-top: 1px solid var(--border-color);
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  z-index: 20;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 900px) {
+  .pg-ai-panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 30;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .pg-ai-panel.open { transform: translateX(0); }
+  .pg-sidebar { width: 180px; min-width: 180px; }
+  .tb-btn span.tb-label { display: none; }
+}
+@media (max-width: 600px) {
+  .pg-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 25;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 200px;
+  }
+  .pg-sidebar.open { transform: translateX(0); }
+  .pg-header { padding: 6px 10px; gap: 8px; }
+  .pg-logo { font-size: 13px; }
+  .pg-stats { display: none; }
+  .pg-toolbar { gap: 2px; }
+  .tb-btn { padding: 4px 6px; font-size: 10px; }
+}
+
+/* ---- SCROLLBAR ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+  </style>
+</head>
+<body>
+
+<!-- Particle Background Canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- ======================================================================
+     TOP HEADER / TOOLBAR
+     ====================================================================== -->
+<header class="pg-header">
+  <div class="pg-header-left">
+    <a href="/" class="pg-back-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Back
+    </a>
+    <div class="pg-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+      Circuit Playground
+    </div>
+  </div>
+
+  <div class="pg-toolbar">
+    <button class="tb-btn" onclick="newCircuit()" title="New Circuit (Ctrl+N)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+      <span class="tb-label">New</span>
+    </button>
+    <button class="tb-btn" onclick="saveCircuit()" title="Save (Ctrl+S)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+      <span class="tb-label">Save</span>
+    </button>
+    <button class="tb-btn" onclick="exportJSON()" title="Export JSON">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      <span class="tb-label">Export</span>
+    </button>
+    <div class="tb-sep"></div>
+    <div class="examples-dropdown">
+      <button class="tb-btn accent" onclick="toggleExamples()" title="Load Example Circuit">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        <span class="tb-label">Examples ▾</span>
+      </button>
+      <div id="examples-menu" class="examples-menu">
+        <button class="example-item" onclick="loadExample('led')">
+          <div class="ex-name">💡 LED with Resistor</div>
+          <div class="ex-desc">Simple LED circuit with current-limiting resistor</div>
+        </button>
+        <button class="example-item" onclick="loadExample('555')">
+          <div class="ex-name">⏱️ 555 Timer Astable</div>
+          <div class="ex-desc">Classic astable oscillator with LED blinker</div>
+        </button>
+        <button class="example-item" onclick="loadExample('esp32_dht')">
+          <div class="ex-name">🌡️ ESP32-S3 + DHT22</div>
+          <div class="ex-desc">Temperature sensor with indicator LED</div>
+        </button>
+      </div>
+    </div>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="undoAction()" title="Undo (Ctrl+Z)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+    </button>
+    <button class="tb-btn" onclick="redoAction()" title="Redo (Ctrl+Y)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+    </button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn success" id="btn-simulate" onclick="toggleSimulation()" title="Toggle Simulation">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      <span class="tb-label">Simulate</span>
+    </button>
+    <button class="tb-btn" onclick="sendToKiosk()" title="Send circuit to kiosk display">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      <span class="tb-label">To Kiosk</span>
+    </button>
+  </div>
+
+  <div class="pg-header-right">
+    <div class="pg-stats">
+      <span id="stat-components">⬡ 0 components</span>
+      <span id="stat-wires">⚡ 0 wires</span>
+    </div>
+    <button class="tb-btn" onclick="toggleAIPanel()" title="Toggle AI Assistant">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      AI
+    </button>
+    <button class="tb-btn" onclick="toggleSidebar()" title="Toggle Component Palette" id="btn-toggle-sidebar">☰</button>
+  </div>
+</header>
+
+<!-- ======================================================================
+     MAIN LAYOUT: SIDEBAR + CANVAS + AI PANEL
+     ====================================================================== -->
+<div class="pg-main">
+
+  <!-- LEFT: COMPONENT PALETTE -->
+  <aside class="pg-sidebar" id="pg-sidebar">
+    <div class="sidebar-title">Component Palette</div>
+
+    <!-- Basic Components -->
+    <div class="component-group">
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span>🔌 Basic</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="group-items">
+        <div class="comp-item" draggable="true" data-type="resistor" data-value="1kΩ">
+          <div class="comp-icon"><svg viewBox="0 0 24 12" stroke="#38bdf8" stroke-width="1.5" fill="none"><line x1="0" y1="6" x2="5" y2="6"/><rect x="5" y="2" width="14" height="8" rx="1"/><line x1="19" y1="6" x2="24" y2="6"/></svg></div>
+          <span>Resistor</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="capacitor" data-value="100µF">
+          <div class="comp-icon"><svg viewBox="0 0 24 12" stroke="#38bdf8" stroke-width="1.5" fill="none"><line x1="0" y1="6" x2="9" y2="6"/><line x1="9" y1="1" x2="9" y2="11"/><line x1="15" y1="1" x2="15" y2="11"/><line x1="15" y1="6" x2="24" y2="6"/></svg></div>
+          <span>Capacitor</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="inductor" data-value="10mH">
+          <div class="comp-icon"><svg viewBox="0 0 24 12" stroke="#38bdf8" stroke-width="1.5" fill="none"><line x1="0" y1="8" x2="4" y2="8"/><path d="M4 8 Q7 0 10 8 Q13 0 16 8 Q19 0 22 8" fill="none"/><line x1="22" y1="8" x2="24" y2="8"/></svg></div>
+          <span>Inductor</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="diode" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 24 12" stroke="#38bdf8" stroke-width="1.5" fill="none"><line x1="0" y1="6" x2="8" y2="6"/><polygon points="8,2 8,10 16,6" fill="none"/><line x1="16" y1="2" x2="16" y2="10"/><line x1="16" y1="6" x2="24" y2="6"/></svg></div>
+          <span>Diode</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="led" data-value="red">
+          <div class="comp-icon"><svg viewBox="0 0 24 12" stroke="#ef4444" stroke-width="1.5" fill="none"><line x1="0" y1="6" x2="8" y2="6"/><polygon points="8,2 8,10 16,6" fill="rgba(239,68,68,0.2)"/><line x1="16" y1="2" x2="16" y2="10"/><line x1="16" y1="6" x2="24" y2="6"/><line x1="14" y1="1" x2="17" y2="-1"/><line x1="16" y1="2" x2="19" y2="0"/></svg></div>
+          <span>LED</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="switch" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 24 12" stroke="#10b981" stroke-width="1.5" fill="none"><line x1="0" y1="6" x2="8" y2="6"/><circle cx="8" cy="6" r="2" fill="none"/><line x1="10" y1="5" x2="20" y2="2"/><circle cx="20" cy="6" r="2" fill="none"/><line x1="22" y1="6" x2="24" y2="6"/></svg></div>
+          <span>Switch</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Components -->
+    <div class="component-group">
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span>⚡ Active</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="group-items">
+        <div class="comp-item" draggable="true" data-type="npn" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#a855f7" stroke-width="1.2" fill="none"><circle cx="10" cy="10" r="8"/><line x1="2" y1="10" x2="8" y2="10"/><line x1="8" y1="4" x2="8" y2="16"/><line x1="8" y1="6" x2="16" y2="2"/><line x1="8" y1="14" x2="16" y2="18"/><polygon points="14,17 16,18 15,15" fill="#a855f7"/></svg></div>
+          <span>NPN Transistor</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="mosfet" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#a855f7" stroke-width="1.2" fill="none"><line x1="2" y1="10" x2="7" y2="10"/><line x1="7" y1="4" x2="7" y2="16"/><line x1="9" y1="4" x2="9" y2="8"/><line x1="9" y1="9" x2="9" y2="13"/><line x1="9" y1="14" x2="9" y2="18"/><line x1="9" y1="6" x2="16" y2="6"/><line x1="16" y1="6" x2="16" y2="2"/><line x1="9" y1="16" x2="16" y2="16"/><line x1="16" y1="16" x2="16" y2="18"/><line x1="9" y1="10" x2="16" y2="10"/></svg></div>
+          <span>N-MOSFET</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="opamp" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 24 20" stroke="#f59e0b" stroke-width="1.2" fill="none"><polygon points="2,2 2,18 20,10"/><line x1="20" y1="10" x2="24" y2="10"/><text x="5" y="8" fill="#f59e0b" font-size="6">+</text><text x="5" y="15" fill="#f59e0b" font-size="6">−</text></svg></div>
+          <span>Op-Amp</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="555" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 24 18" stroke="#f59e0b" stroke-width="1" fill="none"><rect x="4" y="1" width="16" height="16" rx="1"/><text x="8" y="11" fill="#f59e0b" font-size="6" font-weight="bold">555</text></svg></div>
+          <span>555 Timer IC</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Microcontrollers -->
+    <div class="component-group">
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span>🎛️ Microcontrollers</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="group-items">
+        <div class="comp-item" draggable="true" data-type="esp32s3" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#38bdf8" stroke-width="1" fill="none"><rect x="3" y="2" width="14" height="16" rx="2"/><text x="5" y="10" fill="#38bdf8" font-size="4" font-weight="bold">ESP32</text><text x="7" y="15" fill="#38bdf8" font-size="3">S3</text></svg></div>
+          <span>ESP32-S3</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="rpipico" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#10b981" stroke-width="1" fill="none"><rect x="3" y="2" width="14" height="16" rx="2"/><text x="5" y="10" fill="#10b981" font-size="3.5" font-weight="bold">PICO</text><text x="5" y="15" fill="#10b981" font-size="3">RP2040</text></svg></div>
+          <span>RPi Pico</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="arduino" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#10b981" stroke-width="1" fill="none"><rect x="2" y="3" width="16" height="14" rx="2"/><text x="4" y="11" fill="#10b981" font-size="3.5" font-weight="bold">NANO</text></svg></div>
+          <span>Arduino Nano</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sensors -->
+    <div class="component-group">
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span>📡 Sensors</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="group-items">
+        <div class="comp-item" draggable="true" data-type="mq2" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#f59e0b" stroke-width="1" fill="none"><circle cx="10" cy="10" r="7"/><text x="6" y="12" fill="#f59e0b" font-size="4" font-weight="bold">MQ2</text></svg></div>
+          <span>MQ2 Gas</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="ld2410" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#a855f7" stroke-width="1" fill="none"><rect x="3" y="4" width="14" height="12" rx="2"/><text x="4" y="12" fill="#a855f7" font-size="3.5" font-weight="bold">LD2410</text></svg></div>
+          <span>LD2410 Radar</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="flame" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#ef4444" stroke-width="1" fill="none"><path d="M10 2C10 2 4 8 4 12a6 6 0 0 0 12 0c0-4-6-10-6-10z" fill="rgba(239,68,68,0.15)"/></svg></div>
+          <span>Flame Sensor</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="dht22" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#38bdf8" stroke-width="1" fill="none"><rect x="4" y="2" width="12" height="16" rx="2"/><text x="5" y="11" fill="#38bdf8" font-size="3.5" font-weight="bold">DHT22</text></svg></div>
+          <span>DHT22 Temp</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="hcsr04" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 20" stroke="#10b981" stroke-width="1" fill="none"><rect x="2" y="5" width="16" height="10" rx="1"/><circle cx="7" cy="10" r="3"/><circle cx="13" cy="10" r="3"/></svg></div>
+          <span>HC-SR04 Ultra</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Power -->
+    <div class="component-group">
+      <div class="group-header" onclick="toggleGroup(this)">
+        <span>🔋 Power</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="group-items">
+        <div class="comp-item" draggable="true" data-type="battery" data-value="3.3V">
+          <div class="comp-icon"><svg viewBox="0 0 24 14" stroke="#10b981" stroke-width="1.5" fill="none"><line x1="0" y1="7" x2="7" y2="7"/><line x1="7" y1="2" x2="7" y2="12"/><line x1="10" y1="4" x2="10" y2="10"/><line x1="13" y1="2" x2="13" y2="12"/><line x1="16" y1="4" x2="16" y2="10"/><line x1="16" y1="7" x2="24" y2="7"/></svg></div>
+          <span>Battery 3.3V</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="battery" data-value="5V">
+          <div class="comp-icon"><svg viewBox="0 0 24 14" stroke="#f59e0b" stroke-width="1.5" fill="none"><line x1="0" y1="7" x2="7" y2="7"/><line x1="7" y1="2" x2="7" y2="12"/><line x1="10" y1="4" x2="10" y2="10"/><line x1="13" y1="2" x2="13" y2="12"/><line x1="16" y1="4" x2="16" y2="10"/><line x1="16" y1="7" x2="24" y2="7"/></svg></div>
+          <span>Battery 5V</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="vregulator" data-value="3.3V">
+          <div class="comp-icon"><svg viewBox="0 0 24 16" stroke="#38bdf8" stroke-width="1" fill="none"><rect x="4" y="2" width="16" height="12" rx="1"/><text x="7" y="10" fill="#38bdf8" font-size="4" font-weight="bold">REG</text></svg></div>
+          <span>V. Regulator</span>
+        </div>
+        <div class="comp-item" draggable="true" data-type="gnd" data-value="">
+          <div class="comp-icon"><svg viewBox="0 0 20 16" stroke="#94a3b8" stroke-width="1.5" fill="none"><line x1="10" y1="0" x2="10" y2="6"/><line x1="4" y1="6" x2="16" y2="6"/><line x1="6" y1="9" x2="14" y2="9"/><line x1="8" y1="12" x2="12" y2="12"/></svg></div>
+          <span>Ground</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER: CIRCUIT CANVAS -->
+  <div class="pg-canvas-wrap" id="canvas-wrap">
+    <div class="canvas-grid-overlay"></div>
+    <svg id="circuit-canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <!-- Property Panel -->
+    <div class="prop-panel" id="prop-panel">
+      <h4>
+        <span id="prop-comp-name">Component</span>
+        <button onclick="closePropPanel()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">✕</button>
+      </h4>
+      <div class="prop-row">
+        <span class="prop-label">ID</span>
+        <input class="prop-input" id="prop-id" readonly>
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">Value</span>
+        <input class="prop-input" id="prop-value" onchange="updatePropValue()">
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">X</span>
+        <input class="prop-input" id="prop-x" type="number" onchange="updatePropPos()">
+      </div>
+      <div class="prop-row">
+        <span class="prop-label">Y</span>
+        <input class="prop-input" id="prop-y" type="number" onchange="updatePropPos()">
+      </div>
+      <button class="tb-btn" style="width:100%;justify-content:center;margin-top:8px;color:var(--danger);" onclick="deleteSelected()">🗑 Delete</button>
+    </div>
+
+    <!-- Canvas Info -->
+    <div class="canvas-info">
+      <span id="canvas-coords">x: 0, y: 0</span> · <span id="canvas-zoom">100%</span>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+      <button class="zoom-btn" onclick="zoomIn()">+</button>
+      <button class="zoom-btn" onclick="zoomOut()">−</button>
+      <button class="zoom-btn" onclick="zoomFit()" title="Fit to screen">⊡</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: AI ASSISTANT PANEL -->
+  <aside class="pg-ai-panel" id="pg-ai-panel">
+    <div class="ai-panel-header">
+      <div class="ai-panel-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Feynman Circuit AI
+      </div>
+      <button class="ai-panel-toggle" onclick="toggleAIPanel()">✕</button>
+    </div>
+    <div class="ai-chat-messages" id="ai-messages">
+      <div class="ai-msg system">
+        🔬 <strong>Hey!</strong> I'm your circuit assistant — powered by the Feynman spirit! Describe any circuit and I'll help you build it. Try: "LED blinker with 555 timer" or "ESP32 with temperature sensor"
+      </div>
+    </div>
+    <div class="ai-quick-actions">
+      <button class="quick-action-btn" onclick="aiQuickAsk('LED blinker circuit')">💡 LED blinker</button>
+      <button class="quick-action-btn" onclick="aiQuickAsk('voltage divider for 3.3V from 5V')">⚡ V-divider</button>
+      <button class="quick-action-btn" onclick="aiQuickAsk('ESP32-S3 with DHT22 sensor circuit')">🌡️ ESP32+DHT</button>
+    </div>
+    <div class="ai-input-area">
+      <input type="text" id="ai-input" placeholder="Describe a circuit..." onkeydown="if(event.key==='Enter')sendAIMessage()">
+      <button class="ai-send-btn" onclick="sendAIMessage()" id="ai-send-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<!-- FOOTER -->
+<div class="pg-footer">
+  <span>Powered by Smart Electronics Workbench • workbench.ayushdubey.tech</span>
+  <span id="footer-info">Ready</span>
+</div>
+
+<!-- ======================================================================
+     APPLICATION LOGIC
+     ====================================================================== -->
+<script>
+// ============================================================================
+// STATE
+// ============================================================================
+const state = {
+  components: [],
+  wires: [],
+  nextId: 1,
+  selectedComp: null,
+  selectedWire: null,
+  wiringFrom: null,  // {compId, pinIdx}
+  dragging: null,     // {compId, offsetX, offsetY}
+  panning: false,
+  panStart: {x:0, y:0},
+  viewBox: {x: -200, y: -100, w: 1400, h: 800},
+  zoom: 1,
+  simulating: false,
+  undoStack: [],
+  redoStack: [],
+  circuitName: 'Untitled Circuit'
+};
+
+const svgNS = 'http://www.w3.org/2000/svg';
+const canvas = document.getElementById('circuit-canvas');
+
+// ============================================================================
+// COMPONENT DEFINITIONS (pin positions relative to component origin)
+// ============================================================================
+const COMP_DEFS = {
+  resistor:   { w: 80, h: 30, pins: [{x:0,y:15,name:'1'},{x:80,y:15,name:'2'}], color: '#38bdf8', label: 'R' },
+  capacitor:  { w: 60, h: 30, pins: [{x:0,y:15,name:'+'},{x:60,y:15,name:'-'}], color: '#38bdf8', label: 'C' },
+  inductor:   { w: 80, h: 30, pins: [{x:0,y:15,name:'1'},{x:80,y:15,name:'2'}], color: '#38bdf8', label: 'L' },
+  diode:      { w: 60, h: 30, pins: [{x:0,y:15,name:'A'},{x:60,y:15,name:'K'}], color: '#38bdf8', label: 'D' },
+  led:        { w: 60, h: 30, pins: [{x:0,y:15,name:'A'},{x:60,y:15,name:'K'}], color: '#ef4444', label: 'LED' },
+  switch:     { w: 70, h: 30, pins: [{x:0,y:15,name:'1'},{x:70,y:15,name:'2'}], color: '#10b981', label: 'SW' },
+  npn:        { w: 50, h: 60, pins: [{x:0,y:30,name:'B'},{x:50,y:5,name:'C'},{x:50,y:55,name:'E'}], color: '#a855f7', label: 'NPN' },
+  mosfet:     { w: 50, h: 60, pins: [{x:0,y:30,name:'G'},{x:50,y:5,name:'D'},{x:50,y:55,name:'S'}], color: '#a855f7', label: 'FET' },
+  opamp:      { w: 60, h: 60, pins: [{x:0,y:15,name:'+'},{x:0,y:45,name:'-'},{x:60,y:30,name:'out'}], color: '#f59e0b', label: 'OA' },
+  '555':      { w: 70, h: 70, pins: [{x:0,y:15,name:'TRIG'},{x:0,y:35,name:'THR'},{x:0,y:55,name:'GND'},{x:70,y:15,name:'VCC'},{x:70,y:35,name:'OUT'},{x:70,y:55,name:'DIS'}], color: '#f59e0b', label: '555' },
+  esp32s3:    { w: 100, h: 120, pins: [{x:0,y:20,name:'3V3'},{x:0,y:40,name:'GND'},{x:0,y:60,name:'GPIO4'},{x:0,y:80,name:'GPIO5'},{x:0,y:100,name:'GPIO6'},{x:100,y:20,name:'GPIO7'},{x:100,y:40,name:'GPIO8'},{x:100,y:60,name:'GPIO9'},{x:100,y:80,name:'GPIO10'},{x:100,y:100,name:'GPIO11'}], color: '#38bdf8', label: 'ESP32-S3' },
+  rpipico:    { w: 90, h: 110, pins: [{x:0,y:15,name:'3V3'},{x:0,y:35,name:'GND'},{x:0,y:55,name:'GP0'},{x:0,y:75,name:'GP1'},{x:0,y:95,name:'GP2'},{x:90,y:15,name:'GP3'},{x:90,y:35,name:'GP4'},{x:90,y:55,name:'GP5'},{x:90,y:75,name:'VSYS'},{x:90,y:95,name:'GND2'}], color: '#10b981', label: 'PICO' },
+  arduino:    { w: 90, h: 100, pins: [{x:0,y:15,name:'5V'},{x:0,y:35,name:'GND'},{x:0,y:55,name:'D2'},{x:0,y:75,name:'D3'},{x:90,y:15,name:'A0'},{x:90,y:35,name:'A1'},{x:90,y:55,name:'D4'},{x:90,y:75,name:'D5'}], color: '#10b981', label: 'NANO' },
+  mq2:        { w: 60, h: 50, pins: [{x:0,y:15,name:'VCC'},{x:0,y:35,name:'GND'},{x:60,y:25,name:'AOUT'}], color: '#f59e0b', label: 'MQ2' },
+  ld2410:     { w: 60, h: 50, pins: [{x:0,y:15,name:'VCC'},{x:0,y:35,name:'GND'},{x:60,y:15,name:'TX'},{x:60,y:35,name:'OUT'}], color: '#a855f7', label: 'LD2410' },
+  flame:      { w: 50, h: 40, pins: [{x:0,y:10,name:'VCC'},{x:0,y:30,name:'GND'},{x:50,y:20,name:'DO'}], color: '#ef4444', label: 'FLAME' },
+  dht22:      { w: 50, h: 50, pins: [{x:10,y:50,name:'VCC'},{x:25,y:50,name:'DATA'},{x:40,y:50,name:'GND'}], color: '#38bdf8', label: 'DHT22' },
+  hcsr04:     { w: 70, h: 40, pins: [{x:10,y:40,name:'VCC'},{x:25,y:40,name:'TRIG'},{x:45,y:40,name:'ECHO'},{x:60,y:40,name:'GND'}], color: '#10b981', label: 'HC-SR04' },
+  battery:    { w: 50, h: 40, pins: [{x:0,y:20,name:'+'},{x:50,y:20,name:'-'}], color: '#10b981', label: 'BAT' },
+  vregulator: { w: 60, h: 40, pins: [{x:0,y:20,name:'IN'},{x:30,y:40,name:'GND'},{x:60,y:20,name:'OUT'}], color: '#38bdf8', label: 'REG' },
+  gnd:        { w: 30, h: 30, pins: [{x:15,y:0,name:'GND'}], color: '#94a3b8', label: 'GND' }
+};
+
+// ============================================================================
+// RENDER
+// ============================================================================
+function render() {
+  canvas.innerHTML = '';
+  canvas.setAttribute('viewBox', `${state.viewBox.x} ${state.viewBox.y} ${state.viewBox.w} ${state.viewBox.h}`);
+
+  // Render wires
+  state.wires.forEach((wire, idx) => {
+    const fromComp = state.components.find(c => c.id === wire.fromComp);
+    const toComp = state.components.find(c => c.id === wire.toComp);
+    if (!fromComp || !toComp) return;
+    const fromDef = COMP_DEFS[fromComp.type];
+    const toDef = COMP_DEFS[toComp.type];
+    if (!fromDef || !toDef) return;
+    const fromPin = fromDef.pins[wire.fromPin];
+    const toPin = toDef.pins[wire.toPin];
+    if (!fromPin || !toPin) return;
+
+    const x1 = fromComp.x + fromPin.x;
+    const y1 = fromComp.y + fromPin.y;
+    const x2 = toComp.x + toPin.x;
+    const y2 = toComp.y + toPin.y;
+
+    // Manhattan routing
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', `M${x1},${y1} L${mx},${y1} L${mx},${y2} L${x2},${y2}`);
+    path.setAttribute('class', 'wire-path' + (state.selectedWire === idx ? ' selected' : '') + (state.simulating ? ' simulating' : ''));
+    path.addEventListener('click', (e) => { e.stopPropagation(); selectWire(idx); });
+    canvas.appendChild(path);
+  });
+
+  // Render components
+  state.components.forEach(comp => {
+    const def = COMP_DEFS[comp.type];
+    if (!def) return;
+
+    const g = document.createElementNS(svgNS, 'g');
+    g.setAttribute('transform', `translate(${comp.x}, ${comp.y})`);
+    g.style.cursor = 'move';
+
+    // Component body
+    const rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('x', '0');
+    rect.setAttribute('y', '0');
+    rect.setAttribute('width', def.w);
+    rect.setAttribute('height', def.h);
+    rect.setAttribute('rx', '4');
+    rect.setAttribute('fill', state.selectedComp === comp.id ? 'rgba(56,189,248,0.12)' : 'rgba(20,25,36,0.9)');
+    rect.setAttribute('stroke', state.selectedComp === comp.id ? '#38bdf8' : def.color);
+    rect.setAttribute('stroke-width', state.selectedComp === comp.id ? '2' : '1');
+    if (state.selectedComp === comp.id) {
+      rect.setAttribute('filter', 'url(#glow)');
+    }
+    g.appendChild(rect);
+
+    // Label
+    const label = document.createElementNS(svgNS, 'text');
+    label.setAttribute('x', def.w / 2);
+    label.setAttribute('y', def.h / 2 - 2);
+    label.setAttribute('class', 'component-label');
+    label.setAttribute('fill', def.color);
+    label.setAttribute('font-size', def.w > 70 ? '10' : '8');
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('dominant-baseline', 'middle');
+    label.textContent = def.label;
+    g.appendChild(label);
+
+    // ID label
+    const idLabel = document.createElementNS(svgNS, 'text');
+    idLabel.setAttribute('x', def.w / 2);
+    idLabel.setAttribute('y', def.h / 2 + 10);
+    idLabel.setAttribute('font-size', '7');
+    idLabel.setAttribute('fill', '#64748b');
+    idLabel.setAttribute('text-anchor', 'middle');
+    idLabel.setAttribute('dominant-baseline', 'middle');
+    idLabel.textContent = comp.id;
+    g.appendChild(idLabel);
+
+    // Value label
+    if (comp.value) {
+      const valLabel = document.createElementNS(svgNS, 'text');
+      valLabel.setAttribute('x', def.w / 2);
+      valLabel.setAttribute('y', def.h + 12);
+      valLabel.setAttribute('class', 'component-value');
+      valLabel.textContent = comp.value;
+      g.appendChild(valLabel);
+    }
+
+    // LED glow during simulation
+    if (comp.type === 'led' && state.simulating) {
+      const glow = document.createElementNS(svgNS, 'circle');
+      glow.setAttribute('cx', def.w / 2);
+      glow.setAttribute('cy', def.h / 2);
+      glow.setAttribute('r', '12');
+      glow.setAttribute('fill', comp.value === 'green' ? '#10b981' : comp.value === 'blue' ? '#38bdf8' : '#ef4444');
+      glow.setAttribute('opacity', '0.4');
+      glow.setAttribute('class', 'led-glow');
+      g.appendChild(glow);
+    }
+
+    // Pins
+    def.pins.forEach((pin, pinIdx) => {
+      const circle = document.createElementNS(svgNS, 'circle');
+      circle.setAttribute('cx', pin.x);
+      circle.setAttribute('cy', pin.y);
+      circle.setAttribute('r', '3.5');
+      circle.setAttribute('class', 'pin-dot');
+      circle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handlePinClick(comp.id, pinIdx);
+      });
+      g.appendChild(circle);
+
+      // Pin label
+      const pinLabel = document.createElementNS(svgNS, 'text');
+      const labelX = pin.x < def.w / 2 ? pin.x - 8 : pin.x + 8;
+      pinLabel.setAttribute('x', labelX);
+      pinLabel.setAttribute('y', pin.y + 3);
+      pinLabel.setAttribute('font-size', '6');
+      pinLabel.setAttribute('fill', '#64748b');
+      pinLabel.setAttribute('text-anchor', pin.x < def.w / 2 ? 'end' : 'start');
+      pinLabel.textContent = pin.name;
+      g.appendChild(pinLabel);
+    });
+
+    // Drag handlers
+    g.addEventListener('mousedown', (e) => startDrag(e, comp.id));
+    g.addEventListener('click', (e) => { e.stopPropagation(); selectComponent(comp.id); });
+    canvas.appendChild(g);
+  });
+
+  // SVG filter for glow
+  if (!document.getElementById('glow-filter')) {
+    const defs = document.createElementNS(svgNS, 'defs');
+    defs.innerHTML = `<filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+    defs.id = 'glow-filter';
+    canvas.prepend(defs);
+  }
+
+  updateStats();
+}
+
+// ============================================================================
+// COMPONENT ACTIONS
+// ============================================================================
+function addComponent(type, x, y, value) {
+  pushUndo();
+  const def = COMP_DEFS[type];
+  if (!def) return;
+  const id = def.label + state.nextId++;
+  const comp = { id, type, x: x || 300, y: y || 200, value: value || '' };
+  state.components.push(comp);
+  render();
+  selectComponent(id);
+  return id;
+}
+
+function selectComponent(id) {
+  state.selectedComp = id;
+  state.selectedWire = null;
+  render();
+  showPropPanel(id);
+}
+
+function selectWire(idx) {
+  state.selectedWire = idx;
+  state.selectedComp = null;
+  closePropPanel();
+  render();
+}
+
+function deleteSelected() {
+  pushUndo();
+  if (state.selectedComp) {
+    state.wires = state.wires.filter(w => w.fromComp !== state.selectedComp && w.toComp !== state.selectedComp);
+    state.components = state.components.filter(c => c.id !== state.selectedComp);
+    state.selectedComp = null;
+    closePropPanel();
+  }
+  if (state.selectedWire !== null) {
+    state.wires.splice(state.selectedWire, 1);
+    state.selectedWire = null;
+  }
+  render();
+}
+
+// ============================================================================
+// WIRING
+// ============================================================================
+function handlePinClick(compId, pinIdx) {
+  if (!state.wiringFrom) {
+    state.wiringFrom = { compId, pinIdx };
+    document.getElementById('footer-info').textContent = `Wiring from ${compId} pin ${pinIdx} — click another pin to connect`;
+  } else {
+    if (state.wiringFrom.compId !== compId || state.wiringFrom.pinIdx !== pinIdx) {
+      pushUndo();
+      state.wires.push({
+        fromComp: state.wiringFrom.compId,
+        fromPin: state.wiringFrom.pinIdx,
+        toComp: compId,
+        toPin: pinIdx
+      });
+    }
+    state.wiringFrom = null;
+    document.getElementById('footer-info').textContent = 'Wire connected!';
+    render();
+  }
+}
+
+// ============================================================================
+// DRAG & PAN
+// ============================================================================
+function startDrag(e, compId) {
+  if (e.button !== 0) return;
+  const comp = state.components.find(c => c.id === compId);
+  if (!comp) return;
+  const pt = svgPoint(e);
+  state.dragging = { compId, offsetX: pt.x - comp.x, offsetY: pt.y - comp.y };
+  e.preventDefault();
+}
+
+function svgPoint(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = state.viewBox.w / rect.width;
+  const scaleY = state.viewBox.h / rect.height;
+  return {
+    x: (e.clientX - rect.left) * scaleX + state.viewBox.x,
+    y: (e.clientY - rect.top) * scaleY + state.viewBox.y
+  };
+}
+
+canvas.addEventListener('mousemove', (e) => {
+  const pt = svgPoint(e);
+  document.getElementById('canvas-coords').textContent = `x: ${Math.round(pt.x)}, y: ${Math.round(pt.y)}`;
+
+  if (state.dragging) {
+    const comp = state.components.find(c => c.id === state.dragging.compId);
+    if (comp) {
+      comp.x = Math.round((pt.x - state.dragging.offsetX) / 10) * 10; // snap to grid
+      comp.y = Math.round((pt.y - state.dragging.offsetY) / 10) * 10;
+      render();
+    }
+  }
+  if (state.panning) {
+    const dx = (e.clientX - state.panStart.x) * (state.viewBox.w / canvas.getBoundingClientRect().width);
+    const dy = (e.clientY - state.panStart.y) * (state.viewBox.h / canvas.getBoundingClientRect().height);
+    state.viewBox.x -= dx;
+    state.viewBox.y -= dy;
+    state.panStart = {x: e.clientX, y: e.clientY};
+    render();
+  }
+});
+
+canvas.addEventListener('mouseup', () => {
+  if (state.dragging) {
+    pushUndo();
+    state.dragging = null;
+  }
+  state.panning = false;
+});
+
+canvas.addEventListener('mousedown', (e) => {
+  if (e.target === canvas || e.target.closest('.canvas-grid-overlay')) {
+    if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+      state.panning = true;
+      state.panStart = {x: e.clientX, y: e.clientY};
+      e.preventDefault();
+    } else if (e.button === 0) {
+      state.selectedComp = null;
+      state.selectedWire = null;
+      state.wiringFrom = null;
+      closePropPanel();
+      render();
+      document.getElementById('footer-info').textContent = 'Ready';
+    }
+  }
+});
+
+// Mouse wheel zoom
+document.getElementById('canvas-wrap').addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 1.1 : 0.9;
+  const pt = svgPoint(e);
+  state.viewBox.x = pt.x - (pt.x - state.viewBox.x) * factor;
+  state.viewBox.y = pt.y - (pt.y - state.viewBox.y) * factor;
+  state.viewBox.w *= factor;
+  state.viewBox.h *= factor;
+  state.zoom = 1400 / state.viewBox.w;
+  document.getElementById('canvas-zoom').textContent = Math.round(state.zoom * 100) + '%';
+  render();
+});
+
+// ============================================================================
+// DRAG FROM PALETTE
+// ============================================================================
+document.querySelectorAll('.comp-item[draggable]').forEach(item => {
+  item.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({
+      type: item.dataset.type,
+      value: item.dataset.value || ''
+    }));
+  });
+});
+
+document.getElementById('canvas-wrap').addEventListener('dragover', (e) => e.preventDefault());
+document.getElementById('canvas-wrap').addEventListener('drop', (e) => {
+  e.preventDefault();
+  try {
+    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+    const pt = svgPoint(e);
+    addComponent(data.type, Math.round(pt.x / 10) * 10, Math.round(pt.y / 10) * 10, data.value);
+  } catch {}
+});
+
+// ============================================================================
+// PROPERTY PANEL
+// ============================================================================
+function showPropPanel(compId) {
+  const comp = state.components.find(c => c.id === compId);
+  if (!comp) return;
+  const def = COMP_DEFS[comp.type];
+  document.getElementById('prop-comp-name').textContent = def ? def.label : comp.type;
+  document.getElementById('prop-id').value = comp.id;
+  document.getElementById('prop-value').value = comp.value || '';
+  document.getElementById('prop-x').value = comp.x;
+  document.getElementById('prop-y').value = comp.y;
+  document.getElementById('prop-panel').classList.add('show');
+}
+
+function closePropPanel() {
+  document.getElementById('prop-panel').classList.remove('show');
+}
+
+function updatePropValue() {
+  if (!state.selectedComp) return;
+  const comp = state.components.find(c => c.id === state.selectedComp);
+  if (comp) {
+    pushUndo();
+    comp.value = document.getElementById('prop-value').value;
+    render();
+  }
+}
+
+function updatePropPos() {
+  if (!state.selectedComp) return;
+  const comp = state.components.find(c => c.id === state.selectedComp);
+  if (comp) {
+    pushUndo();
+    comp.x = parseInt(document.getElementById('prop-x').value) || 0;
+    comp.y = parseInt(document.getElementById('prop-y').value) || 0;
+    render();
+  }
+}
+
+// ============================================================================
+// TOOLBAR ACTIONS
+// ============================================================================
+function newCircuit() {
+  if (state.components.length > 0 && !confirm('Clear current circuit?')) return;
+  state.components = [];
+  state.wires = [];
+  state.selectedComp = null;
+  state.selectedWire = null;
+  state.nextId = 1;
+  state.circuitName = 'Untitled Circuit';
+  closePropPanel();
+  render();
+}
+
+function saveCircuit() {
+  const data = { name: state.circuitName, components: state.components, wires: state.wires, nextId: state.nextId };
+  const saves = JSON.parse(localStorage.getItem('playground_circuits') || '[]');
+  saves.push({ ...data, savedAt: new Date().toISOString() });
+  localStorage.setItem('playground_circuits', JSON.stringify(saves));
+  document.getElementById('footer-info').textContent = 'Circuit saved to localStorage!';
+}
+
+function exportJSON() {
+  const data = { name: state.circuitName, components: state.components, wires: state.wires };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = state.circuitName.replace(/\s+/g, '_') + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function zoomIn() {
+  state.viewBox.w *= 0.85;
+  state.viewBox.h *= 0.85;
+  state.zoom = 1400 / state.viewBox.w;
+  document.getElementById('canvas-zoom').textContent = Math.round(state.zoom * 100) + '%';
+  render();
+}
+
+function zoomOut() {
+  state.viewBox.w *= 1.15;
+  state.viewBox.h *= 1.15;
+  state.zoom = 1400 / state.viewBox.w;
+  document.getElementById('canvas-zoom').textContent = Math.round(state.zoom * 100) + '%';
+  render();
+}
+
+function zoomFit() {
+  if (state.components.length === 0) {
+    state.viewBox = {x: -200, y: -100, w: 1400, h: 800};
+  } else {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    state.components.forEach(c => {
+      const def = COMP_DEFS[c.type];
+      if (def) {
+        minX = Math.min(minX, c.x - 40);
+        minY = Math.min(minY, c.y - 40);
+        maxX = Math.max(maxX, c.x + def.w + 40);
+        maxY = Math.max(maxY, c.y + def.h + 40);
+      }
+    });
+    state.viewBox = {x: minX, y: minY, w: Math.max(maxX - minX, 200), h: Math.max(maxY - minY, 200)};
+  }
+  state.zoom = 1400 / state.viewBox.w;
+  document.getElementById('canvas-zoom').textContent = Math.round(state.zoom * 100) + '%';
+  render();
+}
+
+// ============================================================================
+// UNDO / REDO
+// ============================================================================
+function pushUndo() {
+  state.undoStack.push(JSON.stringify({ components: state.components, wires: state.wires, nextId: state.nextId }));
+  if (state.undoStack.length > 50) state.undoStack.shift();
+  state.redoStack = [];
+}
+
+function undoAction() {
+  if (state.undoStack.length === 0) return;
+  state.redoStack.push(JSON.stringify({ components: state.components, wires: state.wires, nextId: state.nextId }));
+  const prev = JSON.parse(state.undoStack.pop());
+  state.components = prev.components;
+  state.wires = prev.wires;
+  state.nextId = prev.nextId;
+  render();
+}
+
+function redoAction() {
+  if (state.redoStack.length === 0) return;
+  state.undoStack.push(JSON.stringify({ components: state.components, wires: state.wires, nextId: state.nextId }));
+  const next = JSON.parse(state.redoStack.pop());
+  state.components = next.components;
+  state.wires = next.wires;
+  state.nextId = next.nextId;
+  render();
+}
+
+// ============================================================================
+// SIMULATION
+// ============================================================================
+function toggleSimulation() {
+  state.simulating = !state.simulating;
+  const btn = document.getElementById('btn-simulate');
+  if (state.simulating) {
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg><span class="tb-label">Stop</span>';
+    btn.classList.remove('success');
+    btn.style.color = 'var(--danger)';
+    document.getElementById('footer-info').textContent = '⚡ Simulation running — current flow animated';
+  } else {
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span class="tb-label">Simulate</span>';
+    btn.classList.add('success');
+    btn.style.color = '';
+    document.getElementById('footer-info').textContent = 'Simulation stopped';
+  }
+  render();
+}
+
+// ============================================================================
+// SEND TO KIOSK
+// ============================================================================
+async function sendToKiosk() {
+  const circuitDesc = state.components.map(c => `${c.id} (${c.type}${c.value ? ': ' + c.value : ''})`).join(', ');
+  const wireDesc = state.wires.map(w => `${w.fromComp}.pin${w.fromPin} → ${w.toComp}.pin${w.toPin}`).join(', ');
+  const content = `# Circuit: ${state.circuitName}\n\n**Components:** ${circuitDesc || 'None'}\n\n**Wires:** ${wireDesc || 'None'}\n\n*Sent from Circuit Playground*`;
+  try {
+    await fetch('/api/kiosk/show', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: 'Circuit: ' + state.circuitName, content, content_type: 'schematic' })
+    });
+    document.getElementById('footer-info').textContent = '📺 Circuit sent to kiosk display!';
+  } catch (err) {
+    document.getElementById('footer-info').textContent = 'Failed to send to kiosk';
+  }
+}
+
+// ============================================================================
+// EXAMPLES
+// ============================================================================
+function toggleExamples() {
+  document.getElementById('examples-menu').classList.toggle('open');
+}
+
+// Close examples on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.examples-dropdown')) {
+    document.getElementById('examples-menu').classList.remove('open');
+  }
+});
+
+function loadExample(name) {
+  document.getElementById('examples-menu').classList.remove('open');
+  newCircuitSilent();
+
+  if (name === 'led') {
+    state.circuitName = 'LED with Resistor';
+    addComponent('battery', 100, 200, '3.3V');
+    addComponent('resistor', 250, 200, '220Ω');
+    addComponent('led', 430, 200, 'red');
+    addComponent('gnd', 560, 220, '');
+    state.wires.push(
+      { fromComp: state.components[0].id, fromPin: 0, toComp: state.components[1].id, toPin: 0 },
+      { fromComp: state.components[1].id, fromPin: 1, toComp: state.components[2].id, toPin: 0 },
+      { fromComp: state.components[2].id, fromPin: 1, toComp: state.components[3].id, toPin: 0 }
+    );
+  } else if (name === '555') {
+    state.circuitName = '555 Timer Astable';
+    addComponent('battery', 50, 100, '9V');
+    addComponent('555', 250, 120, '');
+    addComponent('resistor', 150, 50, '1kΩ');
+    addComponent('resistor', 350, 50, '10kΩ');
+    addComponent('capacitor', 350, 280, '10µF');
+    addComponent('led', 500, 160, 'red');
+    addComponent('resistor', 500, 100, '220Ω');
+    addComponent('gnd', 250, 350, '');
+  } else if (name === 'esp32_dht') {
+    state.circuitName = 'ESP32-S3 + DHT22 Sensor';
+    addComponent('esp32s3', 200, 100, '');
+    addComponent('dht22', 450, 120, '');
+    addComponent('led', 450, 280, 'green');
+    addComponent('resistor', 350, 280, '220Ω');
+    addComponent('battery', 50, 150, '3.3V');
+    addComponent('gnd', 200, 350, '');
+  }
+  render();
+  zoomFit();
+  document.getElementById('footer-info').textContent = `Loaded example: ${state.circuitName}`;
+}
+
+function newCircuitSilent() {
+  state.components = [];
+  state.wires = [];
+  state.selectedComp = null;
+  state.selectedWire = null;
+  state.nextId = 1;
+}
+
+// ============================================================================
+// SIDEBAR / AI PANEL TOGGLES
+// ============================================================================
+function toggleGroup(header) {
+  header.classList.toggle('collapsed');
+  const items = header.nextElementSibling;
+  items.classList.toggle('hidden');
+}
+
+function toggleSidebar() {
+  document.getElementById('pg-sidebar').classList.toggle('open');
+}
+
+function toggleAIPanel() {
+  document.getElementById('pg-ai-panel').classList.toggle('open');
+}
+
+// ============================================================================
+// AI ASSISTANT
+// ============================================================================
+function aiQuickAsk(text) {
+  document.getElementById('ai-input').value = text;
+  sendAIMessage();
+}
+
+async function sendAIMessage() {
+  const input = document.getElementById('ai-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  // Add user message
+  addAIMsg('user', text);
+
+  // Show typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'ai-typing';
+  typing.id = 'ai-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  document.getElementById('ai-messages').appendChild(typing);
+  scrollAI();
+
+  const sendBtn = document.getElementById('ai-send-btn');
+  sendBtn.disabled = true;
+
+  try {
+    // Enhance prompt for circuit context
+    const circuitContext = state.components.length > 0
+      ? `\n\nCurrent circuit has: ${state.components.map(c => c.id + '(' + c.type + ')').join(', ')}. Wires: ${state.wires.length}.`
+      : '';
+
+    const res = await fetch('/api/copilot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: text + circuitContext,
+        session_id: 'playground_circuit'
+      })
+    });
+    const data = await res.json();
+    const reply = data.response || data.full_kiosk || 'Sorry, I could not process that.';
+
+    // Remove typing indicator
+    const t = document.getElementById('ai-typing');
+    if (t) t.remove();
+
+    // Render markdown response
+    addAIMsg('assistant', reply, true);
+
+    // Try to extract circuit JSON from response
+    tryAutoPlaceCircuit(reply);
+
+  } catch (err) {
+    const t = document.getElementById('ai-typing');
+    if (t) t.remove();
+    addAIMsg('system', '⚠️ Connection error. Make sure the workbench server is running.');
+  }
+  sendBtn.disabled = false;
+}
+
+function addAIMsg(role, content, isMarkdown) {
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'ai-msg ' + role;
+  if (isMarkdown && typeof marked !== 'undefined') {
+    msgDiv.innerHTML = marked.parse(content);
+  } else {
+    msgDiv.textContent = content;
+  }
+  document.getElementById('ai-messages').appendChild(msgDiv);
+  scrollAI();
+}
+
+function scrollAI() {
+  const msgs = document.getElementById('ai-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function tryAutoPlaceCircuit(text) {
+  // Try to find JSON circuit definition in the AI response
+  const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+  if (jsonMatch) {
+    try {
+      const circuit = JSON.parse(jsonMatch[1]);
+      if (circuit.components && Array.isArray(circuit.components)) {
+        newCircuitSilent();
+        circuit.components.forEach(c => {
+          if (COMP_DEFS[c.type]) {
+            const id = addComponent(c.type, c.x || 200, c.y || 200, c.value || '');
+          }
+        });
+        if (circuit.wires) {
+          // Wire by component ID matching
+          circuit.wires.forEach(w => {
+            // Simple auto-wire attempt
+          });
+        }
+        state.circuitName = circuit.name || 'AI Generated Circuit';
+        render();
+        zoomFit();
+        addAIMsg('system', '✨ Circuit auto-placed on canvas! Drag components to arrange.');
+      }
+    } catch {}
+  }
+}
+
+// ============================================================================
+// KEYBOARD SHORTCUTS
+// ============================================================================
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    deleteSelected();
+  } else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    undoAction();
+  } else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    redoAction();
+  } else if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    saveCircuit();
+  } else if (e.key === 'Escape') {
+    state.selectedComp = null;
+    state.selectedWire = null;
+    state.wiringFrom = null;
+    closePropPanel();
+    render();
+    document.getElementById('footer-info').textContent = 'Ready';
+  }
+});
+
+// ============================================================================
+// UPDATE STATS
+// ============================================================================
+function updateStats() {
+  document.getElementById('stat-components').textContent = `⬡ ${state.components.length} components`;
+  document.getElementById('stat-wires').textContent = `⚡ ${state.wires.length} wires`;
+}
+
+// ============================================================================
+// PARTICLE BACKGROUND
+// ============================================================================
+(function initParticles() {
+  const c = document.getElementById('particle-canvas');
+  const ctx = c.getContext('2d');
+  let W, H;
+  const particles = [];
+  const PARTICLE_COUNT = 60;
+
+  function resize() {
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 1.5 + 0.5,
+      a: Math.random() * 0.3 + 0.1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(56, 189, 248, ${p.a})`;
+      ctx.fill();
+    });
+
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * (1 - dist / 120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ============================================================================
+// INITIAL RENDER
+// ============================================================================
+render();
+
+// On mobile, AI panel starts closed
+if (window.innerWidth <= 900) {
+  document.getElementById('pg-ai-panel').classList.remove('open');
+}
+</script>
+</body>
+</html>

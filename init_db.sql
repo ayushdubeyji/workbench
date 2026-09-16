@@ -1,0 +1,26 @@
+
+PRAGMA journal_mode=WAL;
+
+CREATE TABLE IF NOT EXISTS inventory (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    component_name TEXT NOT NULL,
+    quantity INTEGER DEFAULT 0,
+    storage_location TEXT,
+    category TEXT,
+    notes TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    entry_type TEXT NOT NULL,
+    content TEXT NOT NULL,
+    tags TEXT
+);
+
+CREATE TABLE IF NOT EXISTS kiosk_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    display_payload TEXT NOT NULL
+);

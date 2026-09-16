@@ -1,0 +1,612 @@
+import os
+import sys
+import json
+import asyncio
+import sqlite3
+from datetime import datetime, timezone
+from typing import Optional, List, Dict, Any
+from pathlib import Path
+from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, PlainTextResponse
+from pydantic import BaseModel
+
+# Load environment variables
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+LOCAL_AUTH_KEY = os.getenv("LOCAL_AUTH_KEY", "workbench_secret_key_12345")
+DB_PATH = BASE_DIR / "workbench.db"
+NOTES_LOG_PATH = BASE_DIR / "notes" / "workbench_log.md"
+
+# -----------------------------------------------------------------------------
+# Database Helper
+# -----------------------------------------------------------------------------
+def get_db():
+    conn = sqlite3.connect(str(DB_PATH), check_same_thread=False, timeout=10.0)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA busy_timeout = 5000;")
+    return conn
+
+# -----------------------------------------------------------------------------
+# Models
+# -----------------------------------------------------------------------------
+class InventoryItem(BaseModel):
+    id: Optional[int] = None
+    component_name: str
+    quantity: int = 0
+    storage_location: Optional[str] = ""
+    category: Optional[str] = "General"
+    notes: Optional[str] = ""
+    updated_at: Optional[str] = None
+
+class LogEntry(BaseModel):
+    id: Optional[int] = None
+    timestamp: Optional[str] = None
+    entry_type: str = "text"
+    content: str
+    tags: Optional[str] = ""
+
+class KioskPayload(BaseModel):
+    type: str = "markdown"  # 'markdown', 'pinout', 'schematic', 'code', 'image'
+    title: str = "Workbench Notice"
+    content: str
+
+class PromptRequest(BaseModel):
+    prompt: str
+    context: Optional[str] = None
+
+# -----------------------------------------------------------------------------
+# WebSocket Connection Manager
+# -----------------------------------------------------------------------------
+class KioskConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+        self._lock = asyncio.Lock()
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        async with self._lock:
+            self.active_connections.append(websocket)
+        print(f"[WS/kiosk (PID {os.getpid()})] Client connected. Local active: {len(self.active_connections)}")
+
+    async def disconnect(self, websocket: WebSocket):
+        async with self._lock:
+            if websocket in self.active_connections:
+                self.active_connections.remove(websocket)
+        print(f"[WS/kiosk (PID {os.getpid()})] Client disconnected. Local active: {len(self.active_connections)}")
+
+    async def broadcast(self, message: dict):
+        async with self._lock:
+            dead_sockets = []
+            for connection in self.active_connections:
+                try:
+                    await connection.send_json(message)
+                except Exception as e:
+                    print(f"[WS/kiosk] Broadcast error: {e}")
+                    dead_sockets.append(connection)
+            for dead in dead_sockets:
+                if dead in self.active_connections:
+                    self.active_connections.remove(dead)
+
+kiosk_manager = KioskConnectionManager()
+
+# -----------------------------------------------------------------------------
+# Multi-Worker SQLite Sync Loop (Cross-Worker WebSocket Broadcast)
+# -----------------------------------------------------------------------------
+async def kiosk_sync_worker():
+    """Polls kiosk_history in WAL mode to sync broadcasts across multi-worker Uvicorn processes."""
+    my_pid = os.getpid()
+    last_id = 0
+    try:
+        with get_db() as conn:
+            row = conn.execute("SELECT MAX(id) FROM kiosk_history").fetchone()
+            if row and row[0] is not None:
+                last_id = row[0]
+    except Exception:
+        pass
+
+    while True:
+        try:
+            await asyncio.sleep(0.3)
+            with get_db() as conn:
+                rows = conn.execute(
+                    "SELECT id, display_payload FROM kiosk_history WHERE id > ? ORDER BY id ASC",
+                    (last_id,)
+                ).fetchall()
+                for r in rows:
+                    last_id = r["id"]
+                    try:
+                        payload = json.loads(r["display_payload"])
+                        if payload.get("_origin_pid") != my_pid:
+                            await kiosk_manager.broadcast(payload)
+                    except Exception as e:
+                        print(f"[Sync Worker Parse Error]: {e}")
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            await asyncio.sleep(1)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        with get_db() as conn:
+            conn.execute("PRAGMA journal_mode=WAL;")
+    except Exception as e:
+        print(f"[Lifespan Init Error]: {e}")
+    # Start cross-process sync task
+    sync_task = asyncio.create_task(kiosk_sync_worker())
+    yield
+    sync_task.cancel()
+
+app = FastAPI(title="Smart Workbench Hub", version="1.0.0", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# -----------------------------------------------------------------------------
+# Tool Calling / MCP Functions
+# -----------------------------------------------------------------------------
+async def display_on_desk(type: str, content: str, title: str = "Smart Workbench") -> dict:
+    """Dispatches JSON payload to all kiosk sockets and commits to kiosk_history."""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    my_pid = os.getpid()
+    payload = {
+        "type": type,
+        "title": title,
+        "content": content,
+        "timestamp": now_iso,
+        "_origin_pid": my_pid
+    }
+    
+    # Immediate zero-latency broadcast to this worker's active sockets
+    await kiosk_manager.broadcast(payload)
+    
+    # Commit to kiosk_history for persistence and cross-worker broadcast
+    payload_str = json.dumps(payload)
+    try:
+        with get_db() as conn:
+            conn.execute(
+                "INSERT INTO kiosk_history (timestamp, display_payload) VALUES (CURRENT_TIMESTAMP, ?)",
+                (payload_str,)
+            )
+            conn.commit()
+    except Exception as e:
+        print(f"[DB Error in display_on_desk]: {e}")
+        
+    return {"status": "success", "payload": payload}
+
+def log_note(content: str, entry_type: str = "text", tags: str = "") -> dict:
+    """Inserts row into logs and appends cleanly formatted markdown to workbench_log.md."""
+    utc_now = datetime.now(timezone.utc)
+    utc_str = utc_now.strftime("%Y-%m-%d %H:%M:%S UTC")
+    local_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ts_display = f"{utc_str} / Local: {local_str}"
+    
+    # 1. Insert into database
+    new_id = None
+    try:
+        with get_db() as conn:
+            cur = conn.execute(
+                "INSERT INTO logs (timestamp, entry_type, content, tags) VALUES (CURRENT_TIMESTAMP, ?, ?, ?)",
+                (entry_type, content, tags)
+            )
+            conn.commit()
+            new_id = cur.lastrowid
+    except Exception as e:
+        print(f"[DB Error in log_note]: {e}")
+
+    # 2. Append markdown to notes/workbench_log.md
+    try:
+        NOTES_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        md_entry = (
+            f"\n\n### [{ts_display}] ({entry_type.upper()})\n"
+            f"{content.strip()}\n"
+        )
+        if tags:
+            md_entry += f"\n*Tags: {tags}*\n"
+        md_entry += "\n---\n"
+        
+        with open(NOTES_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(md_entry)
+    except Exception as e:
+        print(f"[File Error in log_note]: {e}")
+
+    return {"status": "success", "id": new_id, "timestamp": utc_str, "entry_type": entry_type}
+
+# -----------------------------------------------------------------------------
+# LLM Routing Hook (Groq Llama 3.3 + Gemini 1.5 Flash)
+# -----------------------------------------------------------------------------
+async def route_llm_intent(user_prompt: str) -> dict:
+    """Routes user intent using Groq fast classification and Gemini deep synthesis."""
+    user_prompt_clean = user_prompt.strip()
+    
+    intent = "chat"
+    groq_routed = False
+
+    if GROQ_API_KEY and GROQ_API_KEY != "your_groq_api_key_here":
+        try:
+            from groq import Groq
+            client = Groq(api_key=GROQ_API_KEY)
+            sys_msg = (
+                "You are an intent router for an electronics smart workbench. "
+                "Classify user message into one of: "
+                "1. 'schematic': user requests circuit diagram, pinout, wiring, component pin connection. "
+                "2. 'log': user wants to log note, multimeter reading, test measurement. "
+                "3. 'inventory': user asks to check, add, or alter component stock. "
+                "4. 'kiosk': user wants to explicitly show/display something on the kiosk screen. "
+                "5. 'general': general electronics theory or calculation. "
+                "Respond in JSON ONLY with keys: intent (string), title (short title), type (pinout|schematic|markdown|code), content_summary (string)."
+            )
+            for g_model in ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b", "groq/compound-mini"]:
+                try:
+                    response = client.chat.completions.create(
+                        model=g_model,
+                        messages=[
+                            {"role": "system", "content": sys_msg},
+                            {"role": "user", "content": user_prompt_clean}
+                        ],
+                        temperature=0.1,
+                        response_format={"type": "json_object"}
+                    )
+                    result = json.loads(response.choices[0].message.content)
+                    intent = result.get("intent", "general")
+                    groq_routed = True
+                    break
+                except Exception as ex_g:
+                    continue
+        except Exception as e:
+            print(f"[Groq Routing Error]: {e}")
+
+    # Heuristic fallback if Groq unavailable or keys not set
+    if not groq_routed:
+        lowered = user_prompt_clean.lower()
+        if any(k in lowered for k in ["pinout", "schematic", "circuit", "wiring", "diagram", "resistor calculation"]):
+            intent = "schematic"
+        elif any(k in lowered for k in ["log", "note", "multimeter", "reading", "voltage", "current", "measured"]):
+            intent = "log"
+        elif any(k in lowered for k in ["inventory", "stock", "add component", "parts"]):
+            intent = "inventory"
+        elif any(k in lowered for k in ["show", "display", "mirror", "screen"]):
+            intent = "kiosk"
+        else:
+            intent = "general"
+
+    # Action dispatch based on intent
+    if intent in ["schematic", "kiosk", "general"]:
+        content_text = ""
+        title = "Workbench Analysis"
+        display_type = "markdown"
+
+        if GEMINI_API_KEY and GEMINI_API_KEY != "your_gemini_api_key_here":
+            try:
+                import google.generativeai as genai
+                genai.configure(api_key=GEMINI_API_KEY)
+                for m_name in ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.5-pro"]:
+                    try:
+                        model = genai.GenerativeModel(m_name)
+                        gemini_prompt = (
+                            f"You are the Smart Electronics Workbench assistant. "
+                            f"Generate a clear, high-contrast, technical response for bench display. "
+                            f"If circuit or pinout is requested, provide clear ASCII art/Markdown tables and wiring instructions.\n\n"
+                            f"User Request: {user_prompt_clean}"
+                        )
+                        resp = model.generate_content(gemini_prompt)
+                        content_text = resp.text
+                        title = "Circuit & Pinout Guide" if intent == "schematic" else "Workbench Intel"
+                        display_type = "schematic" if intent == "schematic" else "markdown"
+                        break
+                    except Exception as ex_gem:
+                        continue
+            except Exception as e:
+                print(f"[Gemini Generation Error]: {e}")
+
+        if not content_text:
+            # Fallback generated technical template
+            if "esp32" in user_prompt_clean.lower():
+                display_type = "pinout"
+                title = "ESP32 DevKit V1 Pinout"
+                content_text = (
+                    "### ESP32 DevKit V1 Standard Pinout\n\n"
+                    "| Pin | Function | Notes |\n"
+                    "|-----|----------|-------|\n"
+                    "| 3V3 | 3.3V Power Out | Max 500mA regulator |\n"
+                    "| GND | Ground | Common Ground |\n"
+                    "| D21 | I2C SDA | Default Wire SDA |\n"
+                    "| D22 | I2C SCL | Default Wire SCL |\n"
+                    "| D18 | SPI SCK | VSPI Bus |\n"
+                    "| D19 | SPI MISO | VSPI Bus |\n"
+                    "| D23 | SPI MOSI | VSPI Bus |\n"
+                    "| D34 | ADC1_CH6 | Input Only (No Pullup) |\n"
+                    "| D35 | ADC1_CH7 | Input Only (No Pullup) |\n"
+                    "\n```\n"
+                    " [EN]  [3V3]  [GND]  [D15]  [D2]   [D4]   [D16]  [D17]  [D5]   [D18]  [D19]  [D21]  [RX0]  [TX0]  [D22]  [D23]\n"
+                    "  |      |      |      |      |      |      |      |      |      |      |      |      |      |      |\n"
+                    " +------------------------------------------------------------------------------------------------+\n"
+                    " |                                    ESP-WROOM-32 MODULE                                         |\n"
+                    " +------------------------------------------------------------------------------------------------+\n"
+                    "```\n"
+                )
+            else:
+                display_type = "markdown"
+                title = "Workbench Query Result"
+                content_text = f"### Workbench Response\n\nProcessed query: **{user_prompt_clean}**\n\n*Intent classified as: `{intent}`. Hub active and monitoring.*"
+
+        # Push to desk kiosk
+        await display_on_desk(type=display_type, content=content_text, title=title)
+        return {"intent": intent, "displayed": True, "title": title, "content": content_text}
+
+    elif intent == "log":
+        res = log_note(content=user_prompt_clean, entry_type="reading" if "reading" in user_prompt_clean.lower() else "text")
+        await display_on_desk(type="markdown", content=f"**Note Logged Successfully**\n\n> {user_prompt_clean}", title="Log Recorded")
+        return {"intent": "log", "logged": True, "result": res}
+
+    elif intent == "inventory":
+        with get_db() as conn:
+            items = conn.execute("SELECT * FROM inventory ORDER BY updated_at DESC LIMIT 10").fetchall()
+            item_list = [dict(r) for r in items]
+        summary = "\n".join([f"- **{it['component_name']}**: {it['quantity']} pcs ({it['storage_location'] or 'Unassigned'})" for it in item_list])
+        if not summary:
+            summary = "*Inventory currently empty. Use the Dashboard to add components.*"
+        await display_on_desk(type="markdown", content=f"### Inventory Status\n\n{summary}", title="Stock Overview")
+        return {"intent": "inventory", "items": item_list}
+
+    return {"intent": intent, "message": "Query processed"}
+
+# -----------------------------------------------------------------------------
+# REST API: System & MCP Status
+# -----------------------------------------------------------------------------
+@app.get("/api/status")
+def get_system_status():
+    return {
+        "status": "online",
+        "groq_configured": bool(GROQ_API_KEY and GROQ_API_KEY != "your_groq_api_key_here"),
+        "gemini_configured": bool(GEMINI_API_KEY and GEMINI_API_KEY != "your_gemini_api_key_here"),
+        "cloudflare_tunnel_id": os.getenv("CLOUDFLARE_TUNNEL_ID", "f521d45d-0510-40c3-b59b-a9a6526ec5f8"),
+        "domain": os.getenv("CLOUDFLARE_DOMAIN", "ayushdubey.tech"),
+        "kiosk_clients": len(kiosk_manager.active_connections),
+        "xiaozhi_endpoint": "/ws/xiaozhi",
+        "kiosk_endpoint": "/ws/kiosk",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+# -----------------------------------------------------------------------------
+# REST API: Inventory CRUD
+# -----------------------------------------------------------------------------
+@app.get("/api/inventory", response_model=List[Dict[str, Any]])
+def get_inventory(q: Optional[str] = None, category: Optional[str] = None):
+    with get_db() as conn:
+        query = "SELECT * FROM inventory WHERE 1=1"
+        params = []
+        if q:
+            query += " AND (component_name LIKE ? OR notes LIKE ? OR storage_location LIKE ?)"
+            wildcard = f"%{q}%"
+            params.extend([wildcard, wildcard, wildcard])
+        if category and category != "All":
+            query += " AND category = ?"
+            params.append(category)
+        query += " ORDER BY component_name ASC"
+        rows = conn.execute(query, params).fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/inventory")
+def create_or_update_inventory(item: InventoryItem):
+    with get_db() as conn:
+        if item.id:
+            conn.execute(
+                """UPDATE inventory 
+                   SET component_name = ?, quantity = ?, storage_location = ?, category = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+                   WHERE id = ?""",
+                (item.component_name, item.quantity, item.storage_location, item.category, item.notes, item.id)
+            )
+            item_id = item.id
+        else:
+            cur = conn.execute(
+                """INSERT INTO inventory (component_name, quantity, storage_location, category, notes, updated_at)
+                   VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)""",
+                (item.component_name, item.quantity, item.storage_location, item.category, item.notes)
+            )
+            item_id = cur.lastrowid
+        conn.commit()
+    return {"status": "success", "id": item_id, "item": item.dict()}
+
+@app.post("/api/inventory/{item_id}/adjust")
+def adjust_inventory_quantity(item_id: int, delta: int = Body(..., embed=True)):
+    with get_db() as conn:
+        row = conn.execute("SELECT quantity FROM inventory WHERE id = ?", (item_id,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Item not found")
+        new_qty = max(0, row["quantity"] + delta)
+        conn.execute("UPDATE inventory SET quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (new_qty, item_id))
+        conn.commit()
+    return {"status": "success", "id": item_id, "new_quantity": new_qty}
+
+@app.delete("/api/inventory/{item_id}")
+def delete_inventory_item(item_id: int):
+    with get_db() as conn:
+        conn.execute("DELETE FROM inventory WHERE id = ?", (item_id,))
+        conn.commit()
+    return {"status": "success", "deleted_id": item_id}
+
+# -----------------------------------------------------------------------------
+# REST API: Logs
+# -----------------------------------------------------------------------------
+@app.get("/api/logs", response_model=List[Dict[str, Any]])
+def get_logs(q: Optional[str] = None, entry_type: Optional[str] = None, limit: int = 50):
+    with get_db() as conn:
+        query = "SELECT * FROM logs WHERE 1=1"
+        params = []
+        if q:
+            query += " AND (content LIKE ? OR tags LIKE ?)"
+            wildcard = f"%{q}%"
+            params.extend([wildcard, wildcard])
+        if entry_type and entry_type != "All":
+            query += " AND entry_type = ?"
+            params.append(entry_type)
+        query += " ORDER BY id DESC LIMIT ?"
+        params.append(limit)
+        rows = conn.execute(query, params).fetchall()
+        return [dict(r) for r in rows]
+
+@app.post("/api/logs")
+def create_log(entry: LogEntry):
+    res = log_note(content=entry.content, entry_type=entry.entry_type, tags=entry.tags or "")
+    return res
+
+@app.get("/api/logs/export", response_class=PlainTextResponse)
+def export_notes():
+    if NOTES_LOG_PATH.exists():
+        return NOTES_LOG_PATH.read_text(encoding="utf-8")
+    return "# Workbench Notes Log\n*No notes recorded yet.*\n"
+
+# -----------------------------------------------------------------------------
+# REST API: Kiosk Show & History
+# -----------------------------------------------------------------------------
+@app.post("/api/kiosk/show")
+async def show_on_kiosk(payload: KioskPayload):
+    res = await display_on_desk(type=payload.type, content=payload.content, title=payload.title)
+    return res
+
+@app.get("/api/kiosk/history")
+def get_kiosk_history(limit: int = 20):
+    with get_db() as conn:
+        rows = conn.execute("SELECT * FROM kiosk_history ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+        result = []
+        for r in rows:
+            try:
+                parsed = json.loads(r["display_payload"])
+            except Exception:
+                parsed = {"content": r["display_payload"]}
+            result.append({
+                "id": r["id"],
+                "timestamp": r["timestamp"],
+                "payload": parsed
+            })
+        return result
+
+# -----------------------------------------------------------------------------
+# REST API: Prompt / Intent Routing Hook
+# -----------------------------------------------------------------------------
+@app.post("/api/llm/prompt")
+async def process_prompt(req: PromptRequest):
+    result = await route_llm_intent(req.prompt)
+    return result
+
+# -----------------------------------------------------------------------------
+# WebSockets: /ws/kiosk and /ws/xiaozhi
+# -----------------------------------------------------------------------------
+@app.websocket("/ws/kiosk")
+async def ws_kiosk_endpoint(websocket: WebSocket):
+    await kiosk_manager.connect(websocket)
+    # Send current most recent display payload on initial connect
+    try:
+        with get_db() as conn:
+            last = conn.execute("SELECT display_payload FROM kiosk_history ORDER BY id DESC LIMIT 1").fetchone()
+            if last:
+                try:
+                    init_payload = json.loads(last["display_payload"])
+                    await websocket.send_json(init_payload)
+                except Exception:
+                    pass
+    except Exception as e:
+        print(f"[WS/kiosk init send error]: {e}")
+
+    # Keepalive ping/pong loop & client message handler
+    async def ping_loop():
+        try:
+            while True:
+                await asyncio.sleep(20)
+                await websocket.send_json({"type": "ping", "timestamp": datetime.now(timezone.utc).isoformat()})
+        except asyncio.CancelledError:
+            pass
+        except Exception:
+            pass
+
+    ping_task = asyncio.create_task(ping_loop())
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                msg = json.loads(data)
+                if msg.get("type") == "pong":
+                    continue
+                elif msg.get("type") == "request_refresh":
+                    with get_db() as conn:
+                        last = conn.execute("SELECT display_payload FROM kiosk_history ORDER BY id DESC LIMIT 1").fetchone()
+                        if last:
+                            await websocket.send_json(json.loads(last["display_payload"]))
+            except Exception:
+                pass
+    except WebSocketDisconnect:
+        pass
+    finally:
+        ping_task.cancel()
+        await kiosk_manager.disconnect(websocket)
+
+@app.websocket("/ws/xiaozhi")
+async def ws_xiaozhi_endpoint(websocket: WebSocket):
+    """Audio/command ingress channel for ESP32 devices."""
+    await websocket.accept()
+    print("[WS/xiaozhi] ESP32 device connected.")
+    try:
+        # Initial greeting handshake
+        await websocket.send_json({
+            "type": "hello",
+            "version": 1,
+            "transport": "websocket",
+            "audio_params": {"format": "opus", "sample_rate": 16000, "channels": 1}
+        })
+        while True:
+            msg = await websocket.receive()
+            if "text" in msg and msg["text"]:
+                try:
+                    parsed = json.loads(msg["text"])
+                    event_type = parsed.get("type", "")
+                    if event_type == "listen" and "text" in parsed:
+                        cmd_text = parsed.get("text", "")
+                        print(f"[WS/xiaozhi] Received voice transcript: {cmd_text}")
+                        # Route voice command through LLM router
+                        res = await route_llm_intent(cmd_text)
+                        await websocket.send_json({
+                            "type": "tts",
+                            "state": "start",
+                            "text": f"Workbench processed: {res.get('title', 'Command executed')}"
+                        })
+                    elif event_type == "ping":
+                        await websocket.send_json({"type": "pong"})
+                except Exception as e:
+                    print(f"[WS/xiaozhi text error]: {e}")
+            elif "bytes" in msg and msg["bytes"]:
+                pass
+    except WebSocketDisconnect:
+        print("[WS/xiaozhi] ESP32 device disconnected.")
+    except Exception as e:
+        print(f"[WS/xiaozhi error]: {e}")
+
+# -----------------------------------------------------------------------------
+# Static Frontend Serving
+# -----------------------------------------------------------------------------
+STATIC_DIR = BASE_DIR / "static"
+if not STATIC_DIR.exists():
+    STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+@app.get("/")
+def serve_index():
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {"status": "Workbench API online. Static frontend not yet compiled."}

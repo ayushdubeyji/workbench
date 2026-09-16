@@ -1,0 +1,14 @@
+[Unit]
+Description=Smart Workbench FastAPI Hub
+After=network.target
+
+[Service]
+User=ayush
+WorkingDirectory=/home/ayush/workbench_hub
+EnvironmentFile=/home/ayush/workbench_hub/.env
+ExecStart=/home/ayush/workbench_hub/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

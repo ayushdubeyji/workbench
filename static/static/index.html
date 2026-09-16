@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Electronics Workbench Hub | Xiaozhi AI & MCP</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- CDN Marked.js with automatic fallback to local /static/marked.min.js -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    if (typeof marked === "undefined") {
+      document.write('<script src="/static/marked.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- =========================================================================
+       TOP NAVIGATION HEADER
+       ========================================================================= -->
+  <header class="site-header">
+    <a href="/" class="logo-group">
+      <div class="brand-icon-wrapper">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <div class="brand-title-wrap">
+        <span class="brand-title">Smart Electronics Workbench</span>
+        <span class="brand-subtitle">Xiaozhi AI & MCP Telemetry Gateway</span>
+      </div>
+    </a>
+
+    <div class="nav-controls">
+      <div class="device-badge" title="Xiaozhi S3 & P4 Hardware Listener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+          <rect x="9" y="9" width="6" height="6"></rect>
+          <line x1="9" y1="1" x2="9" y2="4"></line>
+          <line x1="15" y1="1" x2="15" y2="4"></line>
+          <line x1="9" y1="20" x2="9" y2="23"></line>
+          <line x1="15" y1="20" x2="15" y2="23"></line>
+          <line x1="20" y1="9" x2="23" y2="9"></line>
+          <line x1="20" y1="14" x2="23" y2="14"></line>
+          <line x1="1" y1="9" x2="4" y2="9"></line>
+          <line x1="1" y1="14" x2="4" y2="14"></line>
+        </svg>
+        <span>Xiaozhi S3 & P4 Active</span>
+      </div>
+
+      <div id="connection-status" class="status-badge" title="WebSocket link to benchtop daemon">
+        <span class="status-dot"></span>
+        <span id="status-text">Connecting...</span>
+      </div>
+
+      <!-- Theme Switcher (Sun / Moon) -->
+      <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Light / Dark theme">
+        <svg id="theme-icon-sun" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="theme-icon-moon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span id="theme-label">Dark</span>
+      </button>
+
+      <a id="mode-toggle-link" href="/?mode=kiosk" class="mode-toggle-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h6v6"></path>
+          <path d="M10 14L21 3"></path>
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        </svg>
+        <span>Launch Kiosk</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       SEGMENTED TABS
+       ========================================================================= -->
+  <div class="tab-nav-wrapper">
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="tab-workbench">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>Live Workbench & AI</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-inventory">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+        <span>Inventory Catalog</span>
+        <span id="tab-inv-badge" class="tab-badge">0</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-logs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span>Lab Notebook & Logs</span>
+        <span id="tab-logs-badge" class="tab-badge">0</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- =========================================================================
+       DASHBOARD MODE CONTAINER
+       ========================================================================= -->
+  <main id="dashboard-container" class="dashboard-container">
+
+    <!-- -----------------------------------------------------------------------
+         TAB 1: LIVE WORKBENCH & AI COPILOT
+         ----------------------------------------------------------------------- -->
+    <section id="tab-workbench" class="tab-content active">
+      <div class="grid-2">
+
+        <!-- Left: Prompt Injection & Kiosk Controls -->
+        <div>
+          <!-- LLM Router Card -->
+          <div class="card">
+            <h2 class="card-title">
+              <span class="card-title-text">
+                <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                AI Copilot & Intent Router
+              </span>
+              <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">Groq Llama + Gemini Flash</span>
+            </h2>
+
+            <div class="input-group">
+              <label class="input-label" for="prompt-input">Command or Electronics Technical Query</label>
+              <textarea id="prompt-input" placeholder="Ask for a pinout, circuit calculation, multimeter log, or component search... (e.g. 'Show pinout ESP32-S3', 'Calculate 555 timer 1kHz circuit', 'Log reading 3.3V on GPIO4')"></textarea>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <button id="btn-send-prompt" class="btn btn-accent" type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                <span>Dispatch to Copilot</span>
+              </button>
+              <span style="font-size: 11.5px; color: var(--text-muted);">Press <kbd style="background: var(--bg-card-subtle); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Ctrl</kbd> + <kbd style="background: var(--bg-card-subtle); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Enter</kbd></span>
+            </div>
+
+            <!-- Quick Suggestion Chips -->
+            <label class="input-label">Quick Workbench Commands:</label>
+            <div class="chip-list">
+              <span class="chip" data-quick="Show pinout Waveshare ESP32-S3-Zero">⚡ ESP32-S3 Pinout</span>
+              <span class="chip" data-quick="Explain ESP32-P4 features and audio codec pinout">📟 ESP32-P4 Specs</span>
+              <span class="chip" data-quick="Calculate voltage divider to step down 12V to 3.3V for ADC">📐 12V to 3.3V Divider</span>
+              <span class="chip" data-quick="Design 555 timer astable multivibrator circuit 1kHz">🔌 555 Timer 1kHz</span>
+              <span class="chip" data-quick="Log multimeter reading 3.29V on 3V3 rail under load">📝 Log 3.29V Rail</span>
+              <span class="chip" data-quick="Check inventory stock for resistors and capacitors">📦 Check Inventory</span>
+            </div>
+          </div>
+
+          <!-- Direct Kiosk Override Card -->
+          <div class="card">
+            <h2 class="card-title">
+              <span class="card-title-text">
+                <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                Direct Kiosk Screen Push (Override)
+              </span>
+            </h2>
+
+            <div class="input-group">
+              <label class="input-label" for="direct-title">Display Title</label>
+              <input type="text" id="direct-title" value="Benchtop Notice" />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label" for="direct-type">Payload Format</label>
+              <select id="direct-type">
+                <option value="markdown">Markdown Document</option>
+                <option value="pinout">Pinout Table</option>
+                <option value="schematic">Schematic / Circuit Wiring</option>
+                <option value="code">Monospace Code / ASCII</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label" for="direct-content">Display Content</label>
+              <textarea id="direct-content" placeholder="Type direct Markdown, ASCII art, or pinout table to broadcast to the kiosk monitor..."></textarea>
+            </div>
+
+            <button id="btn-direct-push" class="btn btn-primary" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 17 20 12 15 7"></polyline>
+                <path d="M4 12h16"></path>
+              </svg>
+              <span>Broadcast to Bench Display</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Screen Mirror & System Telemetry -->
+        <div>
+          <!-- Realistic Bench Screen Mirror -->
+          <div class="mirror-bezel">
+            <div class="mirror-titlebar">
+              <div class="mirror-dots">
+                <span class="mirror-dot red"></span>
+                <span class="mirror-dot yellow"></span>
+                <span class="mirror-dot green"></span>
+              </div>
+              <div id="mirror-screen-title" class="mirror-screen-title">BENCHTOP DISPLAY MIRROR</div>
+              <span id="mirror-screen-type" class="mirror-screen-type">READY</span>
+            </div>
+
+            <div id="mirror-content-area" class="mirror-content-area">
+              <h3 id="mirror-title" style="color: #38bdf8; margin-bottom: 12px;">Workbench Ready</h3>
+              <div id="mirror-body">
+                <p>Bench display connected to <code>/ws/kiosk</code>. Ready for telemetry, schematics, and pinout diagrams.</p>
+              </div>
+            </div>
+
+            <div class="mirror-footer">
+              <span id="mirror-timestamp">Syncing with daemon...</span>
+              <div style="display: flex; gap: 8px;">
+                <button id="btn-copy-mirror" class="btn btn-secondary btn-sm" type="button" title="Copy display text">Copy</button>
+                <button id="btn-clear-mirror" class="btn btn-secondary btn-sm" type="button" title="Clear mirror">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- System & MCP Status Telemetry Card -->
+          <div class="card" style="margin-top: 20px;">
+            <h2 class="card-title">
+              <span class="card-title-text">
+                <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                System & MCP Endpoints Telemetry
+              </span>
+            </h2>
+
+            <div class="status-grid">
+              <div class="status-metric">
+                <span class="metric-label">LLM Intent</span>
+                <span id="metric-groq" class="metric-value">
+                  <span class="metric-pill online"></span> Groq Active
+                </span>
+              </div>
+              <div class="status-metric">
+                <span class="metric-label">LLM Synthesis</span>
+                <span id="metric-gemini" class="metric-value">
+                  <span class="metric-pill online"></span> Gemini Flash
+                </span>
+              </div>
+              <div class="status-metric">
+                <span class="metric-label">Cloudflare Tunnel</span>
+                <span id="metric-tunnel" class="metric-value" title="Tunnel ID: f521d45d-0510-40c3-b59b-a9a6526ec5f8">
+                  <span class="metric-pill online"></span> Connected
+                </span>
+              </div>
+              <div class="status-metric">
+                <span class="metric-label">Xiaozhi Socket</span>
+                <span id="metric-xiaozhi" class="metric-value">
+                  <span class="metric-pill online"></span> /ws/xiaozhi
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         TAB 2: INVENTORY CATALOG
+         ----------------------------------------------------------------------- -->
+    <section id="tab-inventory" class="tab-content">
+      <!-- Quick Stats Row -->
+      <div class="stats-bar">
+        <div class="stat-box">
+          <div class="stat-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+          </div>
+          <div>
+            <div id="stat-total-parts" class="stat-number">0</div>
+            <div class="stat-caption">Total Components</div>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-icon-wrap" style="color: var(--success); background: var(--success-bg);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div>
+            <div id="stat-in-stock" class="stat-number">0</div>
+            <div class="stat-caption">In Stock (>0)</div>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-icon-wrap" style="color: var(--warning); background: var(--warning-bg);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <div>
+            <div id="stat-low-stock" class="stat-number">0</div>
+            <div class="stat-caption">Low Stock (≤ 2)</div>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-icon-wrap" style="color: var(--purple); background: var(--purple-bg);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <div>
+            <div id="stat-categories" class="stat-number">0</div>
+            <div class="stat-caption">Categories</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Inventory Card -->
+      <div class="card">
+        <div class="card-title">
+          <span class="card-title-text">
+            <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            Component Inventory Catalog
+          </span>
+          <button id="btn-refresh-inv" class="btn btn-secondary btn-sm" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <!-- Filter Controls -->
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+          <input type="text" id="inv-search" placeholder="Search components by name, location, or notes..." style="flex: 2; min-width: 220px;" />
+          <select id="inv-category-filter" style="flex: 1; min-width: 160px;">
+            <option value="All">All Categories</option>
+            <option value="Microcontrollers">Microcontrollers</option>
+            <option value="Sensors">Sensors</option>
+            <option value="Audio">Audio & DAC</option>
+            <option value="Displays">Displays & Screens</option>
+            <option value="Passive">Passives (R, C, L)</option>
+            <option value="Semiconductors">Semiconductors</option>
+            <option value="Power">Power & Regulators</option>
+            <option value="Connectors">Connectors</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+
+        <!-- Add Component Drawer -->
+        <details style="margin-bottom: 20px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px;">
+          <summary style="font-weight: 700; cursor: pointer; color: var(--accent); user-select: none; font-size: 14px;">+ Add New Component to Stock</summary>
+          <form id="form-add-inventory" style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+            <div>
+              <label class="input-label" for="inv-name">Component Name *</label>
+              <input type="text" id="inv-name" required placeholder="e.g., Waveshare ESP32-S3-Zero" />
+            </div>
+            <div>
+              <label class="input-label" for="inv-qty">Stock Quantity</label>
+              <input type="number" id="inv-qty" value="1" min="0" />
+            </div>
+            <div>
+              <label class="input-label" for="inv-category">Category</label>
+              <select id="inv-category">
+                <option value="Microcontrollers">Microcontrollers</option>
+                <option value="Sensors">Sensors</option>
+                <option value="Audio">Audio & DAC</option>
+                <option value="Displays">Displays & Screens</option>
+                <option value="Passive">Passives (R, C, L)</option>
+                <option value="Semiconductors">Semiconductors</option>
+                <option value="Power">Power & Regulators</option>
+                <option value="Connectors">Connectors</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+            <div>
+              <label class="input-label" for="inv-location">Storage Location</label>
+              <input type="text" id="inv-location" placeholder="e.g., Bin B-4, Drawer 2" />
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <label class="input-label" for="inv-notes">Technical Notes / Specs</label>
+              <input type="text" id="inv-notes" placeholder="e.g., 3.3V logic, I2S DAC connected, verified pinout" />
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <button type="submit" class="btn btn-primary">Save Component</button>
+            </div>
+          </form>
+        </details>
+
+        <!-- Inventory Table -->
+        <div class="table-container">
+          <table class="workbench-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Quantity</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>Technical Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading inventory...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         TAB 3: LAB NOTEBOOK & LOGS
+         ----------------------------------------------------------------------- -->
+    <section id="tab-logs" class="tab-content">
+      <div class="grid-2">
+        <!-- New Log Entry Form -->
+        <div class="card">
+          <h2 class="card-title">
+            <span class="card-title-text">
+              <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Record Bench Note / Reading
+            </span>
+          </h2>
+
+          <form id="form-add-log">
+            <div class="input-group">
+              <label class="input-label" for="log-type">Entry Type</label>
+              <select id="log-type">
+                <option value="text">General Technical Note</option>
+                <option value="reading">Multimeter / Sensor Reading</option>
+                <option value="oscilloscope">Oscilloscope Trace / Signal</option>
+                <option value="schematic">Circuit Note / Pinout</option>
+                <option value="issue">Bug / Hardware Failure</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label" for="log-content">Content (Markdown supported)</label>
+              <textarea id="log-content" required placeholder="Record test results, voltages, scope frequencies, circuit alterations..."></textarea>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label" for="log-tags">Tags (comma-separated)</label>
+              <input type="text" id="log-tags" placeholder="e.g., esp32-s3, i2s, 3v3-rail, inmp441" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>Record Bench Note</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- History & Telemetry Timeline -->
+        <div class="card">
+          <div class="card-title">
+            <span class="card-title-text">
+              <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              Logbook History
+            </span>
+            <button id="btn-export-logs" class="btn btn-secondary btn-sm" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Export Markdown</span>
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+            <input type="text" id="log-search" placeholder="Search log entries..." style="flex: 1;" />
+            <select id="log-type-filter" style="width: 140px;">
+              <option value="All">All Types</option>
+              <option value="text">Notes</option>
+              <option value="reading">Readings</option>
+              <option value="oscilloscope">Oscilloscope</option>
+              <option value="schematic">Schematic</option>
+              <option value="issue">Issues</option>
+            </select>
+          </div>
+
+          <div id="log-list" class="log-timeline" style="max-height: 520px; overflow-y: auto;">
+            <div style="color: var(--text-muted); text-align: center; padding: 24px;">Loading lab notes...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       KIOSK FULLSCREEN VIEW (Benchtop High-Contrast Display)
+       ========================================================================= -->
+  <main id="kiosk-view" class="kiosk-view">
+    <div class="kiosk-header">
+      <div class="kiosk-title-box">
+        <h1 id="kiosk-display-title" class="kiosk-title">Smart Electronics Workbench</h1>
+        <span id="kiosk-display-type" class="kiosk-type-tag">READY</span>
+      </div>
+      <div id="kiosk-clock" class="kiosk-clock">00:00:00</div>
+    </div>
+    <div id="kiosk-display-body" class="kiosk-body">
+      <h2>Welcome to Workbench Hub</h2>
+      <p>Bench display connected to <code>/ws/kiosk</code>. Ready for telemetry, schematics, and pinout diagrams.</p>
+    </div>
+    <div class="kiosk-footer">
+      <span id="kiosk-footer-status">Connected to Workbench Daemon</span>
+      <span id="kiosk-footer-ts">UTC Time</span>
+    </div>
+  </main>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
