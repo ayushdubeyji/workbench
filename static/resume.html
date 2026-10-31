@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayush Dubey | Hardware & Embedded AI Engineer - Resume</title>
+  <meta name="description" content="Official Resume of Ayush Dubey - Embedded Systems Engineer, AI Systems Architect & Maker.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --bg-page: #080c14;
+      --bg-card: rgba(17, 24, 39, 0.9);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --cyan-glow: #38bdf8;
+      --border-subtle: rgba(56, 189, 248, 0.15);
+      --border-highlight: rgba(56, 189, 248, 0.4);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .resume-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Top Control Bar */
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #041226;
+      border: none;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-print:hover {
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-back {
+      background: rgba(30, 41, 59, 0.7);
+      color: #cbd5e1;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-back:hover {
+      border-color: var(--cyan-glow);
+      color: #fff;
+    }
+
+    /* Resume Document Canvas */
+    .resume-sheet {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 48px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      backdrop-filter: blur(16px);
+    }
+
+    /* Resume Header */
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--border-subtle);
+      padding-bottom: 28px;
+      margin-bottom: 28px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .header-info h1 {
+      font-size: 2.6rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin: 0 0 6px;
+      background: linear-gradient(90deg, #ffffff, var(--cyan-glow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-info h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--cyan-glow);
+      margin: 0 0 12px;
+      font-family: var(--font-mono);
+    }
+
+    .header-contacts {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      text-align: right;
+    }
+
+    @media (max-width: 700px) {
+      .header-contacts { text-align: left; }
+    }
+
+    .header-contacts a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .header-contacts a:hover {
+      color: var(--cyan-glow);
+    }
+
+    /* Resume Sections */
+    .resume-section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--cyan-glow);
+      font-family: var(--font-mono);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 6px;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-p {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* Skills Grid */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 650px) {
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+
+    .skill-category {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .skill-cat-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    .skill-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .skill-pill {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.1);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    /* Experience / Projects Items */
+    .item-block {
+      margin-bottom: 24px;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .item-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .item-role {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--cyan-glow);
+    }
+
+    .item-date {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: #64748b;
+    }
+
+    .item-bullets {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #cbd5e1;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .item-bullets li {
+      margin-bottom: 6px;
+    }
+
+    .item-bullets strong {
+      color: #f8fafc;
+    }
+
+    /* Printable Stylesheet */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .top-actions {
+        display: none !important;
+      }
+      .resume-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .resume-sheet {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+      .header-info h1 {
+        background: none !important;
+        -webkit-text-fill-color: initial !important;
+        color: #000000 !important;
+      }
+      .header-info h2, .section-title, .item-role {
+        color: #0284c7 !important;
+      }
+      .header-contacts a, .header-contacts span {
+        color: #333333 !important;
+      }
+      .skill-category {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      .skill-pill {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      .item-bullets, .section-p {
+        color: #1e293b !important;
+      }
+      .item-bullets strong {
+        color: #000000 !important;
+      }
+      .item-date {
+        color: #475569 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="resume-container">
+    <!-- Top Action Bar -->
+    <div class="top-actions">
+      <div style="display: flex; gap: 12px;">
+        <a href="/" class="btn-action btn-back">&larr; Return to Portfolio</a>
+        <a href="https://workbench.ayushdubey.tech" class="btn-action btn-back">⚡ Workbench Hub</a>
+      </div>
+      <button onclick="window.print()" class="btn-action btn-print">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        <span>Download / Print Resume (PDF)</span>
+      </button>
+    </div>
+
+    <!-- Resume Document -->
+    <div class="resume-sheet">
+      <!-- Header -->
+      <header class="sheet-header">
+        <div class="header-info">
+          <h1>Ayush Dubey</h1>
+          <h2>Embedded Systems Engineer &amp; Hardware AI Architect</h2>
+          <div style="color: var(--text-muted); font-size: 0.95rem;">Building physical computing platforms, autonomous agentic tools &amp; open maker systems.</div>
+        </div>
+        <div class="header-contacts">
+          <div>🌐 <a href="https://ayushdubey.tech">ayushdubey.tech</a></div>
+          <div>⚡ <a href="https://workbench.ayushdubey.tech">workbench.ayushdubey.tech</a></div>
+          <div>🐙 <a href="https://github.com/ayushdubeyji" target="_blank">github.com/ayushdubeyji</a></div>
+          <div>✉️ <a href="mailto:ayush@ayushdubey.tech">ayush@ayushdubey.tech</a></div>
+        </div>
+      </header>
+
+      <!-- Profile Summary -->
+      <section class="resume-section">
+        <div class="section-title">01. Professional Profile</div>
+        <p class="section-p">
+          Innovative Embedded Systems Engineer and Physical AI Architect specializing in edge computing, digital signal buses (I2S, SPI, I2C), and autonomous agent-to-hardware bridges. Pioneer of Model Context Protocol (MCP) integrations connecting frontier LLM coding agents directly to laboratory bench multimeters, optocoupled relays, microwave radar sensors, and multi-node microcontroller swarms. Proven track record in rapid prototyping, hardware-in-the-loop debugging, and leading open-source maker communities.
+        </p>
+      </section>
+
+      <!-- Technical Skills Matrix -->
+      <section class="resume-section">
+        <div class="section-title">02. Technical Competencies</div>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <div class="skill-cat-title">Silicon &amp; Microcontrollers</div>
+            <div class="skill-pills">
+              <span class="skill-pill">ESP32-S3 (Xtensa LX7)</span>
+              <span class="skill-pill">ESP32-P4 (RISC-V)</span>
+              <span class="skill-pill">Raspberry Pi 4B/CM4</span>
+              <span class="skill-pill">STM32 (ARM Cortex)</span>
+              <span class="skill-pill">RP2040</span>
+            </div>
+          </div>
+
+          <div class="skill-category">
+            <div class="skill-cat-title">Protocols &amp; Audio Interfaces</div>
+            <div class="skill-pills">
+              <span class="skill-pill">I2S Audio (INMP441 / MAX98357A)</span>
+              <span class="skill-pill">SPI Display Bus</span>
+              <span class="skill-pill">I2C / UART / CAN</span>
+              <span class="skill-pill">WebSockets &amp; MQTT</span>
+            </div>
+          </div>
+
+          <div class="skill-category">
+            <div class="skill-cat-title">Physical AI &amp; Software</div>
+            <div class="skill-pills">
+              <span class="skill-pill">Model Context Protocol (MCP 2.0)</span>
+              <span class="skill-pill">Python (AsyncIO / FastAPI)</span>
+              <span class="skill-pill">Groq Whisper API</span>
+              <span class="skill-pill">Google Gemini Multimodal</span>
+              <span class="skill-pill">C / C++ (ESP-IDF / FreeRTOS)</span>
+            </div>
+          </div>
+
+          <div class="skill-category">
+            <div class="skill-cat-title">Hardware Lab &amp; Infrastructure</div>
+            <div class="skill-pills">
+              <span class="skill-pill">KiCAD / EasyEDA PCB Layout</span>
+              <span class="skill-pill">Rigol Digital Oscilloscope</span>
+              <span class="skill-pill">SMT Soldering &amp; Hot Air</span>
+              <span class="skill-pill">Linux systemd Daemons</span>
+              <span class="skill-pill">Cloudflare Zero-Trust Tunnels</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Signature Projects & Engineering Leadership -->
+      <section class="resume-section">
+        <div class="section-title">03. Key Engineering Projects &amp; Architecture</div>
+
+        <!-- Project 1 -->
+        <div class="item-block">
+          <div class="item-header">
+            <div>
+              <span class="item-title">Xiaozhi Smart Electronics Workbench Ecosystem</span>
+              <span class="item-role"> • Lead Architect &amp; Developer</span>
+            </div>
+            <span class="item-date">2025 – Present</span>
+          </div>
+          <ul class="item-bullets">
+            <li>Engineered an edge-to-cloud distributed lab environment connecting ESP32-S3/P4 voice satellites to a central Raspberry Pi 4B hub and 7-inch capacitive touchscreen kiosk.</li>
+            <li>Designed and published a <strong>JSON-RPC 2.0 Model Context Protocol (MCP) Server</strong> with 9 verified agentic tools, allowing autonomous AI agents (Claude Desktop, Cursor, Antigravity) to query multimeters, toggle bench relays, and manage component drawer stock.</li>
+            <li>Implemented a dual-screen telemetry dispatch pipeline driving a high-contrast 2.8" SPI display at the soldering bench and live WebSocket browser mirrors.</li>
+          </ul>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="item-block">
+          <div class="item-header">
+            <div>
+              <span class="item-title">Autonomous Circuit Builder &amp; SVG Simulator</span>
+              <span class="item-role"> • Core Creator</span>
+            </div>
+            <span class="item-date">2026</span>
+          </div>
+          <ul class="item-bullets">
+            <li>Created a dependency-free, high-performance browser-based schematic playground capable of drag-and-drop component placement (ESP32, Raspberry Pi, LD2410 radar, MQ-2 gas sensors).</li>
+            <li>Integrated generative AI routing to parse conversational circuit requests into verified netlists and automatically broadcast pinout wiring instructions to benchtop displays.</li>
+          </ul>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="item-block">
+          <div class="item-header">
+            <div>
+              <span class="item-title">24GHz mmWave Bench Automation &amp; Safety Control</span>
+              <span class="item-role"> • Hardware &amp; Firmware Engineer</span>
+            </div>
+            <span class="item-date">2025 – 2026</span>
+          </div>
+          <ul class="item-bullets">
+            <li>Constructed an automated lab safety system utilizing LD2410 24GHz microwave radar sensors to detect bench presence and automatically control dual optocoupled relays for soldering iron and glue gun power lines.</li>
+            <li>Connected live environmental telemetry (DHT22 temperature, humidity, air quality) to Adafruit IO cloud feeds with sub-3-second polling.</li>
+          </ul>
+        </div>
+
+        <!-- Project 4 -->
+        <div class="item-block">
+          <div class="item-header">
+            <div>
+              <span class="item-title">Global Push-to-Talk Linux Dictation &amp; Command Daemon</span>
+              <span class="item-role"> • Systems Engineer</span>
+            </div>
+            <span class="item-date">2026</span>
+          </div>
+          <ul class="item-bullets">
+            <li>Developed an asynchronous Linux hardware service reading tactile switches on GPIO 2 &amp; 22 with software debouncing.</li>
+            <li>Pioneered dual-mode voice gesture inference: momentary hold routes I2S INMP441 audio to Groq Whisper for typing dictation; quick tap-and-hold automatically launches Konsole terminal and executes spoken CLI instructions.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Community Leadership & Open Source -->
+      <section class="resume-section">
+        <div class="section-title">04. Community &amp; Open Source Leadership</div>
+        <div class="item-block">
+          <div class="item-header">
+            <div>
+              <span class="item-title">Founder — The Open Maker Sanctuary</span>
+              <span class="item-role"> • Community Lead</span>
+            </div>
+            <span class="item-date">Ongoing</span>
+          </div>
+          <p class="section-p" style="margin-top: 6px;">
+            Leading an open collective of makers and embedded engineers dedicated to open-sourcing hardware blueprints, PCB schematics, and tutorials bridging artificial intelligence with hands-on solder and silicon.
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+</body>
+</html>

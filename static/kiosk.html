@@ -1,0 +1,2417 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>
+  (function() {
+    try {
+      localStorage.removeItem('workbench_theme');
+      localStorage.removeItem('kiosk_theme');
+      var v = localStorage.getItem('workbench_theme_hud_v2');
+      if (!v || v === 'light') {
+        localStorage.setItem('workbench_theme_hud_v2', 'dark');
+      }
+    } catch(e) {}
+    document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+</script>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link rel="shortcut icon" href="/static/favicon.ico">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, viewport-fit=cover, shrink-to-fit=no">
+  <title>Workbench Smart Kiosk HUD | Feynman Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="/static/marked.min.js"></script>
+  <script src="/vendor/msgpack.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @media (max-width: 900px) {
+      .kiosk-main {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+        overflow-y: auto !important;
+      }
+      .telemetry-strip {
+        display: none !important;
+      }
+      .kiosk-main {
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+        overflow-y: auto !important;
+      }
+      .telemetry-strip {
+        display: none !important;
+      }
+      body {
+        overflow-y: auto !important;
+      }
+      .kiosk-btn, .mobile-kiosk-btn {
+        min-height: 44px;
+      }
+    }
+    @media (max-width: 480px) {
+      .kiosk-btn, .mobile-kiosk-btn {
+        min-height: 44px;
+      }
+    }
+
+    :root, [data-theme="light"], [data-theme="dark"] {
+      --bg-base: #040813;
+      --bg-surface: rgba(12, 22, 39, 0.85);
+      --bg-card: rgba(15, 27, 49, 0.78);
+      --bg-card-subtle: rgba(20, 36, 64, 0.62);
+      --bg-card-hover: rgba(28, 48, 84, 0.85);
+      --border-subtle: rgba(56, 189, 248, 0.18);
+      --border-glow: rgba(0, 240, 255, 0.45);
+      --border-active: #00f0ff;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --cyan-glow: #38bdf8;
+      --cyan-bright: #00f0ff;
+      --emerald-neon: #4ade80;
+      --amber-neon: #fbbf24;
+      --rose-neon: #f87171;
+      --purple-neon: #c084fc;
+      --header-bg: rgba(9, 16, 30, 0.88);
+      --footer-bg: rgba(9, 16, 30, 0.92);
+      --btn-bg: rgba(18, 33, 58, 0.7);
+      --btn-border: rgba(56, 189, 248, 0.28);
+      --btn-text: #f8fafc;
+      --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+      --code-bg: rgba(6, 12, 22, 0.85);
+      --pre-border: rgba(56, 189, 248, 0.22);
+    }
+
+    
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      max-height: 100vh;
+      overflow: hidden;
+      overflow-x: hidden;
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -10%, rgba(14, 165, 233, 0.18), transparent 70%),
+        radial-gradient(circle at 10% 40%, rgba(99, 102, 241, 0.08), transparent 45%),
+        linear-gradient(rgba(56, 189, 248, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    /* Scrollable Container with Pan-Y Touch */
+    .scroll-touch {
+      overflow-y: auto;
+      touch-action: pan-y;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-touch::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    /* Top Kiosk Header (Compact ~46px) */
+    header.kiosk-header {
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+      padding: 0 16px !important;
+      gap: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      overflow: hidden !important;
+      flex-wrap: nowrap !important;
+      height: 48px !important;
+    }
+    .kiosk-header .brand-wrap { flex-shrink: 0 !important; }
+    .kiosk-header .telemetry-strip { flex: 0 1 auto !important; min-width: 0 !important; overflow: hidden !important; }
+    .kiosk-header .controls-group { flex-shrink: 0 !important; margin-left: auto !important; }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--border-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan-glow);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .brand-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--emerald-neon);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .status-dot-live {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald-neon);
+    }
+
+    /* Telemetry Quick Strip */
+    .telemetry-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card-subtle);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .telem-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    .telem-val {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Header Controls */
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hdr-btn {
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      color: var(--btn-text);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+      text-decoration: none;
+    }
+
+    .hdr-btn:active {
+      transform: scale(0.96);
+    }
+
+    .hdr-btn.primary {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #ffffff;
+      border: none;
+    }
+
+    /* Main Kiosk Layout (1024x600 target: Height = 100vh - 46px - 50px = 504px) */
+    main.kiosk-main {
+      height: calc(100vh - 96px);
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 14px;
+      padding: 12px 16px;
+      overflow: hidden;
+    }
+
+    .kiosk-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+
+    .kiosk-panel::before {
+      content: "";
+      position: absolute;
+      top: 6px; left: 6px;
+      width: 8px; height: 8px;
+      border-top: 2px solid rgba(0, 240, 255, 0.55);
+      border-left: 2px solid rgba(0, 240, 255, 0.55);
+      border-top-left-radius: 3px;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .kiosk-panel::after {
+      content: "";
+      position: absolute;
+      bottom: 6px; right: 6px;
+      width: 8px; height: 8px;
+      border-bottom: 2px solid rgba(0, 240, 255, 0.55);
+      border-right: 2px solid rgba(0, 240, 255, 0.55);
+      border-bottom-right-radius: 3px;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .panel-header {
+      padding: 10px 14px;
+      background: var(--bg-card-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .panel-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .panel-body {
+      flex: 1;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Relays Grid */
+    .bench-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .bench-relay-card {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .bench-relay-card:active {
+      transform: scale(0.97);
+    }
+
+    .bench-relay-card.active-hot {
+      border-color: var(--amber-neon);
+      background: rgba(245, 158, 11, 0.12);
+    }
+
+    .relay-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .relay-state-tag {
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .bench-relay-card.active-hot .relay-state-tag {
+      background: rgba(245, 158, 11, 0.25);
+      color: var(--amber-neon);
+    }
+
+    .relay-btn-action {
+      margin-top: 2px;
+      padding: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--cyan-glow);
+      border-radius: 8px;
+      color: var(--cyan-glow);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* Quick Shortcuts */
+    .vault-item {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .vault-item:active {
+      background: var(--bg-card-hover);
+      border-color: var(--cyan-glow);
+    }
+
+    .vault-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .vault-badge {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan-glow);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    /* Right Panel: View Tabs */
+    .view-tab-bar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .view-tab {
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .view-tab.active {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--cyan-glow);
+      color: var(--cyan-glow);
+      font-weight: 700;
+    }
+
+    /* Display Container */
+    .display-screen-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Feynman Copilot Live Card */
+    .kiosk-live-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .live-card-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .live-card-body {
+      flex: 1;
+      padding: 14px;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .live-card-body h1, .live-card-body h2, .live-card-body h3 {
+      color: var(--cyan-glow);
+      margin: 8px 0 6px 0;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .live-card-body p {
+      margin-bottom: 8px;
+    }
+
+    .live-card-body ul, .live-card-body ol {
+      padding-left: 20px;
+      margin-bottom: 8px;
+    }
+
+    .live-card-body li {
+      margin-bottom: 4px;
+    }
+
+    .live-card-body code {
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--cyan-glow);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82em;
+    }
+
+    .live-card-body pre {
+      background: var(--code-bg);
+      border: 1px solid var(--pre-border);
+      border-radius: 8px;
+      padding: 10px;
+      overflow-x: auto;
+      margin: 8px 0;
+      touch-action: pan-x;
+    }
+
+    .live-card-body pre code {
+      background: none;
+      padding: 0;
+      color: var(--text-main);
+    }
+
+    .live-card-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+    }
+
+    .live-card-body th, .live-card-body td {
+      border: 1px solid var(--border-subtle);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    .live-card-body th {
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--cyan-glow);
+    }
+
+    /* Bottom Voice / PTT Bar (~50px) */
+    footer.kiosk-footer {
+      height: 50px;
+      background: var(--footer-bg);
+      border-top: 1px solid var(--border-subtle);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 20;
+    }
+
+    .voice-ptt-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .btn-ptt-main {
+      height: 38px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 0 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .btn-ptt-main:active {
+      transform: scale(0.96);
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+
+    .ptt-status-strip {
+      flex: 1;
+      height: 36px;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* ========================================================================= */
+    /* FEYNMAN TALKING MODE (FULLSCREEN FOCUS OVERLAY - 1024x600)                */
+    /* ========================================================================= */
+    .focus-mode-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg-base);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      box-sizing: border-box;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .focus-mode-overlay.hidden {
+      display: none !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .focus-modal-card {
+      flex: 1;
+      min-height: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .focus-modal-hdr {
+      padding: 12px 20px;
+      background: var(--bg-card-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .focus-modal-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--cyan-glow);
+    }
+
+    .focus-modal-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      padding: 18px 24px;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+    .focus-modal-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92rem;
+    }
+    .focus-modal-body th, .focus-modal-body td {
+      border: 1px solid var(--border-subtle);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .focus-modal-body th {
+      background: var(--bg-card-subtle);
+      color: var(--cyan-glow);
+      font-weight: 700;
+    }
+    .focus-modal-body tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .focus-modal-ftr {
+      padding: 12px 20px;
+      background: var(--bg-card-subtle);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-exit-focus {
+      padding: 10px 22px;
+      min-height: 46px;
+      min-width: 120px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(220, 38, 38, 0.6));
+      border: 2px solid #ef4444;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      touch-action: manipulation;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    }
+    .ignored_old_btn_exit { 
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-exit-focus:active {
+      transform: scale(0.96);
+    }
+  
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .ptt-active-glow {
+      animation: pulse-glow 1.5s infinite;
+      border-color: var(--rose-neon) !important;
+      background: rgba(239, 68, 68, 0.15) !important;
+    }
+    .ptt-active-glow svg {
+      color: var(--rose-neon) !important;
+    }
+
+    /* Circuit Mode CSS */
+    
+    
+    .circuit-container {
+       display: none;
+       flex: 1;
+       flex-direction: row;
+       height: 100%;
+       gap: 14px;
+    }
+    .circuit-mode-active .circuit-container {
+       display: flex;
+    }
+    .circuit-mode-active #display-container {
+       display: none !important;
+    }
+    .circuit-mode-active #panel-telemetry .panel-header {
+       display: none !important;
+    }
+    .circuit-mode-active #panel-telemetry .panel-body {
+       height: 100% !important;
+       padding: 0 !important;
+    }
+    
+    .circuit-canvas-area {
+       flex: 2;
+       background: #000;
+       border: 1px solid var(--cyan-glow);
+       border-radius: 14px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       color: var(--cyan-glow);
+       font-size: 1.5rem;
+    }
+    .circuit-chat-area {
+       flex: 1;
+       background: var(--bg-card);
+       border: 1px solid var(--border-subtle);
+       border-radius: 14px;
+       padding: 16px;
+       color: var(--text-main);
+       overflow-y: hidden;
+       display: flex;
+       flex-direction: column;
+    }
+
+  
+    .kiosk-main {
+       transition: grid-template-columns 0.4s cubic-bezier(0.4, 0, 0.2, 1), gap 0.4s ease;
+    }
+    .kiosk-panel#panel-controls {
+       transition: opacity 0.3s ease;
+    }
+    .circuit-mode-active .kiosk-main {
+       grid-template-columns: 0px 1fr;
+       gap: 0;
+    }
+    .circuit-mode-active .kiosk-panel#panel-controls {
+       opacity: 0;
+       pointer-events: none;
+       overflow: hidden;
+       border-width: 0;
+       margin: 0;
+       padding: 0;
+    }
+
+  
+    /* HUD Radar & Equalizer Animations */
+    @keyframes hud-radar-sweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes hud-pulse-glow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.08); }
+    }
+    @keyframes hud-eq-bar {
+      0%, 100% { height: 6px; }
+      50% { height: 26px; }
+    }
+    .hud-sweep-line {
+      transform-origin: 50% 50%;
+      animation: hud-radar-sweep 4s linear infinite;
+    }
+    .hud-eq-col {
+      width: 4px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #00f0ff, #4ade80);
+      animation: hud-eq-bar 1.2s ease-in-out infinite alternate;
+    }
+    .hud-eq-col:nth-child(2) { animation-delay: 0.15s; }
+    .hud-eq-col:nth-child(3) { animation-delay: 0.3s; }
+    .hud-eq-col:nth-child(4) { animation-delay: 0.45s; }
+    .hud-eq-col:nth-child(5) { animation-delay: 0.6s; }
+    .hud-eq-col:nth-child(6) { animation-delay: 0.75s; }
+    .hud-eq-col:nth-child(7) { animation-delay: 0.9s; }
+    .hud-eq-col:nth-child(8) { animation-delay: 1.05s; }
+
+  
+    /* Live Card HUD Brackets & Glassmorphic Styling */
+    .kiosk-live-card {
+      background: var(--bg-card) !important;
+      border: 1px solid rgba(0, 240, 255, 0.35) !important;
+      border-radius: 14px !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+      position: relative !important;
+      overflow: hidden !important;
+    }
+    .kiosk-live-card::before {
+      content: "";
+      position: absolute;
+      top: 6px; left: 6px;
+      width: 8px; height: 8px;
+      border-top: 2px solid #00f0ff;
+      border-left: 2px solid #00f0ff;
+      border-top-left-radius: 3px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .kiosk-live-card::after {
+      content: "";
+      position: absolute;
+      bottom: 6px; right: 6px;
+      width: 8px; height: 8px;
+      border-bottom: 2px solid #00f0ff;
+      border-right: 2px solid #00f0ff;
+      border-bottom-right-radius: 3px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .live-card-hdr {
+      background: rgba(9, 16, 30, 0.75) !important;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
+      padding: 10px 14px !important;
+    }
+
+  </style>
+
+    <style>
+        .focus-modal-body {
+            font-size: 1.35rem !important;
+            line-height: 1.8 !important;
+            min-height: 0 !important;
+            max-height: calc(100vh - 140px) !important;
+            overflow-y: auto !important;
+            touch-action: pan-y !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior-y: contain !important;
+        }
+        .focus-modal-title, .focus-card-title {
+            font-size: 1.45rem !important;
+        }
+        .live-card-body {
+            font-size: 1.18rem !important;
+            line-height: 1.75 !important;
+        }
+        .live-card-body pre, .focus-modal-body pre {
+            font-size: 1.05rem !important;
+            line-height: 1.6 !important;
+        }
+        .ptt-status-strip {
+            font-size: 0.95rem !important;
+        }
+        .btn-ptt-main {
+            font-size: 1.05rem !important;
+            height: 48px !important;
+        }
+    /* Clean Scaled Window Controls (Minimize & Close) */
+    .kiosk-window-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+    }
+
+    .kiosk-win-btn {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      min-height: 38px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0;
+    }
+
+    .kiosk-win-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .kiosk-win-btn:active {
+      transform: scale(0.92);
+    }
+
+    .kiosk-win-btn.btn-minimize:hover {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: var(--cyan-glow);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+
+    .kiosk-win-btn.btn-close {
+      color: #cbd5e1;
+    }
+
+    .kiosk-win-btn.btn-close:hover {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #f87171;
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.3);
+    }
+
+    .kiosk-win-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.3;
+    }
+
+    /* Minimized Compact HUD Dock */
+    .kiosk-minimized-dock {
+      position: fixed;
+      top: 14px;
+      right: 16px;
+      z-index: 10000;
+      background: rgba(8, 12, 20, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-focus);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.2);
+      animation: slideInDock 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideInDock {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .kiosk-minimized-dock.hidden {
+      display: none !important;
+    }
+
+    .min-dock-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+
+    .min-dock-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald-neon);
+      box-shadow: 0 0 8px var(--emerald-neon);
+      animation: pulse 1.8s infinite;
+    }
+
+    .min-dock-telem {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding-left: 10px;
+    }
+  </style>
+</head>
+<body
+  <!-- Mobile Kiosk Switcher -->
+  <div class="mobile-kiosk-switcher" style="display:none;"><button onclick="switchKioskMobileTab('status')">Status</button></div>>
+
+  <!-- Minimized Floating HUD Dock (Appears when minimized) -->
+  <div id="kiosk-minimized-dock" class="kiosk-minimized-dock hidden">
+    <div class="min-dock-brand">
+      <span class="min-dock-pulse"></span>
+      <span>FEYNMAN HUD</span>
+    </div>
+    <div class="min-dock-telem" id="min-dock-telem">
+      <span id="min-telem-radar">RADAR: IDLE</span> • 
+      <span id="min-telem-temp">--.-°C</span> • 
+      <span id="min-telem-iron" style="color: var(--emerald-neon);">READY</span>
+    </div>
+    <div style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: var(--cyan-glow);" id="min-clock-display">
+      12:00
+    </div>
+    <button class="kiosk-win-btn btn-minimize" onclick="toggleKioskMinimize()" title="Restore Kiosk HUD" style="width: 30px; height: 30px; min-width: 30px; min-height: 30px;" aria-label="Restore">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 13px; height: 13px;"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+    </button>
+    <button class="kiosk-win-btn btn-close-desktop" onclick="exitKioskAction()" title="Exit to Desktop" style="display:inline-flex; align-items:center; gap:4px; height:30px; padding:0 8px; background:rgba(239, 68, 68, 0.25); border:1px solid rgba(239, 68, 68, 0.7); color:#fca5a5; font-size:0.75rem; font-weight:700; border-radius:6px; cursor:pointer;" aria-label="Exit to Desktop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 12px; height: 12px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <span>✕ Desktop</span>
+    </button>
+  </div>
+
+  <!-- Top Kiosk Header -->
+  <header class="kiosk-header">
+    <div class="brand-wrap">
+      <div class="brand-logo-badge">⚡</div>
+      <div>
+        <span class="brand-title">Workbench HUD</span>
+      </div>
+      <div class="brand-status-pill" id="relay-status-pill">
+        <span class="status-dot-live"></span>
+        <span>CONNECTED</span>
+      </div>
+    </div>
+
+    
+
+    <!-- Live Telemetry Quick Bar -->
+    <div class="telemetry-strip" id="kiosk-telem-strip">
+      <div class="telem-item">
+        <span>RADAR:</span>
+        <span class="telem-val" id="telem-radar">IDLE</span>
+      </div>
+      <div class="telem-item">
+        <span>TEMP:</span>
+        <span class="telem-val" id="telem-temp">--.-°C</span>
+      </div>
+      <div class="telem-item">
+        <span>HUM:</span>
+        <span class="telem-val" id="telem-hum">--%</span>
+      </div>
+      <div class="telem-item">
+        <span>IRON:</span>
+        <span class="telem-val" id="telem-iron" style="color: var(--emerald-neon);">READY</span>
+      </div>
+    </div>
+
+    <!-- Controls & Scaled Window Controls -->
+    <div class="controls-group">
+      <button class="hdr-btn" onclick="toggleFocusMode()" title="Talking Focus Mode">
+        <span>💬 Talk Mode</span>
+      </button>
+
+      <a href="/boost/boost" class="hdr-btn" style="text-decoration: none; color: #f59e0b; border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.1);" title="System Booster & Token Optimizer (/boost/boost)">
+        <span>🚀 Booster</span>
+      </a>
+
+      <a href="/" class="hdr-btn primary" style="text-decoration: none;" title="Open Hub">
+        <span>Hub ↗</span>
+      </a>
+
+      <div style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: var(--cyan-glow); min-width: 60px; text-align: right;" id="clock-display">
+        12:00
+      </div>
+
+      <!-- Scaled Kiosk Window Controls -->
+      <div class="kiosk-window-controls" id="kiosk-window-controls" style="display:flex; align-items:center; gap:8px;">
+        <button class="kiosk-win-btn btn-minimize" id="btn-kiosk-minimize" onclick="toggleKioskMinimize()" title="Minimize to Compact HUD (—)" aria-label="Minimize">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button class="kiosk-win-btn btn-close-desktop" id="btn-kiosk-close" onclick="exitKioskAction()" title="Exit Kiosk to Desktop (✕)" aria-label="Exit to Desktop" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg, #ef4444, #dc2626); border:1px solid #b91c1c; color:#ffffff; font-size:0.95rem; font-weight:800; padding:8px 18px; border-radius:10px; cursor:pointer; min-height:44px; min-width:90px; box-shadow:0 2px 8px rgba(239,68,68,0.4); touch-action:manipulation;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <span>✕ EXIT</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Kiosk Layout -->
+  <main class="kiosk-main">
+
+    <!-- Left Column: Lab Hardware Controls (~290px) -->
+    <div class="kiosk-panel" id="panel-controls">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>⚡</span>
+          <span>Bench Relays &amp; Tools</span>
+        </div>
+        <span style="font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; color: var(--text-dim);">GPIO MCP</span>
+      </div>
+
+      <div class="panel-body scroll-touch">
+        <!-- Relays Quick Grid -->
+        <div class="bench-grid">
+          <div class="bench-relay-card" id="card-relay-iron" onclick="toggleRelay(1)">
+            <div class="relay-title">
+              <span>Soldering Iron</span>
+              <span class="relay-state-tag" id="tag-relay-iron">OFF</span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">Relay #1 • 320°C</div>
+            <div class="relay-btn-action">Toggle Power ⚡</div>
+          </div>
+
+          <div class="bench-relay-card" id="card-relay-glue" onclick="toggleRelay(2)">
+            <div class="relay-title">
+              <span>Glue Gun</span>
+              <span class="relay-state-tag" id="tag-relay-glue">OFF</span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">Relay #2 • Hot Melt</div>
+            <div class="relay-btn-action">Toggle Power 🌡️</div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-top: 4px;">
+          Lab Navigation
+        </div>
+
+        <!-- Quick Links -->
+        <a href="/playground" class="vault-item">
+          <div class="vault-item-left">
+            <span>⚡</span>
+            <span>Circuit Playground</span>
+          </div>
+          <span class="vault-badge">SIM</span>
+        </a>
+
+        <a href="/boost/boost" class="vault-item">
+          <div class="vault-item-left">
+            <span>🚀</span>
+            <span>System Booster (/boost/boost)</span>
+          </div>
+          <span class="vault-badge" style="background: rgba(245,158,11,0.2); color: #f59e0b; border-color: rgba(245,158,11,0.4);">4/4</span>
+        </a>
+
+        <a href="/brainstorm" class="vault-item">
+          <div class="vault-item-left">
+            <span>💡</span>
+            <span>Ideas &amp; Notes</span>
+          </div>
+          <span class="vault-badge">NOTES</span>
+        </a>
+
+
+
+        <a href="/blog" class="vault-item">
+          <div class="vault-item-left">
+            <span>📖</span>
+            <span>Cosmic Architecture Blog</span>
+          </div>
+          <span class="vault-badge">DOCS</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: Tabbed View Hub -->
+    <div class="kiosk-panel" id="panel-telemetry">
+      <div class="panel-header">
+        <div class="view-tab-bar">
+          <button class="view-tab active" id="tab-copilot" onclick="switchKioskView('copilot', this)">💡 Feynman Copilot</button>
+          <button class="view-tab" id="tab-charts" onclick="switchKioskView('charts', this)">📊 Telemetry Charts</button>
+
+          <button class="view-tab" id="tab-pinout" onclick="switchKioskView('pinout', this)">🔌 Pinout Matrix</button>
+        </div>
+        <button class="hdr-btn" onclick="toggleFocusMode()" style="height: 28px; font-size: 0.72rem;">
+          <span>⛶ Focus</span>
+        </button>
+      </div>
+
+      <div class="panel-body" style="padding: 10px; height: calc(100% - 46px);">
+        
+        <div class="circuit-container" id="circuit-mode-container">
+           <div class="circuit-canvas-area">
+              [ Circuit Playground Canvas ]
+           </div>
+           <div class="circuit-chat-area">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
+                <h3 style="color: var(--cyan-glow); margin: 0; font-size: 1.1rem;">Agent Chatbox</h3>
+                <button onclick="document.body.classList.remove('circuit-mode-active')" style="background: none; border: 1px solid var(--border-subtle); color: var(--text-muted); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 0.75rem;">Exit</button>
+              </div>
+              <div id="circuit-chat-messages" style="flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.5; padding-right: 4px;"></div>
+           </div>
+        </div>
+        <div class="display-screen-container" id="display-container">
+
+          <!-- Default: Feynman Copilot View -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Voice / PTT Bar -->
+  <footer class="kiosk-footer">
+    
+    <div class="voice-ptt-wrap">
+      <div id="ptt-indicator" style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card-subtle); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-subtle); transition: all 0.3s ease;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="ptt-mic-icon" style="color: var(--text-muted); transition: color 0.3s ease;">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+      </div>
+      <button class="btn-ptt-main" onclick="toggleListenMode()" id="ptt-btn">
+        <span id="ptt-label">🎙️ Tap to Talk</span>
+      </button>
+
+      <div class="ptt-status-strip" id="ptt-status-text">
+        🎙️ Feynman Voice Copilot: Standby (Press physical GPIO 2 or hold button)
+      </div>
+    </div>
+
+    <button class="hdr-btn" onclick="toggleFocusMode()" style="flex-shrink: 0;">
+      <span>💬 Focus View</span>
+    </button>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- FEYNMAN FULLSCREEN FOCUS MODE (TALKING MODE OVERLAY)                      -->
+  <!-- ========================================================================= -->
+  <div id="focus-overlay" class="focus-mode-overlay hidden">
+    <div class="focus-modal-card">
+      <div class="focus-modal-hdr">
+        <div class="focus-modal-title">
+          <span>💡</span>
+          <span id="focus-card-title">Feynman Copilot • Talking Mode</span>
+        </div>
+        <button class="btn-exit-focus" onclick="toggleFocusMode()">✕ Exit Focus</button>
+      </div>
+
+      <div class="focus-modal-body scroll-touch" id="focus-card-body">
+        <!-- Rendered Markdown in Large Format -->
+      </div>
+
+      <div class="focus-modal-ftr">
+        <button class="btn-ptt-main" onclick="toggleListenMode()" id="focus-ptt-btn" style="padding: 0 28px; height: 42px; font-size: 0.95rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          <span>Hold to Talk to Feynman</span>
+        </button>
+        <div style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);" id="focus-status-text">
+          AIY Voice HAT Active • Neural Speech Ready
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================================
+    // THEME MANAGEMENT (LIGHT / DARK)
+    // ============================================================================
+    function initTheme() {
+      const savedTheme = localStorage.getItem('kiosk_theme') || 'dark';
+      applyTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('kiosk_theme', next);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      const icon = document.getElementById('theme-icon');
+      const text = document.getElementById('theme-text');
+      if (theme === 'light') {
+        if (icon) icon.textContent = '🌙';
+        if (text) text.textContent = 'Dark';
+      } else {
+        if (icon) icon.textContent = '☀️';
+        if (text) text.textContent = 'Light';
+      }
+    }
+
+    initTheme();
+
+    // ============================================================================
+    // FOCUS MODE (TALKING MODE OVERLAY)
+    // ============================================================================
+    let isFocusMode = false;
+
+    function toggleFocusMode() {
+      isFocusMode = !isFocusMode;
+      const overlay = document.getElementById('focus-overlay');
+      if (!overlay) return;
+
+      if (isFocusMode) {
+        overlay.classList.remove('hidden');
+        renderFocusContent();
+      } else {
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function setAgentState(st) {
+      let chip = document.getElementById('agent-state-chip');
+      if (!chip) {
+        chip = document.createElement('div');
+        chip.id = 'agent-state-chip';
+        chip.style.cssText = 'position:fixed;top:8px;right:8px;z-index:99999;padding:8px 16px;border-radius:22px;font:700 16px sans-serif;color:#fff;min-height:44px;display:flex;align-items:center;';
+        document.body.appendChild(chip);
+      }
+      const m = {idle: ['#334155', '● Idle'], listening: ['#dc2626', '🎤 Listening'], thinking: ['#d97706', '🧠 Thinking…'], speaking: ['#16a34a', '🔊 Speaking']};
+      const v = m[st] || m.idle;
+      chip.style.background = v[0];
+      chip.textContent = v[1];
+    }
+    document.addEventListener('DOMContentLoaded', () => setAgentState('idle'));
+    
+    function switchKioskMobileTab(tab) {
+      const pCtrl = document.getElementById('panel-controls');
+      const pTelem = document.getElementById('panel-telemetry');
+      if (pCtrl && pTelem) {
+        if (tab === 'status') {
+          pCtrl.style.display = 'block';
+          pTelem.style.display = 'none';
+        } else {
+          pCtrl.style.display = 'none';
+          pTelem.style.display = 'block';
+        }
+      }
+    }
+
+    function renderFocusContent() {
+      const titleEl = document.getElementById('focus-card-title');
+      const bodyEl = document.getElementById('focus-card-body');
+      if (!bodyEl) return;
+
+      if (!currentPayload) {
+        if (titleEl) titleEl.textContent = 'Feynman Copilot • Talking Mode';
+        bodyEl.innerHTML = `
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; color:var(--text-muted); padding:30px;">
+            <div style="font-size:3rem; margin-bottom:12px;">💡</div>
+            <div style="font-size:1.25rem; font-weight:700; color:var(--cyan-glow); margin-bottom:8px;">Ready for Lab Inquiries</div>
+            <div style="font-size:0.95rem; max-width:480px; line-height:1.5;">Press and hold the PTT button or physical GPIO 2 switch to speak to Feynman AI Copilot.</div>
+          </div>`;
+        return;
+      }
+
+      if (titleEl) titleEl.textContent = currentPayload.title || 'Feynman Copilot Notice';
+      const imgHtml = currentPayload.image ? `<img src="${currentPayload.image}" onclick="this.classList.toggle('zoom')" style="max-width:100%;max-height:300px;object-fit:contain;display:block;margin:0 auto 12px;background:#fff;border-radius:8px;">` : '';
+      bodyEl.innerHTML = imgHtml + renderFormattedContent(currentPayload.type, currentPayload.content);
+    }
+
+    // Keyboard shortcut Escape exits focus mode or confirms exit
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (isFocusMode) {
+          toggleFocusMode();
+        } else if (document.body.classList.contains('kiosk-minimized')) {
+          toggleKioskMinimize();
+        }
+      }
+    });
+
+    // ============================================================================
+    // KIOSK WINDOW CONTROLS (MINIMIZE & CLOSE)
+    // ============================================================================
+    function toggleKioskMinimize() {
+      const isMin = document.body.classList.toggle('kiosk-minimized');
+      const dock = document.getElementById('kiosk-minimized-dock');
+      const main = document.querySelector('.kiosk-main');
+      const header = document.querySelector('.kiosk-header');
+      if (isMin) {
+        if (dock) dock.classList.remove('hidden');
+        if (main) main.style.display = 'none';
+        if (header) header.style.display = 'none';
+      } else {
+        if (dock) dock.classList.add('hidden');
+        if (main) main.style.display = '';
+        if (header) header.style.display = '';
+      }
+    }
+
+    async function exitKioskAction() {
+      const btn = document.getElementById('btn-kiosk-close');
+      if (btn) btn.innerHTML = '<span>✕ Closing...</span>';
+      
+      const exitOverlay = document.createElement('div');
+      exitOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#050914;color:#f87171;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;font-family:sans-serif;font-size:1.6rem;font-weight:700;';
+      exitOverlay.innerHTML = '<div style="font-size:3.5rem;margin-bottom:14px;">🚪</div><div>Closing Kiosk HUD...</div><div style="font-size:1rem;color:#94a3b8;margin-top:10px;font-weight:500;">Returning to Raspberry Pi Desktop</div>';
+      document.body.appendChild(exitOverlay);
+
+      try {
+        await fetch('/api/kiosk/exit', { method: 'POST' });
+      } catch (err) {}
+      try {
+        window.close();
+      } catch (err) {}
+    }
+
+    // ============================================================================
+    // LIVE CLOCK
+    // ============================================================================
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const el = document.getElementById('clock-display');
+      if (el) el.textContent = timeStr;
+      const minEl = document.getElementById('min-clock-display');
+      if (minEl) minEl.textContent = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ============================================================================
+    // MARKDOWN & HTML RENDERING
+    // ============================================================================
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function renderFormattedContent(type, content) {
+      if (!content) return '<p style="color:var(--text-muted); font-style:italic;">No active intelligence payload displayed</p>';
+      if (window.marked && typeof window.marked.parse === 'function') {
+        try {
+          return window.marked.parse(content);
+        } catch (e) {
+          console.error('[Marked Parse Error]:', e);
+        }
+      }
+      return `<pre style="white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text-main);">${escapeHtml(content)}</pre>`;
+    }
+
+    // ============================================================================
+    // WEBSOCKET CONNECTION TO /ws/kiosk
+    // ============================================================================
+    let kioskWs = null;
+    let wsReconnectTimer = null;
+    let wsReconnectAttempts = 0;
+    let currentPayload = null;
+    let currentView = 'copilot';
+
+    function handleIncomingPayload(payload, autoFocus) {
+      if (!payload) return;
+      currentPayload = payload;
+      const statusText = document.getElementById('ptt-status-text');
+      const focusStatus = document.getElementById('focus-status-text');
+      const msg = `💡 Feynman: ${payload.title || 'Notice'}`;
+      if (statusText) statusText.textContent = msg;
+      if (focusStatus) focusStatus.textContent = msg;
+
+      // Switch tab to copilot if currently on another tab
+      const copilotTab = document.getElementById('tab-copilot');
+      if (copilotTab) {
+        document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+        copilotTab.classList.add('active');
+      }
+
+      renderCopilotView();
+
+      if (autoFocus || payload.type === 'pinout_push' || payload.type === 'circuit_push' || payload.force_focus) {
+        if (!isFocusMode) {
+          toggleFocusMode();
+        } else {
+          renderFocusContent();
+        }
+      } else if (isFocusMode) {
+        renderFocusContent();
+      }
+
+      if (payload.agent_message || payload.spoken_text) {
+        speakKioskResponse(payload.agent_message || payload.spoken_text);
+      }
+    }
+
+    function renderCopilotView() {
+      const container = document.getElementById('display-container');
+      if (!container) return;
+
+      if (!currentPayload) {
+        container.innerHTML = `
+          <div class="hud-idle-dashboard" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; height:100%; width:100%; padding:4px; box-sizing:border-box;">
+            <!-- Left: Target HUD & Orbit Radar (Matches Sci-Fi HUD Image 2 & 3) -->
+            <div style="background:rgba(10,18,34,0.65); border:1px solid rgba(56,189,248,0.2); border-radius:12px; padding:10px; display:flex; flex-direction:column; position:relative; overflow:hidden;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; border-bottom:1px solid rgba(56,189,248,0.15); padding-bottom:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--cyan-bright); font-weight:700; letter-spacing:0.06em;">TARGET HUD // ORBIT RADAR</span>
+                <span style="background:rgba(74,222,128,0.15); border:1px solid #4ade80; color:#4ade80; font-family:'JetBrains Mono',monospace; font-size:0.65rem; padding:1px 6px; border-radius:10px; font-weight:700;">LIVE FEED</span>
+              </div>
+              
+              <!-- SVG Radar Display -->
+              <div style="flex:1; display:flex; align-items:center; justify-content:center; position:relative; min-height:160px;">
+                <svg viewBox="0 0 200 200" style="width:min(180px, 90%); height:min(180px, 90%); overflow:visible;">
+                  <!-- Radar Concentric Rings -->
+                  <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(56,189,248,0.18)" stroke-width="1" stroke-dasharray="3,3"/>
+                  <circle cx="100" cy="100" r="65" fill="none" stroke="rgba(56,189,248,0.25)" stroke-width="1"/>
+                  <circle cx="100" cy="100" r="40" fill="none" stroke="rgba(56,189,248,0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+                  <circle cx="100" cy="100" r="15" fill="rgba(0,240,255,0.08)" stroke="rgba(0,240,255,0.4)" stroke-width="1.2"/>
+                  <!-- Crosshairs -->
+                  <line x1="100" y1="5" x2="100" y2="195" stroke="rgba(56,189,248,0.2)" stroke-width="1"/>
+                  <line x1="5" y1="100" x2="195" y2="100" stroke="rgba(56,189,248,0.2)" stroke-width="1"/>
+                  <!-- Target Blips -->
+                  <circle cx="75" cy="55" r="3.5" fill="#4ade80"/>
+                  <circle cx="75" cy="55" r="8" fill="none" stroke="#4ade80" stroke-width="0.8" style="animation:hud-pulse-glow 2s infinite;"/>
+                  <text x="82" y="58" fill="#94a3b8" font-size="7" font-family="'JetBrains Mono', monospace">BENCH 24GHz</text>
+
+                  <circle cx="130" cy="80" r="3" fill="#00f0ff"/>
+                  <text x="136" y="83" fill="#94a3b8" font-size="7" font-family="'JetBrains Mono', monospace">ESP32-S3</text>
+
+                  <circle cx="120" cy="140" r="3" fill="#a855f7"/>
+                  <text x="126" y="143" fill="#94a3b8" font-size="7" font-family="'JetBrains Mono', monospace">PI KIOSK</text>
+
+                  <circle cx="60" cy="125" r="3" fill="#fbbf24"/>
+                  <text x="24" y="128" fill="#94a3b8" font-size="7" font-family="'JetBrains Mono', monospace">ROVER 3D</text>
+
+                  <!-- Rotating Radar Sweep Line -->
+                  <g class="hud-sweep-line">
+                    <line x1="100" y1="100" x2="100" y2="10" stroke="url(#sweepGrad)" stroke-width="2"/>
+                    <path d="M100,100 L100,10 A90,90 0 0,1 163,36 Z" fill="url(#sweepSector)" opacity="0.25"/>
+                  </g>
+                  
+                  <defs>
+                    <linearGradient id="sweepGrad" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stop-color="rgba(0,240,255,0)"/>
+                      <stop offset="100%" stop-color="#00f0ff"/>
+                    </linearGradient>
+                    <radialGradient id="sweepSector" cx="100" cy="100" r="90" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="rgba(0,240,255,0)"/>
+                      <stop offset="100%" stop-color="rgba(0,240,255,0.4)"/>
+                    </radialGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              <!-- Technical Coordinates Readout (Matches NASA/Sci-Fi image) -->
+              <div style="display:flex; justify-content:space-between; align-items:center; font-family:'JetBrains Mono', monospace; font-size:0.68rem; color:var(--text-muted); border-top:1px solid rgba(56,189,248,0.15); padding-top:4px;">
+                <span>COORD: 58.5000°N, 1.5000°E</span>
+                <span style="color:var(--cyan-bright);">DEPTH 46.2m</span>
+              </div>
+            </div>
+
+            <!-- Right: Industrial Live Status & Gauges (Matches Oil Rig Image 1) -->
+            <div style="background:rgba(10,18,34,0.65); border:1px solid rgba(56,189,248,0.2); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(56,189,248,0.15); padding-bottom:4px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#4ade80; font-weight:700; letter-spacing:0.06em;">LIVE STATUS // TELEMETRY</span>
+                <span style="color:var(--text-dim); font-size:0.68rem; font-family:'JetBrains Mono', monospace;">14:23 UTC</span>
+              </div>
+
+              <!-- Two Key Metric Tiles (89,200 bbl & 12.4 MMSCF aesthetic) -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <div style="background:rgba(16,28,52,0.8); border:1px solid rgba(74,222,128,0.3); border-radius:8px; padding:6px 8px;">
+                  <div style="font-size:0.65rem; color:#94a3b8; font-family:'JetBrains Mono',monospace;">DATA STREAM</div>
+                  <div style="font-size:1.15rem; font-weight:800; color:#4ade80; font-family:'JetBrains Mono',monospace; margin:2px 0;">89,200 <span style="font-size:0.6rem; color:#94a3b8;">pkt</span></div>
+                  <div style="font-size:0.62rem; color:#4ade80;">▲ 99.8% STABLE</div>
+                </div>
+                <div style="background:rgba(16,28,52,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:6px 8px;">
+                  <div style="font-size:0.65rem; color:#94a3b8; font-family:'JetBrains Mono',monospace;">UPTIME (24h)</div>
+                  <div style="font-size:1.15rem; font-weight:800; color:#38bdf8; font-family:'JetBrains Mono',monospace; margin:2px 0;">99.9%</div>
+                  <div style="font-size:0.62rem; color:#38bdf8;">ACTIVE 4/4 NODES</div>
+                </div>
+              </div>
+
+              <!-- Critical Equipment Health List -->
+              <div style="display:flex; flex-direction:column; gap:4px; margin-top:2px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(16,28,52,0.5); padding:4px 8px; border-radius:6px; font-size:0.72rem; font-family:'JetBrains Mono',monospace;">
+                  <span style="color:#f8fafc;">Soldering Iron Relay</span>
+                  <span style="background:rgba(74,222,128,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.4); padding:1px 6px; border-radius:4px; font-weight:700;">READY</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(16,28,52,0.5); padding:4px 8px; border-radius:6px; font-size:0.72rem; font-family:'JetBrains Mono',monospace;">
+                  <span style="color:#f8fafc;">mmWave Radar 24GHz</span>
+                  <span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.4); padding:1px 6px; border-radius:4px; font-weight:700;">SCANNING</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(16,28,52,0.5); padding:4px 8px; border-radius:6px; font-size:0.72rem; font-family:'JetBrains Mono',monospace;">
+                  <span style="color:#f8fafc;">Feynman Voice HAT</span>
+                  <span style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.4); padding:1px 6px; border-radius:4px; font-weight:700;">STANDBY</span>
+                </div>
+              </div>
+
+              <!-- Audio Equalizer / Data Flow Strip (Image 2 style) -->
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 8px; background:rgba(16,28,52,0.6); border-radius:6px; margin-top:auto;">
+                <span style="font-size:0.65rem; color:#94a3b8; font-family:'JetBrains Mono',monospace;">AUDIO EQ // 16kHz</span>
+                <div style="display:flex; align-items:flex-end; gap:3px; height:24px;">
+                  <div class="hud-eq-col"></div>
+                  <div class="hud-eq-col"></div>
+                  <div class="hud-eq-col"></div>
+                  <div class="hud-eq-col"></div>
+                  <div class="hud-eq-col"></div>
+                  <div class="hud-eq-col"></div>
+                  <div class="hud-eq-col"></div>
+                  <div class="hud-eq-col"></div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const p = currentPayload;
+      const title = p.title || 'Desk Intelligence Notice';
+      const type = (p.type || 'markdown').toUpperCase();
+      const timeStr = p.timestamp ? p.timestamp.substring(11, 19) + ' UTC' : 'LIVE';
+      const bodyHtml = renderFormattedContent(p.type, p.content);
+
+      container.innerHTML = `
+        <div class="kiosk-live-card">
+          <div class="live-card-hdr">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="status-dot-live"></span>
+              <strong style="color:var(--text-main); font-size:0.9rem;">${escapeHtml(title)}</strong>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="background:rgba(56,189,248,0.12); color:var(--cyan-glow); font-family:'JetBrains Mono', monospace; font-size:0.72rem; padding:2px 8px; border-radius:6px; font-weight:600;">${escapeHtml(type)}</span>
+              <span style="color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:0.72rem;">${timeStr}</span>
+              <button class="hdr-btn" onclick="toggleFocusMode()" style="height:24px; padding:0 8px; font-size:0.7rem;">⛶ Focus</button>
+            </div>
+          </div>
+          <div class="live-card-body scroll-touch">
+            ${bodyHtml}
+          </div>
+        </div>`;
+    }
+
+    function initKioskWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/ws/kiosk`;
+      const pill = document.getElementById('relay-status-pill');
+
+      try {
+        kioskWs = new WebSocket(wsUrl);
+        kioskWs.binaryType = 'arraybuffer';
+
+        kioskWs.onopen = () => {
+          console.log('[WS/kiosk] Connected to Workbench Hub');
+          wsReconnectAttempts = 0;
+          if (pill) {
+            pill.innerHTML = '<span class="status-dot-live"></span><span>CONNECTED ⚡</span>';
+            pill.style.borderColor = 'rgba(16,185,129,0.35)';
+            pill.style.color = 'var(--emerald-neon)';
+          }
+        };
+
+        kioskWs.onmessage = (event) => {
+          try {
+            let data = null;
+            const mp = window.MessagePack || window.msgpack;
+            if (event.data instanceof ArrayBuffer) {
+              if (mp && mp.decode) {
+                data = mp.decode(new Uint8Array(event.data));
+              }
+            } else if (typeof event.data === 'string') {
+              data = JSON.parse(event.data);
+            }
+            if (!data) return;
+
+            if (data.type === 'ping') {
+              if (mp && mp.encode && event.data instanceof ArrayBuffer) {
+                kioskWs.send(mp.encode({ type: 'pong' }));
+              } else {
+                kioskWs.send(JSON.stringify({ type: 'pong' }));
+              }
+              return;
+            }
+
+            if (data.type === 'delta' || data.type === 'state_sync') {
+              window.kioskBoardState = window.kioskBoardState || { pins: {}, coords: {} };
+              if (data.pins) Object.assign(window.kioskBoardState.pins, data.pins);
+              if (data.coords) Object.assign(window.kioskBoardState.coords, data.coords);
+              if (data.display) handleIncomingPayload(data.display, false);
+              if (window.EventBus) window.EventBus.emit('circuit:state-tick', data.pins || data);
+              return;
+            }
+            if (data.type === 'force_reload') {
+              window.location.reload();
+              return;
+            }
+            if (data.type === 'agent_state') {
+              setAgentState(data.state);
+              return;
+            }
+            if (data.type === 'ptt_active') {
+              if (window.kioskPttMsg) window.kioskPttMsg(!!data.state);
+              const indicator = document.getElementById('ptt-indicator');
+              if (indicator) {
+                if (data.state) {
+                  indicator.classList.add('ptt-active-glow');
+                } else {
+                  indicator.classList.remove('ptt-active-glow');
+                }
+              }
+              return;
+            }
+            if (data.type === 'circuit_push') {
+              document.body.classList.add('circuit-mode-active');
+              const msgArea = document.getElementById('circuit-chat-messages');
+              if (msgArea) {
+                const p = data.payload || data;
+                msgArea.innerHTML = `<div style="color:var(--cyan-glow); font-weight:700; margin-bottom:6px;">${escapeHtml(p.title || 'Circuit Schematic')}</div><div style="font-size:0.95rem; line-height:1.6;">${renderFormattedContent('markdown', p.content || '')}</div>`;
+              }
+              handleIncomingPayload(data.payload || data, true);
+              return;
+            }
+            if (data.type === 'pinout_push') {
+              document.body.classList.remove('circuit-mode-active');
+              const p = data.payload || data;
+              handleIncomingPayload(p, true);
+              return;
+            }
+
+            handleIncomingPayload(data, false);
+          } catch (e) {
+            console.error('[WS/kiosk] Payload parse err:', e);
+          }
+        };
+
+        kioskWs.onclose = () => {
+          if (pill) {
+            pill.innerHTML = '<span class="status-dot-live" style="background:var(--rose-neon);"></span><span>RECONNECTING...</span>';
+            pill.style.borderColor = 'rgba(239,68,68,0.35)';
+            pill.style.color = 'var(--rose-neon)';
+          }
+          scheduleWsReconnect();
+        };
+
+        kioskWs.onerror = () => {
+          kioskWs.close();
+        };
+      } catch (err) {
+        scheduleWsReconnect();
+      }
+    }
+
+    function scheduleWsReconnect() {
+      if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+      wsReconnectAttempts++;
+      const delay = Math.min(1000 * Math.pow(1.5, wsReconnectAttempts - 1), 10000);
+      wsReconnectTimer = setTimeout(initKioskWebSocket, delay);
+    }
+
+    initKioskWebSocket();
+
+    // ============================================================================
+    // TELEMETRY POLLING & CHART
+    // ============================================================================
+    let telemChart = null;
+    let telemData = { labels: [], temp: [], hum: [] };
+
+    function initChart() {
+      const ctx = document.getElementById('telemChart');
+      if (!ctx || typeof Chart === 'undefined') return;
+      if (telemChart) { telemChart.destroy(); telemChart = null; }
+
+      telemChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: telemData.labels,
+          datasets: [
+            {
+              label: 'Temp (°C)',
+              data: telemData.temp,
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.08)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Humidity (%)',
+              data: telemData.hum,
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.08)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: { legend: { position: 'top' } },
+          scales: {
+            x: { grid: { color: 'rgba(148, 163, 184, 0.1)' } },
+            y: { type: 'linear', display: true, position: 'left', grid: { color: 'rgba(148, 163, 184, 0.1)' } },
+            y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } }
+          }
+        }
+      });
+    }
+
+    async function updateTelemetry() {
+      try {
+        const res = await fetch('/api/workstation/telemetry');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Radar presence
+        const radar = document.getElementById('telem-radar');
+        const minRadar = document.getElementById('min-telem-radar');
+        if (radar) {
+          radar.textContent = data.radar_presence === 1 ? 'AYUSH BENCH ⚡' : 'STANDBY 💭';
+          radar.style.color = data.radar_presence === 1 ? 'var(--cyan-bright)' : 'var(--text-muted)';
+        }
+        if (minRadar) {
+          minRadar.textContent = data.radar_presence === 1 ? 'RADAR: DETECTED ⚡' : 'RADAR: IDLE';
+          minRadar.style.color = data.radar_presence === 1 ? 'var(--cyan-glow)' : 'var(--text-muted)';
+        }
+
+        // Temp & Humidity
+        const temp = document.getElementById('telem-temp');
+        const minTemp = document.getElementById('min-telem-temp');
+        if (temp && data.temperature !== undefined) {
+          temp.textContent = data.temperature.toFixed(1) + '°C';
+          if (minTemp) minTemp.textContent = data.temperature.toFixed(1) + '°C';
+          if (telemData.temp.length > 20) telemData.temp.shift();
+          telemData.temp.push(data.temperature);
+        }
+        const hum = document.getElementById('telem-hum');
+        if (hum && data.humidity !== undefined) {
+          hum.textContent = data.humidity.toFixed(0) + '%';
+          if (telemData.hum.length > 20) telemData.hum.shift();
+          telemData.hum.push(data.humidity);
+          if (telemData.labels.length > 20) telemData.labels.shift();
+          const now = new Date();
+          telemData.labels.push(now.getSeconds() + 's');
+          if (telemChart) telemChart.update('none');
+        }
+
+        // Relay 1 (Soldering Iron)
+        const ironCard = document.getElementById('card-relay-iron');
+        const ironTag = document.getElementById('tag-relay-iron');
+        const telemIron = document.getElementById('telem-iron');
+        const minIron = document.getElementById('min-telem-iron');
+        if (data.relay_1_soldering === 1) {
+          if (ironCard) ironCard.className = 'bench-relay-card active-hot';
+          if (ironTag) ironTag.textContent = 'ON 🔥';
+          if (telemIron) { telemIron.textContent = 'HEATING 🔥'; telemIron.style.color = 'var(--amber-neon)'; }
+          if (minIron) { minIron.textContent = 'IRON: HEATING 🔥'; minIron.style.color = 'var(--amber-neon)'; }
+        } else {
+          if (ironCard) ironCard.className = 'bench-relay-card';
+          if (ironTag) ironTag.textContent = 'OFF';
+          if (telemIron) { telemIron.textContent = 'READY'; telemIron.style.color = 'var(--emerald-neon)'; }
+          if (minIron) { minIron.textContent = 'IRON: READY'; minIron.style.color = 'var(--emerald-neon)'; }
+        }
+
+        // Relay 2 (Glue Gun)
+        const glueCard = document.getElementById('card-relay-glue');
+        const glueTag = document.getElementById('tag-relay-glue');
+        if (data.relay_2_gluegun === 1) {
+          if (glueCard) glueCard.className = 'bench-relay-card active-hot';
+          if (glueTag) glueTag.textContent = 'ON 🌡️';
+        } else {
+          if (glueCard) glueCard.className = 'bench-relay-card';
+          if (glueTag) glueTag.textContent = 'OFF';
+        }
+      } catch (e) {
+        // quiet retry
+      }
+    }
+    setInterval(updateTelemetry, 3000);
+    updateTelemetry();
+
+    async function toggleRelay(relayId) {
+      try {
+        await fetch(`/api/workstation/relay/${relayId}/toggle`, { method: 'POST' });
+        setTimeout(updateTelemetry, 250);
+      } catch (e) {
+        console.error('Relay toggle err:', e);
+      }
+    }
+
+    // ============================================================================
+    // VIEW SWITCHER
+    // ============================================================================
+    function switchKioskView(viewType, btn) {
+      currentView = viewType;
+      document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const container = document.getElementById('display-container');
+      if (!container) return;
+
+      if (viewType === 'copilot') {
+        if (telemChart) { telemChart.destroy(); telemChart = null; }
+        renderCopilotView();
+      } else if (viewType === 'charts') {
+        container.innerHTML = '<div style="width:100%; height:100%; padding:8px;"><canvas id="telemChart"></canvas></div>';
+        setTimeout(initChart, 60);
+
+      } else if (viewType === 'pinout') {
+        if (telemChart) { telemChart.destroy(); telemChart = null; }
+        container.innerHTML = `
+          <div class="scroll-touch" style="padding:14px; color:var(--text-muted); font-family:'JetBrains Mono', monospace; font-size:0.82rem;">
+            <div style="font-size:0.95rem; color:var(--cyan-glow); font-weight:700; margin-bottom:10px;">🔌 Smart Workbench Pinout Matrix</div>
+            <div style="background:var(--bg-card-subtle); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; line-height:1.8; margin-bottom:10px;">
+              <div>• <strong>AIY Voice HAT Mic:</strong> I2S0, 16kHz mono (Card 3, HW 3:0)</div>
+              <div>• <strong>AIY Voice HAT Spk:</strong> I2S0, ALSA voicehat-hifi (pw-play)</div>
+              <div>• <strong>PTT Button:</strong> GPIO 2 (Physical Pin 3, Active LOW)</div>
+              <div>• <strong>Enter/Back Nav:</strong> GPIO 22 (Physical Pin 15, Active LOW)</div>
+              <div>• <strong>Kernel Fan:</strong> GPIO 17 (Physical Pin 11, gpio-fan)</div>
+            </div>
+            <div style="background:var(--bg-card-subtle); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; line-height:1.8;">
+              <div>• <strong>Workbench Host Hub:</strong> 192.168.0.111:80 (WebSocket /ws/kiosk)</div>
+            </div>
+          </div>`;
+      }
+    }
+
+    // Default start view: Copilot
+    renderCopilotView();
+
+
+
+    // === SINGLE-CLICK TOGGLE LISTEN WITH BARGE-IN ===
+    let listenState = 'idle';
+
+    function setListenState(state) {
+      listenState = state;
+      const label = document.getElementById('ptt-label');
+      const status = document.getElementById('ptt-status-text');
+      const focusStatus = document.getElementById('focus-status-text');
+      const pttBtn = document.getElementById('ptt-btn');
+      const focusBtn = document.getElementById('focus-ptt-btn');
+      let labelText, statusText;
+      if (state === 'idle') {
+        labelText = '🎙️ Tap to Talk';
+        statusText = '🎙️ Feynman Copilot: Standby — tap to start';
+        [pttBtn, focusBtn].forEach(b => { if(b) b.style.background=''; });
+      } else if (state === 'listening') {
+        labelText = '🔴 Listening... (tap to stop)';
+        statusText = '🔴 LISTENING... Bol Ayush!';
+        [pttBtn, focusBtn].forEach(b => { if(b) b.style.background='#e11d48'; });
+      } else if (state === 'speaking') {
+        labelText = '🔊 Speaking... (tap to interrupt)';
+        statusText = '🔊 Feynman bol raha hai — tap karo to rok do';
+        [pttBtn, focusBtn].forEach(b => { if(b) b.style.background='#0ea5e9'; });
+      }
+      if (label) label.textContent = labelText;
+      if (status) status.textContent = statusText;
+      if (focusStatus) focusStatus.textContent = statusText;
+    }
+
+    function speakKioskResponse(text) {
+      if (!text || !window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      setListenState('speaking');
+      
+      const clean = text.replace(/[#*`_~\[\]\(\)\|\{\}]/g, ' ').replace(/<[^>]*>/g, ' ').substring(0, 300);
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.rate = 1.25;
+      utter.volume = 1.0;
+      utter.pitch = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const hiVoice = voices.find(v => (v.lang && (v.lang.includes('hi') || v.lang.includes('IN')))) || voices[0];
+      if (hiVoice) utter.voice = hiVoice;
+
+      utter.onend = () => { onTTSStop(); };
+      utter.onerror = () => { onTTSStop(); };
+      window.speechSynthesis.speak(utter);
+    }
+
+    function interruptSpeech() {
+      isPlaying = false;
+      audioQueue = [];
+      if (window.speechSynthesis) {
+        try { window.speechSynthesis.cancel(); } catch(e){}
+      }
+      if (currentSource) { try { currentSource.stop(); } catch(e){} currentSource = null; }
+      if (kioskWs && kioskWs.readyState === WebSocket.OPEN) {
+        kioskWs.send(JSON.stringify({type:'listen',state:'stop'}));
+      }
+      setListenState('idle');
+    }
+
+    let lastSeenKioskId = 0;
+    async function pollKioskUpdates() {
+      try {
+        const resp = await fetch('/api/kiosk/latest');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data && data.id && data.id > lastSeenKioskId) {
+          lastSeenKioskId = data.id;
+          if (data.payload && (data.payload.content || data.payload.title)) {
+            handleIncomingPayload(data.payload);
+          }
+        }
+      } catch (e) {}
+    }
+    setInterval(pollKioskUpdates, 1200);
+    pollKioskUpdates();
+
+    let isContinuousListening = false;
+    let isPlaying = false;
+    let audioQueue = [];
+    let currentSource = null;
+    let kioskSpeechRec = null;
+    let kioskMediaRec = null;
+    let kioskChunks = [];
+    let audioCtx = null;
+    let vadInterval = null;
+
+    function initKioskSpeechEngine() {
+      const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (Rec) {
+        try {
+          kioskSpeechRec = new Rec();
+          kioskSpeechRec.continuous = true;
+          kioskSpeechRec.interimResults = true;
+          kioskSpeechRec.lang = 'hi-IN';
+
+          kioskSpeechRec.onspeechstart = () => {
+            if (listenState === 'speaking') {
+              interruptSpeech();
+            }
+          };
+
+          kioskSpeechRec.onresult = (event) => {
+            let finalT = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) finalT += event.results[i][0].transcript;
+            }
+            if (finalT.trim()) {
+              submitKioskVoicePrompt(finalT.trim());
+            }
+          };
+
+          kioskSpeechRec.onerror = (e) => {
+            console.warn('[SpeechRec Error]:', e.error);
+            if (isContinuousListening && e.error !== 'not-allowed') {
+              setTimeout(() => {
+                if (isContinuousListening && listenState === 'listening') {
+                  try { kioskSpeechRec.start(); } catch(err){}
+                }
+              }, 500);
+            }
+          };
+
+          kioskSpeechRec.onend = () => {
+            if (isContinuousListening && listenState === 'listening') {
+              try { kioskSpeechRec.start(); } catch(err){}
+            }
+          };
+        } catch(e) {
+          console.warn('[SpeechRec Init]:', e);
+        }
+      }
+    }
+
+    async function submitKioskVoicePrompt(text) {
+      if (!text) return;
+      setListenState('speaking');
+      const status = document.getElementById('ptt-status-text');
+      const focusStatus = document.getElementById('focus-status-text');
+      const msg = `⚡ Bol raha: "${text.substring(0, 35)}..."`;
+      if (status) status.textContent = msg;
+      if (focusStatus) focusStatus.textContent = msg;
+
+      try {
+        const resp = await fetch('/api/llm/prompt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: text, session_id: 'kiosk_voice' })
+        });
+        const data = await resp.json();
+        const reply = data.content || data.response || 'Mission nominal.';
+        const title = data.title || 'Xiaozhi AI Desk Copilot';
+        handleIncomingPayload({
+          type: 'markdown',
+          title: title,
+          content: reply,
+          agent_message: reply
+        });
+        if (!isFocusMode) toggleFocusMode();
+      } catch (err) {
+        speakKioskResponse('Connection mein rukawat aayi, dubara bolo Ayush!');
+      }
+    }
+
+    function toggleListenMode() {
+      if (listenState === 'idle') {
+        isContinuousListening = true;
+        setListenState('listening');
+        if (!kioskSpeechRec) initKioskSpeechEngine();
+        if (kioskSpeechRec) {
+          try { kioskSpeechRec.start(); } catch(e){}
+        } else {
+          startKioskMediaRecorder();
+        }
+        if (kioskWs && kioskWs.readyState === WebSocket.OPEN) {
+          kioskWs.send(JSON.stringify({ type: 'listen', state: 'start', mode: 'chat' }));
+        }
+      } else if (listenState === 'listening') {
+        isContinuousListening = false;
+        if (kioskSpeechRec) {
+          try { kioskSpeechRec.stop(); } catch(e){}
+        }
+        if (kioskMediaRec && kioskMediaRec.state !== 'inactive') {
+          try { kioskMediaRec.stop(); } catch(e){}
+        }
+        if (kioskWs && kioskWs.readyState === WebSocket.OPEN) {
+          kioskWs.send(JSON.stringify({ type: 'listen', state: 'stop' }));
+        }
+        setListenState('idle');
+      } else if (listenState === 'speaking') {
+        interruptSpeech();
+      }
+    }
+
+    function interruptSpeech() {
+      isPlaying = false;
+      audioQueue = [];
+      if (window.speechSynthesis) {
+        try { window.speechSynthesis.cancel(); } catch(e){}
+      }
+      if (currentSource) {
+        try { currentSource.stop(); } catch(e){}
+        currentSource = null;
+      }
+      if (isContinuousListening) {
+        setListenState('listening');
+        if (kioskSpeechRec) {
+          try { kioskSpeechRec.start(); } catch(e){}
+        }
+      } else {
+        setListenState('idle');
+      }
+    }
+
+    function onTTSStop() {
+      if (isContinuousListening) {
+        setListenState('listening');
+        if (kioskSpeechRec) {
+          try { kioskSpeechRec.start(); } catch(e){}
+        }
+      } else {
+        setListenState('idle');
+      }
+    }
+
+    async function startKioskMediaRecorder() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        src.connect(analyser);
+
+        kioskMediaRec = new MediaRecorder(stream);
+        kioskChunks = [];
+        kioskMediaRec.ondataavailable = (e) => {
+          if (e.data.size > 0) kioskChunks.push(e.data);
+        };
+        kioskMediaRec.onstop = async () => {
+          if (kioskChunks.length > 0 && isContinuousListening) {
+            const blob = new Blob(kioskChunks, { type: 'audio/webm' });
+            kioskChunks = [];
+            const fd = new FormData();
+            fd.append('file', blob, 'kiosk_voice.webm');
+            fd.append('audio', blob, 'kiosk_voice.webm');
+            fd.append('session_id', 'kiosk_voice');
+            fd.append('device_id', 'kiosk');
+            try {
+              const r = await fetch('/api/chat/voice', { method: 'POST', body: fd });
+              const d = await r.json();
+              if (d.response) {
+                handleIncomingPayload({
+                  type: 'markdown',
+                  title: 'Xiaozhi AI Voice',
+                  content: d.response,
+                  agent_message: d.response
+                });
+                if (!isFocusMode) toggleFocusMode();
+              }
+            } catch(e){}
+          }
+        };
+
+        const pcm = new Uint8Array(analyser.frequencyBinCount);
+        let active = false, silenceCount = 0;
+        vadInterval = setInterval(() => {
+          if (listenState !== 'listening') return;
+          analyser.getByteFrequencyData(pcm);
+          let sum = 0;
+          for (let i = 0; i < pcm.length; i++) sum += pcm[i];
+          const avg = sum / pcm.length;
+          if (avg > 16) {
+            silenceCount = 0;
+            if (!active) {
+              active = true;
+              if (kioskMediaRec.state === 'inactive') {
+                kioskChunks = [];
+                kioskMediaRec.start();
+              }
+            }
+          } else if (active) {
+            silenceCount += 200;
+            if (silenceCount >= 1000) {
+              active = false;
+              if (kioskMediaRec.state === 'recording') {
+                kioskMediaRec.stop();
+              }
+            }
+          }
+        }, 200);
+      } catch(err) {
+        console.warn('[Kiosk MediaRecorder VAD]:', err);
+      }
+    }
+
+    function startPTT() { if (listenState === 'idle') toggleListenMode(); }
+    function stopPTT()  { if (listenState === 'listening') toggleListenMode(); }
+
+    // Touch Drag & Momentum Helper
+    function enableTouchDragScroll(el) {
+      if (!el) return;
+      let startY = 0, scrollTop = 0, isDown = false;
+      el.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isDown = true;
+          startY = e.touches[0].pageY;
+          scrollTop = el.scrollTop;
+        }
+      }, { passive: true });
+      el.addEventListener('touchmove', (e) => {
+        if (!isDown || e.touches.length !== 1) return;
+        const delta = startY - e.touches[0].pageY;
+        el.scrollTop = scrollTop + delta;
+      }, { passive: true });
+      el.addEventListener('touchend', () => { isDown = false; }, { passive: true });
+      el.addEventListener('touchcancel', () => { isDown = false; }, { passive: true });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initKioskSpeechEngine();
+      const scrollEls = document.querySelectorAll('.scroll-touch, .focus-modal-body, .panel-body, .live-card-body');
+      scrollEls.forEach(el => {
+        el.style.touchAction = 'pan-y';
+        el.style.webkitOverflowScrolling = 'touch';
+        enableTouchDragScroll(el);
+      });
+    });
+  </script>
+<style>#focus-card-body img.zoom{max-height:none!important;width:100%}.view-tab,button{min-height:44px}</style>
+<div id="kiosk-settings" style="display:none;position:fixed;inset:0;z-index:100000;background:#0f172aee;color:#fff;padding:24px;font:18px sans-serif;overflow:auto">
+<h2>Settings</h2>
+<p>Input mode: <select id="set-input"><option>PTT</option><option>VAD</option><option>Hybrid</option></select></p>
+<p>Voice: <select id="set-voice"><option value="hi-IN-SwaraNeural">Female (Swara)</option><option value="hi-IN-MadhurNeural">Male (Madhur)</option></select></p>
+<p>Speed: <select id="set-rate"><option value="-10%">Slow</option><option value="+10%" selected>Normal</option><option value="+25%">Fast</option></select></p>
+<p><button onclick="saveKioskSettings()" style="padding:12px 24px;font-size:18px">Save</button> <button onclick="document.getElementById('kiosk-settings').style.display='none'" style="padding:12px 24px;font-size:18px">Close</button></p></div>
+<button onclick="document.getElementById('kiosk-settings').style.display='block'" style="position:fixed;bottom:8px;right:8px;z-index:99998;width:52px;height:52px;border-radius:26px;font-size:24px">⚙</button>
+<script>
+function saveKioskSettings(){const s={volume:'+0%',input:document.getElementById('set-input').value,voice:document.getElementById('set-voice').value,rate:document.getElementById('set-rate').value};localStorage.setItem('kioskSettings',JSON.stringify(s));fetch('/api/settings/voice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(s)});document.getElementById('kiosk-settings').style.display='none';if(window.kioskApplyMode)kioskApplyMode();}
+(function(){try{const s=JSON.parse(localStorage.getItem('kioskSettings')||'{}');for(const k in s){const e=document.getElementById('set-'+(k==='input'?'input':k));if(e)e.value=s[k];}}catch(e){}})();
+</script>
+
+<script>
+function kioskMode(){try{return (JSON.parse(localStorage.getItem('kioskSettings')||'{}').input)||'PTT';}catch(e){return 'PTT';}}
+(function(){
+const _set=setListenState;
+setListenState=function(st){_set(st);if(st==='speaking'&&!window.__ttsStarted)setAgentState('thinking');else setAgentState(st==='listening'?'listening':st==='speaking'?'speaking':'idle');};
+const _stop=onTTSStop;
+onTTSStop=function(){window.__ttsStarted=false;isContinuousListening=(kioskMode()!=='PTT');_stop();setAgentState(isContinuousListening?'listening':'idle');};
+const _int=interruptSpeech;
+interruptSpeech=function(){window.__ttsStarted=false;_int();setAgentState(isContinuousListening?'listening':'idle');};
+const _tog=toggleListenMode;
+toggleListenMode=function(){if(kioskMode()==='VAD'&&listenState==='listening')return;_tog();};
+function autoStart(){if(kioskMode()!=='PTT'&&listenState==='idle')_tog();}
+window.kioskApplyMode=function(){if(kioskMode()==='PTT'){if(listenState==='listening')_tog();}else autoStart();};
+setTimeout(autoStart,3000);
+})();
+</script>
+
+<style id="kiosk-1024">
+:root{--sp1:8px;--sp2:16px;--sp3:24px}
+html,body{overflow:hidden}
+.kiosk-header{width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding:0 16px!important;gap:10px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;overflow:hidden!important;flex-wrap:nowrap!important;height:48px!important}
+main.kiosk-main{grid-template-columns:1fr!important;height:calc(100vh - 135px)!important;overflow:hidden;padding:var(--sp1) var(--sp2)!important;gap:var(--sp1)!important}
+#panel-controls{display:none!important}
+body.show-tools #panel-controls{display:flex!important}
+body.show-tools #panel-telemetry{display:none!important}
+.panel-header{padding:var(--sp1) var(--sp2)!important;gap:var(--sp1)!important}
+.view-tab-bar {
+  position: fixed !important;
+  left: 0; right: 0; bottom: 0;
+  height: 56px;
+  z-index: 99990;
+  background: rgba(8, 14, 28, 0.95) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(0, 240, 255, 0.35) !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  padding: 4px var(--sp1) !important;
+  gap: var(--sp1) !important;
+  overflow-x: auto;
+}
+.view-tab-bar .view-tab {
+  flex: 1 1 0;
+  min-height: 44px;
+  min-width: 44px;
+  font-size: 15px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  padding: var(--sp1) !important;
+  background: rgba(14, 25, 46, 0.7) !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  border-radius: 8px !important;
+  color: #94a3b8 !important;
+  transition: all 0.2s ease !important;
+}
+.view-tab-bar .view-tab.active {
+  background: rgba(0, 240, 255, 0.18) !important;
+  border-color: #00f0ff !important;
+  color: #00f0ff !important;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+.view-tab-bar .view-tab{flex:1 1 0;min-height:44px;min-width:44px;font-size:16px!important;padding:var(--sp1)!important}
+.view-tab,button{min-height:44px;min-width:44px}
+body{font-size:16px}
+#agent-state-chip{top:6px!important;right:var(--sp1)!important}
+#kiosk-gear{display:none!important}
+.hdr-btn,a.hdr-btn,.kiosk-win-btn{min-height:44px!important;min-width:44px!important}
+</style>
+<script>
+(function(){
+function post(o){try{fetch('/api/client-error',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)}).catch(function(){});}catch(e){}}
+window.onerror=function(m,src,l,c,e){post({message:String(m),source:src,line:l,col:c,stack:e&&e.stack||''});return false;};
+window.addEventListener('unhandledrejection',function(ev){post({message:'unhandledrejection: '+(ev.reason&&ev.reason.message||ev.reason),stack:ev.reason&&ev.reason.stack||''});});
+window.kioskPttMsg=function(on){var m=kioskMode();if(m==='VAD')return;if(on&&listenState==='idle')startPTT();else if(!on&&listenState==='listening'&&m==='PTT')stopPTT();};
+var bar=document.querySelector('.view-tab-bar');
+if(bar){
+var t=document.createElement('button');t.className='view-tab';t.id='tab-tools';t.textContent='\ud83d\udee0 Tools';
+t.onclick=function(){document.body.classList.toggle('show-tools');bar.querySelectorAll('.view-tab').forEach(function(x){x.classList.remove('active');});if(document.body.classList.contains('show-tools'))t.classList.add('active');};
+bar.appendChild(t);
+var g=document.createElement('button');g.className='view-tab';g.id='tab-settings';g.textContent='\u2699 Settings';
+g.onclick=function(){document.getElementById('kiosk-settings').style.display='block';};
+bar.appendChild(g);
+bar.addEventListener('click',function(e){var b=e.target.closest('.view-tab');if(b&&b.id!=='tab-tools'&&b.id!=='tab-settings')document.body.classList.remove('show-tools');},true);
+}
+var gb=document.querySelector('button[onclick*="kiosk-settings"][style*="fixed"]');if(gb)gb.id='kiosk-gear';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brainstorming Lab | Ayush's Workbench</title>
+  <meta name="description" content="Workbench Content & Engineering Project Brainstorming Canvas.">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --bg-deep: #080c14;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --cyan-glow: #38bdf8;
+      --accent-neon: #00f0ff;
+      --amber-neon: #f59e0b;
+      --purple-neon: #a855f7;
+      --emerald-neon: #10b981;
+      --border-subtle: rgba(56, 189, 248, 0.15);
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: #f1f5f9;
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .brainstorm-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* Subheader */
+    .lab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .lab-title-area h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0 0 6px;
+      background: linear-gradient(90deg, #fff, var(--cyan-glow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lab-title-area p {
+      color: #94a3b8;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .lab-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .action-btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .action-btn-primary {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #041226;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    }
+
+    .action-btn-primary:hover {
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .action-btn-secondary {
+      background: rgba(30, 41, 59, 0.7);
+      color: #cbd5e1;
+      border-color: var(--border-subtle);
+    }
+
+    .action-btn-secondary:hover {
+      color: #fff;
+      border-color: var(--cyan-glow);
+    }
+
+    /* Filters Bar */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-chip.active, .filter-chip:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--cyan-glow);
+      color: #38bdf8;
+    }
+
+    /* Grid Columns */
+    .kanban-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1200px) {
+      .kanban-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .kanban-grid { grid-template-columns: 1fr; }
+    }
+
+    .column {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 550px;
+    }
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+    }
+
+    .column-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .column-badge {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+    }
+
+    .idea-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .idea-card:hover {
+      border-color: var(--cyan-glow);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .card-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .tag-youtube { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .tag-hardware { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag-opensource { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .tag-community { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin: 0 0 8px;
+      color: #f1f5f9;
+      line-height: 1.4;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin: 0 0 12px;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #64748b;
+      font-family: var(--font-mono);
+    }
+
+    .btn-push-note {
+      background: none;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-push-note:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--cyan-glow);
+      color: #38bdf8;
+    }
+
+    /* Modal for adding idea */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid var(--cyan-glow);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 20px;
+      color: #ffffff;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      font-family: inherit;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--cyan-glow);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Workstation Telemetry Bar -->
+  <div class="workstation-live-bar" id="workstation-live-bar">
+    <div class="ws-bar-left">
+      <div class="ws-radar-badge active" id="ws-radar-status" title="Microwave Radar Bench Presence Detection">
+        <div class="radar-ping"><div class="radar-ping-dot"></div></div>
+        <span id="ws-radar-text">AYUSH AT THE BENCH (MAKING MAGIC ⚡)</span>
+      </div>
+    </div>
+
+    <div class="ws-bar-center">
+      <div class="ws-tool-chip soldering cold" id="ws-iron-chip" onclick="toggleWorkstationRelay(1, event)">
+        <span>🔥 Soldering Iron:</span>
+        <span class="ws-toggle-switch" id="ws-iron-state">OFF</span>
+      </div>
+      <div class="ws-tool-chip gluegun cold" id="ws-glue-chip" onclick="toggleWorkstationRelay(2, event)">
+        <span>🔫 Glue Gun:</span>
+        <span class="ws-toggle-switch" id="ws-glue-state">OFF</span>
+      </div>
+    </div>
+
+    <div class="ws-bar-right">
+      <div class="ws-telemetry-chip">
+        <span>🌡️</span> <span class="val" id="ws-val-temp">--°C</span>
+      </div>
+      <div class="ws-telemetry-chip">
+        <span>💧</span> <span class="val" id="ws-val-hum">--%</span>
+      </div>
+      <div class="ws-sync-indicator">
+        <div class="ws-sync-dot" id="ws-sync-dot"></div>
+        <span>AIO Live</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="brainstorm-wrap">
+    <!-- Header -->
+    <div class="lab-header">
+      <div class="lab-title-area">
+        <h1>💡 Workbench Brainstorming Lab</h1>
+        <p>Curating cutting-edge builds, YouTube tutorials, and open-source blueprints for ayushdubey.tech.</p>
+      </div>
+      <div class="lab-actions">
+        <button class="action-btn action-btn-primary" onclick="openAddModal()">
+          <span>+ Add New Idea</span>
+        </button>
+        <button class="action-btn action-btn-secondary" onclick="exportMarkdown()">
+          <span>📥 Export Markdown</span>
+        </button>
+        <a href="https://workbench.ayushdubey.tech" class="action-btn action-btn-secondary">
+          <span>⚡ Workbench</span>
+        </a>
+        <a href="/" class="action-btn action-btn-secondary">
+          <span>👤 Main Site</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">FILTER BY:</span>
+      <div class="filter-chip active" onclick="filterCards('all')">All Ideas (12)</div>
+      <div class="filter-chip" onclick="filterCards('youtube')">🎥 YouTube & Video</div>
+      <div class="filter-chip" onclick="filterCards('hardware')">🛠️ Hardware & Schematics</div>
+      <div class="filter-chip" onclick="filterCards('opensource')">📦 Open Source Releases</div>
+      <div class="filter-chip" onclick="filterCards('community')">🚀 Community & Maker Hub</div>
+    </div>
+
+    <!-- Kanban Grid -->
+    <div class="kanban-grid">
+      <!-- Column 1: YouTube & Video Breakdowns -->
+      <div class="column" data-col="youtube">
+        <div class="column-header">
+          <span class="column-title">🎥 YouTube &amp; Tutorials</span>
+          <span class="column-badge" id="badge-youtube">3</span>
+        </div>
+        <div class="cards-container" id="col-youtube">
+          <div class="idea-card" data-category="youtube">
+            <span class="card-tag tag-youtube">Deep Dive</span>
+            <div class="card-title">Building an AI-Powered Soldering Station with ESP32-P4</div>
+            <div class="card-desc">Showcase how microwave radar detects user presence to auto-heat the iron, and the 2.8" SPI display guides wiring steps in real-time.</div>
+            <div class="card-meta">
+              <span>Status: Scripting</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="youtube">
+            <span class="card-tag tag-youtube">Speed Build</span>
+            <div class="card-title">Push-to-Talk Desktop Dictation with Groq Whisper & Linux GPIO</div>
+            <div class="card-desc">Walkthrough of how physical pin 3 triggers INMP441 I2S mic recording and parses voice gestures into live Konsole commands.</div>
+            <div class="card-meta">
+              <span>Status: Planned</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="youtube">
+            <span class="card-tag tag-youtube">Concept Explainer</span>
+            <div class="card-title">Physical AI: Why LLMs Need Model Context Protocol (MCP) on Real Hardware</div>
+            <div class="card-desc">Demonstrating AI agents querying bench multimeters, toggling relays, and reading component drawer inventory over JSON-RPC 2.0.</div>
+            <div class="card-meta">
+              <span>Status: Idea</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: Hardware Builds & Schematics -->
+      <div class="column" data-col="hardware">
+        <div class="column-header">
+          <span class="column-title">🛠️ Hardware Blueprints</span>
+          <span class="column-badge" id="badge-hardware">3</span>
+        </div>
+        <div class="cards-container" id="col-hardware">
+          <div class="idea-card" data-category="hardware">
+            <span class="card-tag tag-hardware">PCB Release</span>
+            <div class="card-title">2.8" SPI Secondary Soldering Display Backpack</div>
+            <div class="card-desc">Custom carrier board interfacing ILI9341 display with ESP32-P4 and Raspberry Pi GPIO with 5V/3.3V logic translation.</div>
+            <div class="card-meta">
+              <span>Status: KiCAD Ready</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="hardware">
+            <span class="card-tag tag-hardware">Sensor Rig</span>
+            <div class="card-title">LD2410 24GHz mmWave Radar Isolation Enclosure</div>
+            <div class="card-desc">3D printable bench mount that isolates microwave reflections and houses the optical isolation relays for safety.</div>
+            <div class="card-meta">
+              <span>Status: Prototyped</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="hardware">
+            <span class="card-tag tag-hardware">Audio Rig</span>
+            <div class="card-title">INMP441 Microphone + MAX98357A Dual I2S Hat</div>
+            <div class="card-desc">Clean header footprint connecting I2S mic & speaker cleanly to Raspberry Pi pins 12, 35, 38 without spaghetti jumpers.</div>
+            <div class="card-meta">
+              <span>Status: Wiring Tested</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Open Source Releases -->
+      <div class="column" data-col="opensource">
+        <div class="column-header">
+          <span class="column-title">📦 Open Source Releases</span>
+          <span class="column-badge" id="badge-opensource">3</span>
+        </div>
+        <div class="cards-container" id="col-opensource">
+          <div class="idea-card" data-category="opensource">
+            <span class="card-tag tag-opensource">GitHub Repo</span>
+            <div class="card-title">Workbench MCP Server Bridge (Stdio + HTTP)</div>
+            <div class="card-desc">Publish `workbench_mcp_server.py` with full documentation for Claude Desktop, Cursor, and Antigravity pair programming.</div>
+            <div class="card-meta">
+              <span>Status: Live & Tested</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="opensource">
+            <span class="card-tag tag-opensource">Web Library</span>
+            <div class="card-title">SVG Circuit Playground Visual Simulator</div>
+            <div class="card-desc">Open source the interactive pinout and component wiring canvas with zero heavy dependencies (pure vanilla JS + SVG).</div>
+            <div class="card-meta">
+              <span>Status: v1.0 Deployed</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="opensource">
+            <span class="card-tag tag-opensource">AI Prompt Pack</span>
+            <div class="card-title">Richard Feynman Hardware Copilot System Prompts</div>
+            <div class="card-desc">Open-sourcing the cheerful, intuitive Feynman persona prompts tailored for electronics debugging and biology analogies.</div>
+            <div class="card-meta">
+              <span>Status: Ready</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 4: Community & Maker Initiatives -->
+      <div class="column" data-col="community">
+        <div class="column-header">
+          <span class="column-title">🚀 Community Initiatives</span>
+          <span class="column-badge" id="badge-community">3</span>
+        </div>
+        <div class="cards-container" id="col-community">
+          <div class="idea-card" data-category="community">
+            <span class="card-tag tag-community">Hub</span>
+            <div class="card-title">Ayush Dubey's Maker Sanctuary Discord</div>
+            <div class="card-desc">Channels for hardware debugging, PCB review, embedded firmware help, and showing off physical workbench setups.</div>
+            <div class="card-meta">
+              <span>Status: Setting up</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="community">
+            <span class="card-tag tag-community">Challenge</span>
+            <div class="card-title">Monthly "Bits to Atoms" Hardware Hackathon</div>
+            <div class="card-desc">Theme-based build challenges with open-source voting and hardware prizes (microcontrollers, development boards).</div>
+            <div class="card-meta">
+              <span>Status: Planning</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+
+          <div class="idea-card" data-category="community">
+            <span class="card-tag tag-community">Live Stream</span>
+            <div class="card-title">Live Soldering & Hardware Debug Streams</div>
+            <div class="card-desc">Streaming live from the workbench with the Adafruit telemetry bar visible and viewers interacting with bench AI.</div>
+            <div class="card-meta">
+              <span>Status: Setup Ready</span>
+              <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Idea Modal -->
+  <div class="modal-backdrop" id="add-modal">
+    <div class="modal-box">
+      <div class="modal-title">+ Add Idea to Brainstorming Board</div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="idea-col" class="form-select">
+          <option value="youtube">🎥 YouTube & Video Tutorials</option>
+          <option value="hardware">🛠️ Hardware & Schematics</option>
+          <option value="opensource">📦 Open Source Releases</option>
+          <option value="community">🚀 Community & Maker Hub</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" id="idea-title" class="form-input" placeholder="e.g., Designing an ESP32 Solar Harvester">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tag</label>
+        <input type="text" id="idea-tag" class="form-input" placeholder="e.g., Guide, Prototype, Video">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea id="idea-desc" class="form-textarea" rows="3" placeholder="Key concepts, circuit details, or community goal..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="action-btn action-btn-secondary" onclick="closeAddModal()">Cancel</button>
+        <button class="action-btn action-btn-primary" onclick="saveIdea()">Save Idea</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/workstation-bar.js"></script>
+  <script>
+    function openAddModal() {
+      document.getElementById('add-modal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-modal').style.display = 'none';
+      document.getElementById('idea-title').value = '';
+      document.getElementById('idea-desc').value = '';
+      document.getElementById('idea-tag').value = '';
+    }
+
+    function saveIdea() {
+      const col = document.getElementById('idea-col').value;
+      const title = document.getElementById('idea-title').value.trim();
+      const desc = document.getElementById('idea-desc').value.trim();
+      const tag = document.getElementById('idea-tag').value.trim() || 'Idea';
+
+      if (!title) {
+        alert('Please enter an idea title.');
+        return;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'idea-card';
+      card.dataset.category = col;
+
+      let tagClass = 'tag-youtube';
+      if (col === 'hardware') tagClass = 'tag-hardware';
+      if (col === 'opensource') tagClass = 'tag-opensource';
+      if (col === 'community') tagClass = 'tag-community';
+
+      card.innerHTML = `
+        <span class="card-tag ${tagClass}">${tag}</span>
+        <div class="card-title">${title}</div>
+        <div class="card-desc">${desc || 'No description provided.'}</div>
+        <div class="card-meta">
+          <span>Status: Backlog</span>
+          <button class="btn-push-note" onclick="pushToWorkbenchNotebook(this)">Push to Notes</button>
+        </div>
+      `;
+
+      document.getElementById('col-' + col).prepend(card);
+      updateCounts();
+      closeAddModal();
+    }
+
+    function updateCounts() {
+      ['youtube', 'hardware', 'opensource', 'community'].forEach(col => {
+        const count = document.querySelectorAll(`#col-${col} .idea-card`).length;
+        const badge = document.getElementById('badge-' + col);
+        if (badge) badge.textContent = count;
+      });
+    }
+
+    function filterCards(category) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.querySelectorAll('.idea-card').forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    async function pushToWorkbenchNotebook(btn) {
+      const card = btn.closest('.idea-card');
+      const title = card.querySelector('.card-title').textContent;
+      const desc = card.querySelector('.card-desc').textContent;
+      const tag = card.querySelector('.card-tag').textContent;
+
+      btn.textContent = 'Saving...';
+      try {
+        const res = await fetch('/api/notes', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            content: `### 💡 Brainstorm Idea: ${title}\n**Category:** ${card.dataset.category} | **Tag:** ${tag}\n\n${desc}`,
+            entry_type: 'text',
+            tags: `brainstorm,${card.dataset.category},${tag}`
+          })
+        });
+        if (res.ok) {
+          btn.textContent = '✓ Saved to Notes!';
+          btn.style.color = '#34d399';
+        } else {
+          btn.textContent = 'Failed';
+        }
+      } catch (err) {
+        btn.textContent = 'Error';
+      }
+      setTimeout(() => { btn.textContent = 'Push to Notes'; btn.style.color = ''; }, 3000);
+    }
+
+    function exportMarkdown() {
+      let md = '# 💡 Workbench Content & Project Brainstorming List\n\n';
+      document.querySelectorAll('.column').forEach(col => {
+        const title = col.querySelector('.column-title').textContent.trim();
+        md += `## ${title}\n\n`;
+        col.querySelectorAll('.idea-card').forEach(card => {
+          const t = card.querySelector('.card-title').textContent.trim();
+          const d = card.querySelector('.card-desc').textContent.trim();
+          const tag = card.querySelector('.card-tag').textContent.trim();
+          md += `- **[${tag}] ${t}**: ${d}\n`;
+        });
+        md += '\n';
+      });
+
+      const blob = new Blob([md], {type: 'text/markdown'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'workbench_brainstorm_ideas.md';
+      a.click();
+    }
+  </script>
+</body>
+</html>

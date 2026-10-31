@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=320, height=240, initial-scale=1.0, user-scalable=no">
+  <title>2.8" SPI TFT Soldering Display (ILI9341)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      width: 320px;
+      height: 240px;
+      overflow: hidden;
+      background-color: #030712;
+      color: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      border: 1px solid #1e293b;
+    }
+
+    /* Screen Top Bezel Bar */
+    .spi-header {
+      height: 28px;
+      background: #0f172a;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .spi-title {
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    .spi-pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+      animation: spi-ping 1.5s infinite;
+    }
+
+    @keyframes spi-ping {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .spi-temp-badge {
+      font-size: 10px;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Solder Station Intel Body */
+    .spi-body {
+      flex: 1;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      gap: 6px;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.04), transparent 70%), #030712;
+    }
+
+    .spi-target-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+      padding-bottom: 3px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .spi-tag {
+      font-size: 9px;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .spi-content {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .spi-content strong, .spi-content b {
+      color: #38bdf8;
+    }
+
+    .spi-bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .spi-bullet-item {
+      font-size: 10.5px;
+      line-height: 1.35;
+      color: #e2e8f0;
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
+    .spi-bullet-item::before {
+      content: "▸";
+      color: #38bdf8;
+      font-size: 10px;
+      line-height: 14px;
+    }
+
+    /* Footer / Quick Temps Bar */
+    .spi-footer {
+      height: 22px;
+      background: #090d16;
+      border-top: 1px solid rgba(148, 163, 184, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      font-size: 9.5px;
+      color: #64748b;
+    }
+
+    .spi-footer span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top 2.8" SPI Status Bar -->
+  <div class="spi-header">
+    <div class="spi-title">
+      <div class="spi-pulse-dot"></div>
+      <span>2.8" SPI TFT</span>
+    </div>
+    <div class="spi-temp-badge" id="disp-iron-temp">🔥 320°C (60/40)</div>
+  </div>
+
+  <!-- Main Instructions / Pinout Body -->
+  <div class="spi-body" id="spi-body">
+    <div class="spi-target-title">
+      <span id="disp-title">Feynman Soldering Companion</span>
+      <span class="spi-tag" id="disp-mode">ACTIVE</span>
+    </div>
+    <div class="spi-content" id="disp-content">
+      <ul class="spi-bullet-list" id="disp-bullets">
+        <li class="spi-bullet-item">Standby: Ready for wiring instructions</li>
+        <li class="spi-bullet-item">Ask Feynman on Workbench for instant pinout</li>
+        <li class="spi-bullet-item">60/40 Leaded Alloy: 310°C - 325°C</li>
+        <li class="spi-bullet-item">Lead-Free SAC305: 350°C - 365°C</li>
+        <li class="spi-bullet-item">Keep iron tip tinned &amp; clean</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bottom Fast Intel Bar -->
+  <div class="spi-footer">
+    <span id="disp-time">12:00:00 UTC</span>
+    <span>ILI9341 • 320x240 • 60Hz</span>
+  </div>
+
+  <script>
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('disp-time').textContent = now.toTimeString().split(' ')[0];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function renderSolderingData(data) {
+      if (!data) return;
+      const titleEl = document.getElementById('disp-title');
+      const bulletsEl = document.getElementById('disp-bullets');
+      const tempEl = document.getElementById('disp-iron-temp');
+
+      if (data.title) titleEl.textContent = data.title.substring(0, 26);
+
+      const contentText = data.soldering_content || data.content || "";
+      if (contentText) {
+        bulletsEl.innerHTML = "";
+        const lines = contentText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        
+        let foundLines = 0;
+        for (const line of lines) {
+          if (foundLines >= 6) break;
+          // Clean bullet prefix
+          const clean = line.replace(/^[•\-\*]\s*/, '').replace(/###\s*/, '');
+          if (!clean) continue;
+          
+          const li = document.createElement('li');
+          li.className = 'spi-bullet-item';
+          
+          // Detect temperature
+          if (clean.includes('°C') || clean.includes('SOLDER')) {
+            li.style.color = '#f59e0b';
+            li.style.fontWeight = '700';
+          }
+          // Detect pin numbers
+          if (clean.includes('PIN') || clean.includes('GND') || clean.includes('GPIO')) {
+            li.style.color = '#38bdf8';
+            li.style.fontWeight = '600';
+          }
+
+          li.textContent = clean;
+          bulletsEl.appendChild(li);
+          foundLines++;
+        }
+      }
+    }
+
+    // 1. Fetch initial state
+    async function fetchCurrentState() {
+      try {
+        const res = await fetch('/api/soldering/state');
+        if (res.ok) {
+          const data = await res.json();
+          renderSolderingData(data);
+        }
+      } catch (e) {
+        console.log("State fetch poll:", e);
+      }
+    }
+    fetchCurrentState();
+    setInterval(fetchCurrentState, 3000);
+
+    // 2. Connect to WebSocket for instant zero-latency push
+    let ws;
+    function connectKioskSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${window.location.host}/ws/kiosk`);
+      
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          renderSolderingData(data);
+        } catch (err) {
+          console.error("WS Parse err:", err);
+        }
+      };
+
+      ws.onclose = () => {
+        setTimeout(connectKioskSocket, 3000);
+      };
+    }
+    connectKioskSocket();
+  </script>
+</body>
+</html>
