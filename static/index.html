@@ -1,909 +1,2006 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+
+<html data-theme="dark" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Electronics Workbench Hub | Xiaozhi AI & MCP</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <!-- CDN Marked.js with automatic fallback to local /static/marked.min.js -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
+  <meta charset="utf-8"/>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link rel="shortcut icon" href="/static/favicon.ico">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, viewport-fit=cover, shrink-to-fit=no"/>
+<title>Ayush's Workbench | Live Maker Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="/style.css?v=scifi_hud_v3" rel="stylesheet"/>
+<link href="/static/style.css?v=scifi_hud_v3" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/buy_now_bubble.css"/>
+<script>
+  (function() {
+    try {
+      localStorage.removeItem('workbench_theme');
+      localStorage.removeItem('kiosk_theme');
+      var v = localStorage.getItem('workbench_theme_hud_v3');
+      if (!v || v === 'light') {
+        localStorage.setItem('workbench_theme_hud_v3', 'dark');
+      }
+    } catch(e) {}
+    document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+</script>
+<style>
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    box-sizing: border-box;
+  }
+</style>
+<!-- CDN Marked.js with automatic fallback to local /static/marked.min.js -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
     if (typeof marked === "undefined") {
       document.write('<script src="/static/marked.min.js"><\/script>');
     }
   </script>
+<script src="/static/auth_gate.js"></script>
+<link rel="stylesheet" href="/static/vendor/aos.css">
+<script src="/static/vendor/lucide.min.js"></script>
+<script src="/static/vendor/aos.js"></script>
+<script src="/static/vendor/anime.min.js"></script>
+<script>
+  if (typeof anime === "undefined") {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"><\/script>');
+  }
+</script>
+<script src="/static/command_palette.js?v=scifi_hud_v3"></script>
 </head>
 <body>
-
-  <!-- =========================================================================
+<!-- =========================================================================
        TOP NAVIGATION HEADER
        ========================================================================= -->
-  <header class="site-header">
-    <a href="/" class="logo-group">
-      <div class="brand-icon-wrapper">
-        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
+<header class="site-header">
+<a class="logo-group" href="/">
+<div class="brand-icon-wrapper">
+<svg class="brand-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
+<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+</svg>
+</div>
+<div class="brand-title-wrap">
+<span class="brand-title">Ayush's Workbench</span>
+<span class="brand-subtitle">Live Maker Studio &amp; Hardware Lab</span>
+</div>
+</a>
+<!-- Mobile hamburger menu toggle -->
+<button aria-label="Toggle menu" class="mobile-menu-toggle" id="mobile-menu-toggle" type="button">
+<span class="hamburger-bar"></span>
+<span class="hamburger-bar"></span>
+<span class="hamburger-bar"></span>
+</button>
+<div class="nav-controls" id="nav-controls">
+  <!-- Core Navigation Hub -->
+  <div class="nav-links-hub">
+    <a class="playground-nav-btn" href="/bio" title="Ayush Dubey - Profile, Hardware Architect &amp; Story">
+      <i data-lucide="user" style="width: 15px; height: 15px; color: var(--cyan-glow);"></i>
+      <span>About</span>
+    </a>
+    <a class="playground-nav-btn" href="/blog" title="Read Cosmic Essays &amp; Hardware Blueprints">
+      <i data-lucide="book-open" style="width: 15px; height: 15px; color: #a855f7;"></i>
+      <span>Blog</span>
+    </a>
+    <a class="playground-nav-btn" href="/playground" title="Open Circuit Builder Playground">
+      <i data-lucide="zap" style="width: 15px; height: 15px; color: #38bdf8;"></i>
+      <span>Playground</span>
+    </a>
+    <a class="playground-nav-btn" href="/brainstorm" title="Open Content &amp; Project Brainstorming Lab">
+      <i data-lucide="sparkles" style="width: 15px; height: 15px; color: #f59e0b;"></i>
+      <span>Brainstorm</span>
+    </a>
+    <a class="playground-nav-btn" href="/resume" title="View Professional Resume">
+      <i data-lucide="file-text" style="width: 15px; height: 15px; color: #38bdf8;"></i>
+      <span>Resume</span>
+    </a>
+    <a class="playground-nav-btn" href="/rover" title="Autonomous Mecanum 3D Rover &amp; 3-Format Blog">
+      <i data-lucide="compass" style="width: 15px; height: 15px; color: #00f2fe;"></i>
+      <span>3D Rover</span>
+    </a>
+    <a class="playground-nav-btn" href="/courses" title="Personalized Physical AI &amp; Robotics Courses">
+      <i data-lucide="graduation-cap" style="width: 15px; height: 15px; color: #10b981;"></i>
+      <span>Courses</span>
+    </a>
+    <a class="playground-nav-btn megaseries-nav-btn" href="/megaseries/" title="10-Chapter Technical Megaseries &amp; Course: Embodied Physical AI (50 Mini-Chapters &amp; Labs)" style="border: 1px solid rgba(0, 242, 254, 0.45); background: rgba(0, 242, 254, 0.1); color: #00f2fe;">
+      <i data-lucide="book-marked" style="width: 15px; height: 15px; color: #00f2fe;"></i>
+      <span style="font-weight: 700;">★ Megaseries</span>
+    </a>
+    <a class="playground-nav-btn" href="/engineering" title="Engineering Wiki &amp; Hardware Pinouts">
+      <i data-lucide="cpu" style="width: 15px; height: 15px; color: var(--cyan-glow);"></i>
+      <span>Engineering</span>
+    </a>
+    <a class="playground-nav-btn" href="/boost/boost" title="High-Performance Token Booster &amp; Strategy Health">
+      <i data-lucide="rocket" style="width: 15px; height: 15px; color: #f59e0b;"></i>
+      <span>Booster</span>
+    </a>
+    <button class="playground-nav-btn" onclick="openGlobalCommandPalette()" title="Command Palette (Ctrl+K)" style="background: rgba(15,23,42,0.8); border: 1px solid var(--border-subtle); cursor: pointer; color: #cbd5e1;">
+      <i data-lucide="command" style="width: 14px; height: 14px; color: var(--cyan-glow);"></i>
+      <span style="font-family: var(--font-mono); font-size: 11px;">⌘K</span>
+    </button>
+  </div>
+
+  <!-- System Controls & Badges Hub -->
+  <div class="nav-system-hub">
+    <!-- Objective 1: Dynamic Xiaozhi Hardware Badge -->
+    <div class="device-badge listening" id="device-badge-xiaozhi" title="0 connected Xiaozhi WebSocket devices. Flash ESP32-S3 or P4 firmware to connect.">
+      <svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14">
+        <rect height="16" rx="2" width="16" x="4" y="4"></rect>
+        <rect height="6" width="6" x="9" y="9"></rect>
+        <line x1="9" x2="9" y1="1" y2="4"></line>
+        <line x1="15" x2="15" y1="1" y2="4"></line>
+        <line x1="9" x2="9" y1="20" y2="23"></line>
+        <line x1="15" x2="15" y1="20" y2="23"></line>
+        <line x1="20" x2="23" y1="9" y2="9"></line>
+        <line x1="20" x2="23" y1="14" y2="14"></line>
+        <line x1="1" x2="4" y1="9" y2="9"></line>
+        <line x1="1" x2="4" y1="14" y2="14"></line>
+      </svg>
+      <span class="status-dot"></span>
+      <span id="xiaozhi-badge-text">Listening (0)</span>
+    </div>
+    <div class="status-badge" id="connection-status" title="WebSocket link to benchtop daemon">
+      <span class="status-dot"></span>
+      <span id="status-text">Connecting...</span>
+    </div>
+    <!-- Theme Switcher (Sun / Moon) -->
+    <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light / Dark theme" type="button">
+      <svg class="theme-icon" fill="none" id="theme-icon-sun" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="display: none;" viewbox="0 0 24 24">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" x2="12" y1="1" y2="3"></line>
+        <line x1="12" x2="12" y1="21" y2="23"></line>
+        <line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+        <line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+        <line x1="1" x2="3" y1="12" y2="12"></line>
+        <line x1="21" x2="23" y1="12" y2="12"></line>
+        <line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+        <line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+      </svg>
+      <svg class="theme-icon" fill="none" id="theme-icon-moon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <span id="theme-label">Dark</span>
+    </button>
+    <a class="mode-toggle-btn" href="/kiosk" id="mode-toggle-link" title="Enter Fullscreen Kiosk HUD Mode">
+      <svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14">
+        <path d="M15 3h6v6"></path>
+        <path d="M10 14L21 3"></path>
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+      </svg>
+      <span>Kiosk</span>
+    </a>
+  </div>
+</div>
+</header>
+<!-- =========================================================================
+       WORKSTATION LIVE ADAFRUIT TELEMETRY WIDGET BAR
+       ========================================================================= -->
+<div class="workstation-live-bar" id="workstation-live-bar">
+<div class="ws-bar-left">
+<div class="ws-radar-badge active" id="ws-radar-status" title="Microwave Radar Bench Presence Detection">
+<div class="radar-ping"><div class="radar-ping-dot"></div></div>
+<span id="ws-radar-text">AYUSH AT BENCH ⚡</span>
+</div>
+</div>
+<div class="ws-bar-center">
+<!-- Relay 1: Soldering Iron -->
+<div class="ws-tool-chip soldering cold" id="ws-iron-chip" onclick="toggleWorkstationRelay(1, event)" title="Click to Toggle Soldering Iron Relay">
+<i data-lucide="flame" style="width: 14px; height: 14px; color: #ef4444;"></i>
+<span>Soldering Iron:</span>
+<span class="ws-toggle-switch" id="ws-iron-state">OFF</span>
+</div>
+<!-- Relay 2: Glue Gun -->
+<div class="ws-tool-chip gluegun cold" id="ws-glue-chip" onclick="toggleWorkstationRelay(2, event)" title="Click to Toggle Glue Gun Relay">
+<i data-lucide="zap" style="width: 14px; height: 14px; color: #f59e0b;"></i>
+<span>Glue Gun:</span>
+<span class="ws-toggle-switch" id="ws-glue-state">OFF</span>
+</div>
+</div>
+<div class="ws-bar-right">
+<div class="ws-telemetry-chip" title="Ambient Bench Temperature">
+<i data-lucide="thermometer" style="width: 14px; height: 14px; color: #38bdf8;"></i>
+<span class="val" id="ws-val-temp">--°C</span>
+</div>
+<div class="ws-telemetry-chip" title="Bench Humidity">
+<i data-lucide="droplets" style="width: 14px; height: 14px; color: #60a5fa;"></i>
+<span class="val" id="ws-val-hum">--%</span>
+</div>
+<div class="ws-telemetry-chip" title="Air Quality / Gas Sensor">
+<i data-lucide="wind" style="width: 14px; height: 14px; color: #34d399;"></i>
+<span class="val" id="ws-val-gas">OK</span>
+</div>
+<div class="ws-sync-indicator" title="Adafruit IO Live Telemetry Sync">
+<div class="ws-sync-dot" id="ws-sync-dot"></div>
+<i data-lucide="radio" style="width: 13px; height: 13px; color: #10b981;"></i>
+<span>AIO Live</span>
+</div>
+</div>
+</div>
+<!-- =========================================================================
+       2.8" SOLDERING STATION SPI DISPLAY MODAL (ILI9341 320x240)
+       Opens only after tapping the toggle button in navbar or dock
+       ========================================================================= -->
+<div class="soldering-modal-overlay" style="display:none !important;" id="soldering-modal-overlay" onclick="handleSolderingBackdrop(event)" style="display: none;">
+<div class="soldering-modal-window">
+<div class="soldering-modal-header">
+<div class="smh-title">
+<span class="smh-pulse"></span>
+<span>2.8" SPI TFT LCD (ILI9341 • 320x240)</span>
+</div>
+<div class="smh-actions">
+<a class="smh-btn" href="/soldering-view" target="_blank" title="Open in new window">↗</a>
+<button class="smh-btn smh-close" onclick="toggleSolderingModal(event)" title="Close Mirror">✕</button>
+</div>
+</div>
+<div class="soldering-modal-frame">
+<iframe height="240" id="soldering-iframe" loading="lazy" src="/soldering-view" title="Soldering Station Display Mirror" width="320"></iframe>
+</div>
+</div>
+</div>
+<script>
+    function toggleSolderingModal(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      const modal = document.getElementById('soldering-modal-overlay');
+      if (!modal) return;
+      const isHidden = modal.style.display === 'none' || !modal.style.display;
+      modal.style.display = isHidden ? 'flex' : 'none';
+      if (isHidden) {
+        // Refresh iframe state
+        const iframe = document.getElementById('soldering-iframe');
+        if (iframe) iframe.src = '/soldering-view?t=' + Date.now();
+      }
+    }
+
+    function handleSolderingBackdrop(e) {
+      if (e.target.id === 'soldering-modal-overlay') {
+        toggleSolderingModal(e);
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('soldering-modal-overlay');
+        if (modal && modal.style.display === 'flex') {
+          modal.style.display = 'none';
+        }
+      }
+    });
+  </script>
+<!-- =========================================================================
+       SEGMENTED TABS
+       ========================================================================= -->
+
+<!-- =========================================================================
+       DASHBOARD MODE CONTAINER
+       ========================================================================= -->
+<div class="workbench-layout"><div class="sidebar"><div class="
+sidebar-nav-item active" data-target="dashboard"><img src="/static/assets/icons8/icons/dashboard_Qavl6FF79LJM.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> Dashboard &amp; Overview</div><div class="
+sidebar-nav-item" data-target="ai-chat"><img src="/static/assets/icons8/icons/robot_cMi3MgUvbjxS.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> AI Chat &amp; Copilot</div><div class="
+sidebar-nav-item" data-target="projects"><img src="/static/assets/icons8/icons/microchip_mepX636gAP3u.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> Projects &amp; Builds</div><div class="
+sidebar-nav-item" data-target="tasks"><img src="/static/assets/icons8/icons/check-mark_70yRC8npwT3d.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> Task Planner</div><div class="
+sidebar-nav-item" data-target="inventory"><img src="/static/assets/icons8/icons/toolbox_2sWu6PtiXHWx.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> Parts Inventory</div><div class="
+sidebar-nav-item" data-target="logs"><img src="/static/assets/icons8/icons/terminal_UjcGNVXknmz3.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> Lab Logs</div><div class="
+sidebar-nav-item" data-target="vault"><img src="/static/assets/icons8/icons/database_KZHjwwenS7oK.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> Obsidian Vault</div><div class="
+sidebar-nav-item" data-target="optimizer"><img src="/static/assets/icons8/icons/rocket_8Cpx9JrEbpOM.png" width="18" height="18" style="vertical-align:middle; margin-right:8px;"> Token Optimizer</div><a href="/boost/boost" class="sidebar-nav-item" style="text-decoration:none; color: #00f0ff; font-weight: 700; border-left: 2px solid #00f0ff; background: rgba(0,240,255,0.08); display: block;"><span style="margin-right:8px;">★</span> Physical AI Course</a></div><div class="main-content"><div class="
+section-panel active" data-section="dashboard">
+<div class="dashboard-overview">
+<div style="background: linear-gradient(135deg, rgba(8, 20, 48, 0.95), rgba(4, 8, 19, 0.98)); border: 1px solid rgba(0, 240, 255, 0.45); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <div style="color: #00f0ff; font-family: monospace; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">★ FLAGSHIP MEGASERIES &amp; COURSE</div>
+    <div style="color: #ffffff; font-size: 1.15rem; font-weight: 800; margin: 4px 0;">Physical AI Cyberdeck &amp; Autonomous Mecanum Rover</div>
+    <div style="color: #94a3b8; font-size: 0.85rem;">10 Chapters • 50 Mini-Chapters • 50 Hands-On Laboratories with live interactive HUD tracking.</div>
+  </div>
+  <a href="/boost/boost" class="btn btn-accent" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 8px 16px; min-height: 44px;">
+    Start Course &rarr;
+  </a>
+</div>
+<div class="stats-bar" style="margin-bottom: 20px;">
+<div class="stat-box">
+  <div class="stat-icon-wrap" style="color: var(--accent); background: var(--accent-bg); display: flex; align-items: center; justify-content: center;">
+    <img src="/static/assets/icons8/icons/folder_WWogVNJDSfZ5.png" width="22" height="22" alt="Projects">
+  </div>
+  <div>
+    <div class="stat-number" id="dash-stat-projects">--</div>
+    <div class="stat-caption">Total Projects</div>
+  </div>
+</div>
+<div class="stat-box">
+  <div class="stat-icon-wrap" style="color: #f59e0b; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;">
+    <img src="/static/assets/icons8/icons/check-mark_70yRC8npwT3d.png" width="22" height="22" alt="Tasks">
+  </div>
+  <div>
+    <div class="stat-number" id="dash-stat-tasks">--</div>
+    <div class="stat-caption">Pending Tasks</div>
+  </div>
+</div>
+<div class="stat-box">
+  <div class="stat-icon-wrap" style="color: #10b981; background: rgba(16, 185, 129, 0.12); display: flex; align-items: center; justify-content: center;">
+    <img src="/static/assets/icons8/icons/microchip_mepX636gAP3u.png" width="22" height="22" alt="Inventory">
+  </div>
+  <div>
+    <div class="stat-number" id="dash-stat-inventory">--</div>
+    <div class="stat-caption">Inventory Items</div>
+  </div>
+</div>
+<div class="stat-box">
+  <div class="stat-icon-wrap" style="color: #a855f7; background: rgba(168, 85, 247, 0.12); display: flex; align-items: center; justify-content: center;">
+    <img src="/static/assets/icons8/icons/database_KZHjwwenS7oK.png" width="22" height="22" alt="Vault">
+  </div>
+  <div>
+    <div class="stat-number" id="dash-stat-vault">--</div>
+    <div class="stat-caption">Vault Notes</div>
+  </div>
+</div>
+</div>
+<div class="node-status">
+  <div class="node-card card" data-aos="fade-up" data-aos-delay="50">
+    <div class="node-card-left">
+      <div class="node-card-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+        <i data-lucide="bot" style="width: 18px; height: 18px;"></i>
       </div>
-      <div class="brand-title-wrap">
-        <span class="brand-title">Smart Electronics Workbench</span>
-        <span class="brand-subtitle">Xiaozhi AI & MCP Telemetry Gateway</span>
+      <div>
+        <div class="node-card-title">Node: Xiaozhi</div>
+        <div class="node-card-sub">ESP32 Voice Copilot</div>
+      </div>
+    </div>
+    <span class="metric-pill" id="node-xiaozhi">Checking...</span>
+  </div>
+  <div class="node-card card" data-aos="fade-up" data-aos-delay="100">
+    <div class="node-card-left">
+      <div class="node-card-icon" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+        <i data-lucide="tv" style="width: 18px; height: 18px;"></i>
+      </div>
+      <div>
+        <div class="node-card-title">Node: Pi4B Kiosk</div>
+        <div class="node-card-sub">Bench HUD Display</div>
+      </div>
+    </div>
+    <span class="metric-pill" id="node-kiosk">Checking...</span>
+  </div>
+  <div class="node-card card" data-aos="fade-up" data-aos-delay="150">
+    <div class="node-card-left">
+      <div class="node-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+        <i data-lucide="cpu" style="width: 18px; height: 18px;"></i>
+      </div>
+      <div>
+        <div class="node-card-title">Node: P4 Node</div>
+        <div class="node-card-sub">RISC-V Audio Board</div>
+      </div>
+    </div>
+    <span class="metric-pill" id="node-p4">Checking...</span>
+  </div>
+</div>
+
+<!-- Animated Silicon Engine Showcase -->
+<div class="workbench-asset-banner" style="display: flex; gap: 16px; align-items: center; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 14px 18px; margin: 16px 0;">
+  <div style="flex-shrink: 0; width: 68px; height: 68px; border-radius: 10px; overflow: hidden; background: rgba(8, 12, 20, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); display: flex; align-items: center; justify-content: center;">
+    <video autoplay loop muted playsinline poster="/static/assets/icons8/animated/processor_poster.png" style="width: 100%; height: 100%; object-fit: contain;">
+      <source src="/static/assets/icons8/animated/processor.mp4" type="video/mp4; codecs=hvc1">
+      <source src="/static/assets/icons8/animated/processor.webm" type="video/webm">
+    </video>
+  </div>
+  <div style="flex: 1;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 13px; font-weight: 700; color: #f1f5f9;">Silicon Coprocessor &amp; Physical AI Engine</span>
+      <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); padding: 1px 6px; border-radius: 8px;">PHYSICAL AI</span>
+    </div>
+    <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">
+      Hardware DMA voice streaming, MCP tools gateway, and local agent orchestration active.
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     HOME SCREEN FEATURED ESSAYS & BIOMIMICRY ARTICLES (THUMBNAILS + TITLES)
+     ========================================================================= -->
+<section class="home-articles-section">
+  <div class="home-articles-header">
+    <div class="home-articles-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      <span>Featured Blueprints &amp; Articles</span>
+    </div>
+    <a href="/blog" class="btn btn-secondary btn-xs" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); text-decoration: none;">
+      <span>Explore All &rarr;</span>
+    </a>
+  </div>
+
+  <!-- Featured 10-Chapter Technical Megaseries & Course Banner -->
+  <a href="/megaseries/" class="flagship-megaseries-banner" style="display: block; text-decoration: none; color: inherit; background: linear-gradient(135deg, rgba(0, 242, 254, 0.1) 0%, rgba(13, 21, 39, 0.95) 50%, rgba(16, 185, 129, 0.08) 100%); border: 1px solid rgba(0, 242, 254, 0.45); border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 4px 25px rgba(0, 242, 254, 0.12); transition: all 0.25s ease; position: relative; overflow: hidden; box-sizing: border-box; max-width: 100%;">
+    <div style="position: absolute; top: 0; right: 0; width: 180px; height: 100%; background: radial-gradient(circle at top right, rgba(0, 242, 254, 0.18), transparent 70%); pointer-events: none;"></div>
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+      <div style="flex: 1 1 300px; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+          <span style="font-size: 11px; font-weight: 800; font-family: var(--font-mono); color: #00f2fe; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); border-radius: 12px; padding: 2px 10px; text-transform: uppercase; letter-spacing: 0.04em;">★ FEATURED MEGASERIES &amp; COURSE</span>
+          <span style="font-size: 11px; font-weight: 700; font-family: var(--font-mono); color: #10b981; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 2px 8px;">10 CHAPTERS • 50 LABS</span>
+          <span style="font-size: 11px; font-weight: 600; font-family: var(--font-mono); color: #f59e0b; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 2px 8px;">MATHJAX • SPEC TABLES</span>
+        </div>
+        <h3 style="margin: 0 0 8px 0; font-size: 17px; font-weight: 800; line-height: 1.35; color: #ffffff; letter-spacing: -0.01em;">
+          10-Chapter Technical Megaseries &amp; Course: Embodied Physical AI — Mecanum Rover &amp; Dual-Xiaozhi Cyberdeck Architecture (50 Mini-Chapters &amp; Labs)
+        </h3>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #94a3b8; max-width: 900px;">
+          Comprehensive production curriculum: 4-wheel Mecanum Coulomb stiction kinematics, dual-node Xiaozhi peer federation over WebSockets, ESP32-S3 TinyUSB HID acoustic edge node, FreeRTOS audio DSP pipelines, and custom cyberdeck assembly with 50 hands-on step-by-step labs and 30 wrapped specification tables.
+        </p>
+      </div>
+      <div style="display: flex; align-items: center; align-self: center; gap: 8px; flex-shrink: 0;">
+        <span style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; background: linear-gradient(135deg, #00f2fe 0%, #0284c7 100%); color: #020617; font-size: 13px; font-weight: 800; box-shadow: 0 0 20px rgba(0, 242, 254, 0.35); text-transform: uppercase; letter-spacing: 0.04em;">
+          <span>Start Course</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </span>
+      </div>
+    </div>
+  </a>
+
+  <!-- Flagship Autonomous Rover Reading Suite Feature Banner -->
+  <a href="/rover" class="flagship-rover-banner" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; background: linear-gradient(135deg, rgba(0, 242, 254, 0.08) 0%, rgba(13, 21, 39, 0.75) 100%); border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="width: 44px; height: 44px; border-radius: 8px; overflow: hidden; background: #080c14; border: 1px solid rgba(0, 242, 254, 0.3); flex-shrink: 0;">
+        <img src="/static/rover/assets/optimized/images/IMG20261013221004.webp" alt="Autonomous Rover" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-size: 11px; font-weight: 700; color: #00f2fe; background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 1px 8px;">FLAGSHIP MONOGRAPH</span>
+          <span style="font-size: 11px; color: #00ff87; background: rgba(0, 255, 135, 0.1); border: 1px solid rgba(0, 255, 135, 0.25); border-radius: 12px; padding: 1px 8px;">3 READING FORMATS</span>
+        </div>
+        <h4 style="margin: 4px 0 2px; font-size: 14px; font-weight: 700; color: #f1f5f9;">The Symmetry of Motion: Mecanum Kinematics &amp; Bilateral Evolution</h4>
+        <div style="font-size: 12px; color: #94a3b8;">500w Short Wrapup &bull; Full Visual Article &bull; 100-Page Book in 10 Navigable Chunks</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #00f2fe; white-space: nowrap;">
+      <span>Read Now</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </div>
+  </a>
+
+  <div class="home-articles-grid">
+    <!-- Article 1: Co-evolution Grand Design -->
+    <a href="/blog?bio=1" class="home-article-card" title="Read 150M Years of Insect-Flower Co-Evolution">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_flower_insect_coevolution.jpg" alt="Co-evolution" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #10b981; border-color: rgba(16, 185, 129, 0.35);">Biomimicry • 01</span>
+          <span class="home-article-cat" style="color: #10b981;">Grand Design</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">150M Years of Insect-Flower Co-Evolution</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Article</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
       </div>
     </a>
 
-    <!-- Mobile hamburger menu toggle -->
-    <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Toggle menu">
-      <span class="hamburger-bar"></span>
-      <span class="hamburger-bar"></span>
-      <span class="hamburger-bar"></span>
-    </button>
-
-    <div class="nav-controls" id="nav-controls">
-      <!-- Playground Button - Prominent -->
-      <a href="/playground" class="playground-nav-btn" title="Open Circuit Builder Playground">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-        <span>Playground</span>
-      </a>
-
-      <!-- Objective 1: Dynamic Xiaozhi Hardware Badge (Reflects true connected client count) -->
-      <div id="device-badge-xiaozhi" class="device-badge listening" title="0 connected Xiaozhi WebSocket devices. Flash ESP32-S3 or P4 firmware to connect.">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-          <rect x="9" y="9" width="6" height="6"></rect>
-          <line x1="9" y1="1" x2="9" y2="4"></line>
-          <line x1="15" y1="1" x2="15" y2="4"></line>
-          <line x1="9" y1="20" x2="9" y2="23"></line>
-          <line x1="15" y1="20" x2="15" y2="23"></line>
-          <line x1="20" y1="9" x2="23" y2="9"></line>
-          <line x1="20" y1="14" x2="23" y2="14"></line>
-          <line x1="1" y1="9" x2="4" y2="9"></line>
-          <line x1="1" y1="14" x2="4" y2="14"></line>
-        </svg>
-        <span class="status-dot"></span>
-        <span id="xiaozhi-badge-text">Listening for Devices (0)</span>
+    <!-- Article 2: IIT Biomimicry & Robotics -->
+    <a href="/blog?bio=2" class="home-article-card" title="Read IIT Biomimicry: Adapting Nature to Robotics">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_biomimetic_robotics.jpg" alt="IIT Bio-Robotics" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.35);">Biomimicry • 02</span>
+          <span class="home-article-cat" style="color: #f59e0b;">IIT Bio-Robotics</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+            <rect x="9" y="9" width="6" height="6"></rect>
+            <line x1="9" y1="1" x2="9" y2="4"></line>
+            <line x1="15" y1="1" x2="15" y2="4"></line>
+          </svg>
+        </div>
       </div>
-
-      <div id="connection-status" class="status-badge" title="WebSocket link to benchtop daemon">
-        <span class="status-dot"></span>
-        <span id="status-text">Connecting...</span>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">IIT Biomimicry: Adapting Nature to Robotics</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Article</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
       </div>
+    </a>
 
-      <!-- Theme Switcher (Sun / Moon) -->
-      <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Toggle Light / Dark theme">
-        <svg id="theme-icon-sun" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg id="theme-icon-moon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-        <span id="theme-label">Dark</span>
-      </button>
+    <!-- Article 3: Cyborg Insect Micro-Robotics -->
+    <a href="/blog?bio=3" class="home-article-card" title="Read The Cyborg Insect: Neuromuscular Interfaces">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_cyborg_insect.jpg" alt="Cyborg Insect" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #c084fc; border-color: rgba(168, 85, 247, 0.35);">Biomimicry • 03</span>
+          <span class="home-article-cat" style="color: #c084fc;">Bio-Hybrid Micro-Robotics</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+      </div>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">The Cyborg Insect: Neuromuscular Interfaces</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Article</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
+      </div>
+    </a>
 
-      <a id="mode-toggle-link" href="/?mode=kiosk" class="mode-toggle-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 3h6v6"></path>
-          <path d="M10 14L21 3"></path>
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-        </svg>
-        <span>Launch Kiosk</span>
-      </a>
-    </div>
-  </header>
+    <!-- Article 4: Cosmic Loom -->
+    <a href="/blog?essay=1" class="home-article-card" title="Read The Cosmic Loom: Silicon & Spacetime">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_cosmic_heaven.jpg" alt="Cosmic Loom" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.35);">Cosmic • 01</span>
+          <span class="home-article-cat" style="color: #38bdf8;">Spacetime Loom</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">The Cosmic Loom: Silicon &amp; Spacetime</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Essay</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
+      </div>
+    </a>
 
-  <!-- =========================================================================
-       SEGMENTED TABS
-       ========================================================================= -->
-  <div class="tab-nav-wrapper">
-    <nav class="tab-nav">
-      <button class="tab-btn active" data-tab="tab-workbench">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-          <polyline points="2 17 12 22 22 17"></polyline>
-          <polyline points="2 12 12 17 22 12"></polyline>
-        </svg>
-        <span>Live Workbench & AI</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-projects">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span>Projects & Builds</span>
-        <span id="tab-projects-badge" class="tab-badge">0</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-inventory">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-          <line x1="12" y1="22.08" x2="12" y2="12"></line>
-        </svg>
-        <span>Inventory Catalog</span>
-        <span id="tab-inv-badge" class="tab-badge">0</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-logs">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-          <polyline points="10 9 9 9 8 9"></polyline>
-        </svg>
-        <span>Lab Notebook & Logs</span>
-        <span id="tab-logs-badge" class="tab-badge">0</span>
-      </button>
-    </nav>
+    <!-- Article 5: Portals, Plumbuses & Solder Smoke -->
+    <a href="/blog?essay=2" class="home-article-card" title="Read Portals, Plumbuses, and Solder Smoke">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_multiverse_portal.jpg" alt="Physical AI" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.35);">Cosmic • 02</span>
+          <span class="home-article-cat" style="color: #f43f5e;">Physical AI</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">Portals, Plumbuses, and Solder Smoke</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Essay</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- Article 6: The Whispering Silicon -->
+    <a href="/blog?essay=3" class="home-article-card" title="Read The Whispering Silicon: What ESP32 Hears">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_whispering_silicon.jpg" alt="Audio DSP" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #06b6d4; border-color: rgba(6, 182, 212, 0.35);">Cosmic • 03</span>
+          <span class="home-article-cat" style="color: #06b6d4;">Audio DSP</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path>
+            <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path>
+            <circle cx="12" cy="12" r="2"></circle>
+            <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path>
+            <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">The Whispering Silicon: What ESP32 Hears</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Essay</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- Article 7: Architecting Technological Heaven -->
+    <a href="/blog?essay=4" class="home-article-card" title="Read Architecting Technological Heaven">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_tech_heaven.jpg" alt="Dyson Swarm" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #a855f7; border-color: rgba(168, 85, 247, 0.35);">Cosmic • 04</span>
+          <span class="home-article-cat" style="color: #a855f7;">Dyson Sanctuary</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </div>
+      </div>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">Architecting Technological Heaven</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Essay</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- Article 8: When Webs Intersect: The Great Handshake -->
+    <a href="/blog?essay=5" class="home-article-card" title="Read When Webs Intersect: The Great Handshake">
+      <div class="home-article-top">
+        <div class="home-article-thumb-mini">
+          <img src="/static/thumb_cosmic_handshake.jpg" alt="Interstellar Mesh" class="home-article-mini-img" loading="lazy" width="44" height="44" />
+        </div>
+        <div class="home-article-tags-wrap">
+          <span class="home-article-badge" style="color: #6366f1; border-color: rgba(99, 102, 241, 0.35);">Cosmic • 05</span>
+          <span class="home-article-cat" style="color: #6366f1;">Interstellar Mesh</span>
+        </div>
+        <div class="home-article-type-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+        </div>
+      </div>
+      <div class="home-article-body">
+        <h3 class="home-article-card-title">When Webs Intersect: The Great Handshake</h3>
+        <div class="home-article-footer">
+          <span class="home-article-footer-label">Essay</span>
+          <svg class="home-article-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
+      </div>
+    </a>
   </div>
-
-  <!-- =========================================================================
-       DASHBOARD MODE CONTAINER
-       ========================================================================= -->
-  <main id="dashboard-container" class="dashboard-container">
-
-    <!-- -----------------------------------------------------------------------
-         TAB 1: LIVE WORKBENCH & AI COPILOT
-         ----------------------------------------------------------------------- -->
-    <section id="tab-workbench" class="tab-content active">
-      <div class="grid-2">
-
-        <!-- Left: Prompt Injection, Soldering Station Mirror & Push-To-Talk Controls -->
-        <div>
-          <!-- Dedicated 2.8" SPI TFT Soldering Station Display Mirror -->
-          <div class="card soldering-mirror-card">
-            <div class="card-title soldering-card-header">
-              <span class="card-title-text">
-                <svg class="card-title-icon soldering-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                </svg>
-                Soldering Station • 2.8" SPI TFT Mirror
+</section>
+  <!-- Symmetrical 2-Column Dashboard Tool Grid -->
+  <div class="dashboard-cards-grid">
+    <!-- 2.8" SPI TFT Display Mirror temporarily removed until hooked up --><div class="card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+<line x1="12" x2="12" y1="2" y2="12"></line>
+</svg>
+                Bench Safety Interlock &amp; Power Bus
               </span>
-              <div class="soldering-header-chips">
-                <span class="tft-status-pill online"><span class="status-dot"></span> 320x240 SPI</span>
-                <button id="btn-show-wiring-guide" class="btn btn-secondary btn-xs" type="button" title="View SPI wiring diagram for 2.8-inch TFT">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  Wiring Guide
+<span class="metric-pill online" id="safety-status-pill" style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+<span class="status-dot" style="background: #10b981;"></span> Interlock Engaged
+              </span>
+</div>
+<div class="relay-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+<!-- Relay 1: Soldering Station -->
+<div style="background: var(--bg-card-subtle); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+<div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+<span style="font-weight: 600; font-size: 12.5px; color: var(--text-bright);">Relay 1: Soldering Rig</span>
+<span id="relay1-state-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); font-weight: 600;">ACTIVE (HOT)</span>
+</div>
+<div style="font-size: 11.5px; color: var(--text-muted);">Main iron heater rail • 320°C</div>
+</div>
+<button class="btn btn-secondary btn-xs" id="btn-toggle-relay1" style="margin-top: 8px;" type="button">
+                  Toggle Relay 1
                 </button>
-              </div>
-            </div>
-
-            <!-- Hardware TFT Frame Mockup -->
-            <div class="tft-bezel-frame">
-              <div class="tft-screw top-left"></div>
-              <div class="tft-screw top-right"></div>
-              <div class="tft-screw bottom-left"></div>
-              <div class="tft-screw bottom-right"></div>
-
-              <div class="tft-screen-glass">
-                <div class="tft-top-bar">
-                  <span id="soldering-mirror-title" class="tft-title">SOLDERING STATION STANDBY</span>
-                  <span id="soldering-mirror-temp" class="tft-temp-badge">🔥 320°C / 350°C</span>
-                </div>
-                <div id="soldering-mirror-body" class="tft-content-body">
-                  <div class="tft-bullet-line">• <strong>STATION READY:</strong> Powered via 3.3V SPI0</div>
-                  <div class="tft-bullet-line">• <strong>LEADED (60/40):</strong> 300°C – 320°C</div>
-                  <div class="tft-bullet-line">• <strong>LEAD-FREE (SAC305):</strong> 350°C – 370°C</div>
-                  <div class="tft-bullet-line">• <em>Ask Feynman copilot for pinouts, thermal tips, or science wonders!</em></div>
-                </div>
-                <div class="tft-bottom-bar">
-                  <span id="soldering-mirror-timestamp">SPI0: CE0 (GP8) • DC (GP25)</span>
-                  <span class="tft-res-badge">ILI9341 2.8"</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="soldering-mirror-actions">
-              <button id="btn-copy-soldering" class="btn btn-secondary btn-xs" type="button">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                Copy Solder Notes
-              </button>
-              <button id="btn-reset-soldering" class="btn btn-secondary btn-xs" type="button">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="1 4 1 10 7 10"></polyline>
-                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                </svg>
-                Reset Display
-              </button>
-            </div>
-          </div>
-
-          <!-- Dedicated Push-To-Talk Voice Assistant Card (Objective 7) -->
-          <div class="card ptt-panel">
-            <div class="card-title">
-              <span class="card-title-text">
-                <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                  <line x1="12" y1="19" x2="12" y2="23"></line>
-                  <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-                Dedicated Push-To-Talk Voice Chatbot
-              </span>
-              <div class="ptt-header-controls">
-                <label class="tts-toggle-label" title="Speak answers aloud using voice synthesis">
-                  <input type="checkbox" id="toggle-tts-speech" checked />
-                  <span>Audio Out (TTS)</span>
-                </label>
-                <button id="btn-clear-chat" class="btn btn-secondary btn-sm" type="button" title="Clear conversation context & start a fresh topic">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="1 4 1 10 7 10"></polyline>
-                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                  </svg>
-                  <span>New Topic</span>
+</div>
+<!-- Relay 2: Bench Auxiliary Rail -->
+<div style="background: var(--bg-card-subtle); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+<div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+<span style="font-weight: 600; font-size: 12.5px; color: var(--text-bright);">Relay 2: 5V/12V Rail</span>
+<span id="relay2-state-badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); font-weight: 600;">STANDBY</span>
+</div>
+<div style="font-size: 11.5px; color: var(--text-muted);">Auxiliary logic power bus</div>
+</div>
+<button class="btn btn-secondary btn-xs" id="btn-toggle-relay2" style="margin-top: 8px;" type="button">
+                  Toggle Relay 2
                 </button>
-              </div>
-            </div>
-
-            <!-- PTT Big Button & Voice Waves Area -->
-            <div class="ptt-box">
-              <button id="btn-ptt-mic" class="ptt-btn" type="button">
-                <div class="ptt-wave-ring"></div>
-                <div class="ptt-wave-ring outer"></div>
-                <svg class="ptt-mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                  <line x1="12" y1="19" x2="12" y2="23"></line>
-                  <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-              </button>
-              <div class="ptt-info">
-                <div id="ptt-status" class="ptt-status-title">Push to Talk / Hold to Speak</div>
-                <div id="ptt-transcript" class="ptt-transcript-text">Tap mic or hold Spacebar. Asks copilot with full access to projects, notes, and parts inventory.</div>
-              </div>
-            </div>
-            
-            <div class="ptt-footer-meta">
-              <span id="compaction-status-pill" class="compaction-pill" title="Automatic token compaction active in SQLite">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                </svg>
-                Context Memory Active (Tokens Compacted)
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); background: var(--bg-app); padding: 8px 12px; border-radius: var(--radius-sm); flex-wrap: wrap; gap: 8px;">
+<span>⚡ Bench Draw: <strong id="bench-wattage" style="color: var(--text-bright);">48.2 W</strong></span>
+<span>🔥 Iron State: <strong id="bench-iron-state" style="color: #ef4444;">Assume Hot (320°C)</strong></span>
+<span>🛡️ Interlock: <strong style="color: #10b981;">Dual Cutoff Ready</strong></span>
+</div>
+</div><div class="card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="23"></line>
+</svg>
+                Xiaozhi Edge Voice Node Dispatcher
               </span>
-              <span id="convo-turns-count" style="font-size: 11px; color: var(--text-muted);">Session: workbench_default</span>
-            </div>
-          </div>
-
-          <!-- AI Copilot & Intent Router Card -->
-          <div class="card">
-            <h2 class="card-title">
-              <span class="card-title-text">
-                <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                Text Copilot & Technical Query
+<span class="metric-pill online" style="font-size: 11px;">
+<span class="status-dot"></span> /ws/xiaozhi
               </span>
-              <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">Groq Qwen + Gemini 3.6</span>
-            </h2>
-
-            <!-- Objective 4: Dynamic Contextual Suggestions Bar -->
-            <div class="suggestions-header">
-              <label class="input-label" style="margin-bottom: 0;">Contextual Suggestions (Live Bench State):</label>
-              <button id="btn-refresh-suggestions" class="btn-icon-link" type="button" title="Refresh contextual suggestions">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="23 4 23 10 17 10"></polyline>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                </svg>
-                Refresh
+</div>
+<div style="display: flex; gap: 8px; margin-bottom: 10px;">
+<input id="xiaozhi-broadcast-input" placeholder="Type message to broadcast to Xiaozhi ESP32 hardware via TTS..." style="flex: 1; font-size: 12px;" type="text"/>
+<button class="btn btn-primary btn-sm" id="btn-xiaozhi-broadcast" type="button">
+                🔊 Broadcast
               </button>
-            </div>
-            <div id="dynamic-suggestions-bar" class="chip-list" style="margin-bottom: 14px;">
-              <span class="chip-loading" style="font-size: 12px; color: var(--text-muted);">Analyzing bench data...</span>
-            </div>
-
-            <div class="input-group">
-              <label class="input-label" for="prompt-input">Command or Technical Electronics Query</label>
-              <textarea id="prompt-input" placeholder="Ask for a pinout, circuit calculation, multimeter log, or component search... (e.g. 'Show pinout ESP32-S3', 'Calculate 555 timer 1kHz circuit', 'Log reading 3.3V on GPIO4')"></textarea>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-              <button id="btn-send-prompt" class="btn btn-accent" type="button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-                <span>Dispatch to Copilot</span>
-              </button>
-              <span style="font-size: 11.5px; color: var(--text-muted);">Press <kbd style="background: var(--bg-card-subtle); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Ctrl</kbd> + <kbd style="background: var(--bg-card-subtle); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Enter</kbd></span>
-            </div>
-          </div>
-
-          <!-- Direct Kiosk Override Card -->
-          <div class="card">
-            <h2 class="card-title">
-              <span class="card-title-text">
-                <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                  <line x1="8" y1="21" x2="16" y2="21"></line>
-                  <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg>
+</div>
+<div style="display: flex; gap: 6px; flex-wrap: wrap;">
+<button class="btn btn-secondary btn-xs" onclick="document.getElementById('xiaozhi-broadcast-input').value='Arre Ayush! Checking workbench telemetry. Soldering iron is active.'" type="button">⚡ Telemetry Check</button>
+<button class="btn btn-secondary btn-xs" onclick="document.getElementById('xiaozhi-broadcast-input').value='Caution Ayush! The soldering iron is ON drawing power at 320 degrees!'" type="button">🔥 Heat Warning</button>
+<button class="btn btn-secondary btn-xs" onclick="document.getElementById('xiaozhi-broadcast-input').value='ESP32-S3 I2S ringbuffers synchronized. Ready for testing.'" type="button">🎙️ Audio Test</button>
+</div>
+</div><div class="card" style="margin-top: 20px;">
+<h2 class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" ry="2" width="20" x="2" y="3"></rect>
+<line x1="8" x2="16" y1="21" y2="21"></line>
+<line x1="12" x2="12" y1="17" y2="21"></line>
+</svg>
                 Direct Kiosk Screen Push (Zero-Latency Broadcast)
               </span>
-            </h2>
-
-            <div class="input-group">
-              <label class="input-label" for="direct-title">Display Title</label>
-              <input type="text" id="direct-title" value="Benchtop Notice" />
-            </div>
-
-            <div class="input-group">
-              <label class="input-label" for="direct-type">Payload Format</label>
-              <select id="direct-type">
-                <option value="markdown">Markdown Document</option>
-                <option value="pinout">Pinout Table</option>
-                <option value="schematic">Schematic / Circuit Wiring</option>
-                <option value="code">Monospace Code / ASCII</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label class="input-label" for="direct-content">Display Content</label>
-              <textarea id="direct-content" placeholder="Type direct Markdown, ASCII art, or pinout table to broadcast to the kiosk monitor..."></textarea>
-            </div>
-
-            <button id="btn-direct-push" class="btn btn-primary" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="15 17 20 12 15 7"></polyline>
-                <path d="M4 12h16"></path>
-              </svg>
-              <span>Broadcast to Bench Display</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Right: Screen Mirror & System Telemetry -->
-        <div>
-          <!-- Realistic Bench Screen Mirror -->
-          <div class="mirror-bezel">
-            <div class="mirror-titlebar">
-              <div class="mirror-dots">
-                <span class="mirror-dot red"></span>
-                <span class="mirror-dot yellow"></span>
-                <span class="mirror-dot green"></span>
-              </div>
-              <div id="mirror-screen-title" class="mirror-screen-title">BENCHTOP DISPLAY MIRROR</div>
-              <span id="mirror-screen-type" class="mirror-screen-type">READY</span>
-            </div>
-
-            <div id="mirror-content-area" class="mirror-content-area">
-              <h3 id="mirror-title" style="color: #38bdf8; margin-bottom: 12px;">Workbench Ready</h3>
-              <div id="mirror-body">
-                <p>Bench display connected to <code>/ws/kiosk</code>. Ready for telemetry, schematics, and pinout diagrams.</p>
-              </div>
-            </div>
-
-            <div class="mirror-footer">
-              <span id="mirror-timestamp">Syncing with daemon...</span>
-              <div style="display: flex; gap: 8px;">
-                <button id="btn-copy-mirror" class="btn btn-secondary btn-sm" type="button" title="Copy display text">Copy</button>
-                <button id="btn-clear-mirror" class="btn btn-secondary btn-sm" type="button" title="Clear mirror">Clear</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- System & MCP Status Telemetry Card -->
-          <div class="card" style="margin-top: 20px;">
-            <h2 class="card-title">
-              <span class="card-title-text">
-                <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                </svg>
-                System & Telemetry Gateway
+</h2>
+<div class="input-group">
+<label class="input-label" for="direct-title">Display Title</label>
+<input id="direct-title" type="text" value="Benchtop Notice"/>
+</div>
+<div class="input-group">
+<label class="input-label" for="direct-type">Payload Format</label>
+<select id="direct-type">
+<option value="markdown">Markdown Document</option>
+<option value="pinout">Pinout Table</option>
+<option value="schematic">Schematic / Circuit Wiring</option>
+<option value="code">Monospace Code / ASCII</option>
+</select>
+</div>
+<div class="input-group">
+<label class="input-label" for="direct-content">Display Content</label>
+<textarea id="direct-content" placeholder="Type direct Markdown, ASCII art, or pinout table to broadcast to the kiosk monitor..."></textarea>
+</div>
+<button class="btn btn-primary" id="btn-direct-push" type="button">
+<svg fill="none" height="15" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="15">
+<polyline points="15 17 20 12 15 7"></polyline>
+<path d="M4 12h16"></path>
+</svg>
+<span>Broadcast to Bench Display</span>
+</button>
+</div><div class="card" style="margin-top: 20px;">
+<h2 class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+</svg>
+                System &amp; Telemetry Gateway
               </span>
-            </h2>
-
-            <div class="status-grid">
-              <div class="status-metric">
-                <span class="metric-label">LLM Intent Router</span>
-                <span id="metric-groq" class="metric-value">
-                  <span class="metric-pill online"></span> Groq Active
+</h2>
+<div class="status-grid">
+<div class="status-metric">
+<span class="metric-label">LLM Intent Router</span>
+<span class="metric-value" id="metric-groq">
+<span class="metric-pill online"></span> Groq Active
                 </span>
-              </div>
-              <div class="status-metric">
-                <span class="metric-label">LLM Synthesis Engine</span>
-                <span id="metric-gemini" class="metric-value">
-                  <span class="metric-pill online"></span> Gemini 3.6
+</div>
+<div class="status-metric">
+<span class="metric-label">LLM Synthesis Engine</span>
+<span class="metric-value" id="metric-gemini">
+<span class="metric-pill online"></span> Gemini 3.6
                 </span>
-              </div>
-              <div class="status-metric">
-                <span class="metric-label">Cloudflare Tunnel</span>
-                <span id="metric-tunnel" class="metric-value" title="Subdomain: workbench.ayushdubey.tech">
-                  <span class="metric-pill online"></span> Connected
+</div>
+<div class="status-metric">
+<span class="metric-label">Cloudflare Tunnel</span>
+<span class="metric-value" id="metric-tunnel" title="Subdomain: workbench.ayushdubey.tech">
+<span class="metric-pill online"></span> Connected
                 </span>
-              </div>
-              <div class="status-metric">
-                <span class="metric-label">Xiaozhi Edge Listener</span>
-                <span id="metric-xiaozhi" class="metric-value">
-                  <span class="metric-pill listening"></span> Listening (0 devices)
+</div>
+<div class="status-metric">
+<span class="metric-label">Xiaozhi Edge Listener</span>
+<span class="metric-value" id="metric-xiaozhi">
+<span class="metric-pill listening"></span> Listening (0 devices)
                 </span>
+</div>
+</div>
+</div><div class="card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="16" rx="2" width="16" x="4" y="4"></rect>
+<rect height="6" width="6" x="9" y="9"></rect>
+</svg>
+                Hardware Pinouts &amp; Spec Cheat-Sheet
+              </span>
+<div style="display: flex; gap: 6px;">
+<button class="btn btn-secondary btn-xs" id="btn-push-pinout-screen" title="Push this pinout directly to the benchtop display" type="button">
+                  📺 Push to Screen
+                </button>
+<button class="btn btn-secondary btn-xs" id="btn-copy-pinout" title="Copy pinout table" type="button">
+                  📋 Copy
+                </button>
+</div>
+</div>
+<!-- Board Selector Pills -->
+<div class="pinout-board-pills" id="pinout-board-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+<button class="inv-tab-pill active" data-board="esp32s3">ESP32-S3</button>
+<button class="inv-tab-pill" data-board="rpi4">Raspberry Pi 40-Pin</button>
+<button class="inv-tab-pill" data-board="pico">RP2040 Pico</button>
+<button class="inv-tab-pill" data-board="esp32p4">ESP32-P4</button>
+<button class="inv-tab-pill" data-board="arduino">Arduino Uno</button>
+</div>
+<!-- Pinout Details Display Box -->
+<div id="pinout-display-box" style="background: var(--bg-card-subtle); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 12px; max-height: 220px; overflow-y: auto;">
+<!-- Populated dynamically by JS -->
+</div>
+</div><div class="card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="20" rx="2" width="16" x="4" y="2"></rect>
+<line x1="8" x2="16" y1="6" y2="6"></line>
+<line x1="16" x2="16" y1="14" y2="18"></line>
+<path d="M16 10h.01"></path>
+<path d="M12 10h.01"></path>
+<path d="M8 10h.01"></path>
+<path d="M12 14h.01"></path>
+<path d="M8 14h.01"></path>
+<path d="M12 18h.01"></path>
+<path d="M8 18h.01"></path>
+</svg>
+                Benchtop Electronics Calculator
+              </span>
+<button class="btn btn-secondary btn-xs" id="btn-calc-log" title="Log current calculation result to Lab Notebook" type="button">
+                📝 Log to Notebook
+              </button>
+</div>
+<!-- Calc Mode Tabs -->
+<div class="inv-filter-tabs" id="calc-mode-tabs" style="margin-bottom: 12px;">
+<button class="inv-tab-pill active" data-calc="ohm">⚡ Ohm's Law &amp; Power</button>
+<button class="inv-tab-pill" data-calc="led">💡 LED Resistor</button>
+<button class="inv-tab-pill" data-calc="divider">🎛️ Voltage Divider</button>
+</div>
+<!-- Calc Content: Ohm's Law -->
+<div class="calc-pane" id="calc-pane-ohm">
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
+<div>
+<label class="input-label" style="font-size: 11px;">Voltage (V)</label>
+<input id="calc-ohm-v" placeholder="e.g. 5.0" step="any" type="number"/>
+</div>
+<div>
+<label class="input-label" style="font-size: 11px;">Current (mA)</label>
+<input id="calc-ohm-i" placeholder="e.g. 20" step="any" type="number"/>
+</div>
+<div>
+<label class="input-label" style="font-size: 11px;">Resistance (Ω)</label>
+<input id="calc-ohm-r" placeholder="e.g. 250" step="any" type="number"/>
+</div>
+<div>
+<label class="input-label" style="font-size: 11px;">Power (mW)</label>
+<input id="calc-ohm-p" placeholder="e.g. 100" readonly="" step="any" style="opacity: 0.8;" type="number"/>
+</div>
+</div>
+<div id="calc-ohm-result" style="font-size: 12px; color: var(--accent); background: var(--bg-card-subtle); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                Enter any 2 values to compute the rest.
               </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- -----------------------------------------------------------------------
-         TAB 2: PROJECTS & HARDWARE BUILDS (Objective 8)
-         ----------------------------------------------------------------------- -->
-    <section id="tab-projects" class="tab-content">
-      <!-- Project Stats Bar -->
-      <div class="stats-bar">
-        <div class="stat-box">
-          <div class="stat-icon-wrap" style="color: var(--accent); background: var(--accent-bg);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-total-projects" class="stat-number">0</div>
-            <div class="stat-caption">Total Projects</div>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <div class="stat-icon-wrap" style="color: var(--accent); background: var(--accent-bg);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-prog-projects" class="stat-number">0</div>
-            <div class="stat-caption">In Progress</div>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <div class="stat-icon-wrap" style="color: var(--warning); background: var(--warning-bg);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-plan-projects" class="stat-number">0</div>
-            <div class="stat-caption">Planning</div>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <div class="stat-icon-wrap" style="color: var(--success); background: var(--success-bg);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-done-projects" class="stat-number">0</div>
-            <div class="stat-caption">Completed</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Projects Card -->
-      <div class="card">
-        <div class="card-title">
-          <span class="card-title-text">
-            <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-            </svg>
-            Active Hardware Builds & Project Directory
+</div>
+<!-- Calc Content: LED Resistor -->
+<div class="calc-pane" id="calc-pane-led" style="display: none;">
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;">
+<div>
+<label class="input-label" style="font-size: 11px;">Supply V_in</label>
+<input id="calc-led-vin" step="any" type="number" value="5.0"/>
+</div>
+<div>
+<label class="input-label" style="font-size: 11px;">LED V_f</label>
+<input id="calc-led-vf" step="any" title="Red: 1.8-2.2V, Blue/White: 3.0-3.3V" type="number" value="2.0"/>
+</div>
+<div>
+<label class="input-label" style="font-size: 11px;">Current (mA)</label>
+<input id="calc-led-i" step="any" type="number" value="20"/>
+</div>
+</div>
+<div id="calc-led-result" style="font-size: 12px; color: #10b981; background: var(--bg-card-subtle); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.3);">
+                Calculated Resistor: <strong>150 Ω</strong> (Nearest standard E24). Dissipation: 60 mW.
+              </div>
+</div>
+<!-- Calc Content: Voltage Divider -->
+<div class="calc-pane" id="calc-pane-divider" style="display: none;">
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;">
+<div>
+<label class="input-label" style="font-size: 11px;">Input V_in</label>
+<input id="calc-div-vin" step="any" type="number" value="5.0"/>
+</div>
+<div>
+<label class="input-label" style="font-size: 11px;">Top R1 (kΩ)</label>
+<input id="calc-div-r1" step="any" type="number" value="10"/>
+</div>
+<div>
+<label class="input-label" style="font-size: 11px;">Bottom R2 (kΩ)</label>
+<input id="calc-div-r2" step="any" type="number" value="20"/>
+</div>
+</div>
+<div id="calc-div-result" style="font-size: 12px; color: var(--accent); background: var(--bg-card-subtle); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                Output V_out: <strong>3.33 V</strong> (Divider Current: 0.17 mA).
+              </div>
+</div>
+</div><div class="card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+</svg>
+                Benchtop Scratchpad &amp; Quick Memo
+              </span>
+<div style="display: flex; gap: 6px;">
+<button class="btn btn-secondary btn-xs" id="btn-scratchpad-clear" type="button">Clear</button>
+<button class="btn btn-secondary btn-xs" id="btn-scratchpad-save" type="button">Save to Log</button>
+</div>
+</div>
+<!-- Quick Unit Insert Chips -->
+<div style="display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
+<button class="btn btn-secondary btn-xs chip-unit" onclick="insertScratchUnit('3.3V ')">3.3V</button>
+<button class="btn btn-secondary btn-xs chip-unit" onclick="insertScratchUnit('5.0V ')">5.0V</button>
+<button class="btn btn-secondary btn-xs chip-unit" onclick="insertScratchUnit('GND ')">GND</button>
+<button class="btn btn-secondary btn-xs chip-unit" onclick="insertScratchUnit('GPIO')">GPIO</button>
+<button class="btn btn-secondary btn-xs chip-unit" onclick="insertScratchUnit('320°C ')">320°C</button>
+<button class="btn btn-secondary btn-xs chip-unit" onclick="insertScratchUnit('I2C 0x3C ')">0x3C</button>
+</div>
+<textarea id="bench-scratchpad" placeholder="Quick bench notes, multimeter readings, test pinouts... (Auto-saved to local memory)" style="width: 100%; min-height: 80px; font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;"></textarea>
+<button class="btn btn-secondary btn-sm" id="btn-scratchpad-send-chat" style="width: 100%;" type="button">
+              💬 Ask Feynman Copilot About This Note
+            </button>
+</div><div class="mirror-bezel">
+<div class="mirror-titlebar">
+<div class="mirror-dots">
+<span class="mirror-dot red"></span>
+<span class="mirror-dot yellow"></span>
+<span class="mirror-dot green"></span>
+</div>
+<div class="mirror-screen-title" id="mirror-screen-title">BENCHTOP DISPLAY MIRROR</div>
+<span class="mirror-screen-type" id="mirror-screen-type">READY</span>
+</div>
+<div class="mirror-content-area" id="mirror-content-area">
+<h3 id="mirror-title" style="color: #38bdf8; margin-bottom: 12px;">Workbench Ready</h3>
+<div id="mirror-body">
+<p>Bench display connected to <code>/ws/kiosk</code>. Ready for telemetry, schematics, and pinout diagrams.</p>
+</div>
+</div>
+<div class="mirror-footer">
+<span id="mirror-timestamp">Syncing with daemon...</span>
+<div style="display: flex; gap: 8px;">
+<button class="btn btn-secondary btn-sm" id="btn-copy-mirror" title="Copy display text" type="button">Copy</button>
+<button class="btn btn-secondary btn-sm" id="btn-clear-mirror" title="Clear mirror" type="button">Clear</button>
+    </div>
+  </div>
+</div>
+<div class="section-panel" data-section="ai-chat"><div class="card ptt-panel">
+<div class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="23"></line>
+<line x1="8" x2="16" y1="23" y2="23"></line>
+</svg>
+                Dedicated Push-To-Talk Voice Chatbot
+              </span>
+<div class="ptt-header-controls">
+<label class="tts-toggle-label" title="Speak answers aloud using voice synthesis">
+<input checked="" id="toggle-tts-speech" type="checkbox"/>
+<span>Audio Out (TTS)</span>
+</label>
+<button class="btn btn-secondary btn-sm" id="btn-clear-chat" title="Clear conversation context &amp; start a fresh topic" type="button">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12">
+<polyline points="1 4 1 10 7 10"></polyline>
+<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+</svg>
+<span>New Topic</span>
+</button>
+</div>
+</div>
+<!-- PTT Big Button & Voice Waves Area -->
+<div class="ptt-box">
+<button class="ptt-btn" id="btn-ptt-mic" type="button">
+<div class="ptt-wave-ring"></div>
+<div class="ptt-wave-ring outer"></div>
+<svg class="ptt-mic-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="23"></line>
+<line x1="8" x2="16" y1="23" y2="23"></line>
+</svg>
+</button>
+<div class="ptt-info">
+<div class="ptt-status-title" id="ptt-status">Push to Talk / Hold to Speak</div>
+<div class="ptt-transcript-text" id="ptt-transcript">Tap mic or hold Spacebar. Asks copilot with full access to projects, notes, and parts inventory.</div>
+</div>
+</div>
+<div class="ptt-footer-meta">
+<span class="compaction-pill" id="compaction-status-pill" title="Automatic token compaction active in SQLite">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12">
+<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+</svg>
+                Context Memory Active (Tokens Compacted)
+              </span>
+<span id="convo-turns-count" style="font-size: 11px; color: var(--text-muted);">Session: workbench_default</span>
+</div>
+</div><div class="card">
+<h2 class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+</svg>
+                Text Copilot &amp; Technical Query
+              </span>
+<span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">Groq Qwen + Gemini 3.6</span>
+</h2>
+<!-- Objective 4: Dynamic Contextual Suggestions Bar -->
+<div class="suggestions-header">
+<label class="input-label" style="margin-bottom: 0;">Contextual Suggestions (Live Bench State):</label>
+<button class="btn-icon-link" id="btn-refresh-suggestions" title="Refresh contextual suggestions" type="button">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12">
+<polyline points="23 4 23 10 17 10"></polyline>
+<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+</svg>
+                Refresh
+              </button>
+</div>
+<div class="chip-list" id="dynamic-suggestions-bar" style="margin-bottom: 14px;">
+<span class="chip-loading" style="font-size: 12px; color: var(--text-muted);">Analyzing bench data...</span>
+</div>
+<div class="input-group">
+<label class="input-label" for="prompt-input">Command or Technical Electronics Query</label>
+<textarea id="prompt-input" placeholder="Ask for a pinout, circuit calculation, multimeter log, or component search... (e.g. 'Show pinout ESP32-S3', 'Calculate 555 timer 1kHz circuit', 'Log reading 3.3V on GPIO4')"></textarea>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+<button class="btn btn-accent" id="btn-send-prompt" type="button">
+<svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16">
+<line x1="22" x2="11" y1="2" y2="13"></line>
+<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+</svg>
+<span>Dispatch to Copilot</span>
+</button>
+<span style="font-size: 11.5px; color: var(--text-muted);">Press <kbd style="background: var(--bg-card-subtle); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Ctrl</kbd> + <kbd style="background: var(--bg-card-subtle); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">Enter</kbd></span>
+</div>
+<!-- Live AI Copilot Chat Messages Stream -->
+<div class="chat-conversation-container" id="panel-chat-messages" style="margin-top: 14px; max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: var(--bg-card-subtle); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+  <div class="chat-msg assistant" style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--cyan-glow); padding: 10px 14px; border-radius: 6px; font-size: 13px; line-height: 1.6; color: var(--text-main);">
+    <strong>Richard Feynman Copilot:</strong> Ready for your bench inquiries! Ask for pinouts, calculations, component searches, or circuit simulations.
+  </div>
+</div>
+</div></div><div class="
+section-panel" data-section="projects">
+<!-- Project Stats Bar -->
+<div class="stats-bar">
+<div class="stat-box">
+<div class="stat-icon-wrap" style="color: var(--accent); background: var(--accent-bg);">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-total-projects">0</div>
+<div class="stat-caption">Total Projects</div>
+</div>
+</div>
+<div class="stat-box">
+<div class="stat-icon-wrap" style="color: var(--accent); background: var(--accent-bg);">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-prog-projects">0</div>
+<div class="stat-caption">In Progress</div>
+</div>
+</div>
+<div class="stat-box">
+<div class="stat-icon-wrap" style="color: var(--warning); background: var(--warning-bg);">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-plan-projects">0</div>
+<div class="stat-caption">Planning</div>
+</div>
+</div>
+<div class="stat-box">
+<div class="stat-icon-wrap" style="color: var(--success); background: var(--success-bg);">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+<polyline points="22 4 12 14.01 9 11.01"></polyline>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-done-projects">0</div>
+<div class="stat-caption">Completed</div>
+</div>
+</div>
+</div>
+<!-- Main Projects Card -->
+<div class="card">
+<div class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+</svg>
+            Active Hardware Builds &amp; Project Directory
           </span>
-          <button id="btn-refresh-projects" class="btn btn-secondary btn-sm" type="button">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-            </svg>
-            <span>Refresh</span>
-          </button>
-        </div>
-
-        <!-- Add Project Accordion -->
-        <details id="details-new-project" style="margin-bottom: 20px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px;">
-          <summary style="font-weight: 700; cursor: pointer; color: var(--accent); user-select: none; font-size: 14px;">+ Create New Engineering Project</summary>
-          <form id="form-add-project" style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
-            <div>
-              <label class="input-label" for="proj-name">Project Name *</label>
-              <input type="text" id="proj-name" required placeholder="e.g., Xiaozhi ESP32-P4 Voice Node" />
-            </div>
-            <div>
-              <label class="input-label" for="proj-hw">Target Hardware Platform</label>
-              <select id="proj-hw">
-                <option value="ESP32-S3">ESP32-S3 (Dual Core LX7, AI, USB)</option>
-                <option value="ESP32-P4">ESP32-P4 (RISC-V High Performance, Audio)</option>
-                <option value="Raspberry Pi">Raspberry Pi (Pi 4, Pi 5, Zero 2W)</option>
-                <option value="RP2040">RP2040 (Raspberry Pi Pico / Dual M0+)</option>
-                <option value="STM32">STM32 (ARM Cortex-M)</option>
-                <option value="Arduino">Arduino / ATmega328P</option>
-                <option value="Custom">Custom / Mixed Architecture</option>
-              </select>
-            </div>
-            <div>
-              <label class="input-label" for="proj-status">Initial Status</label>
-              <select id="proj-status">
-                <option value="in_progress">In Progress</option>
-                <option value="planning">Planning Phase</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label class="input-label" for="proj-desc">Project Objective & Architecture Overview</label>
-              <input type="text" id="proj-desc" placeholder="e.g., Handheld edge assistant with microphone, I2S DAC, and screen telemetry mirror" />
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label class="input-label" for="proj-notes">Technical Specifications & Notes (Markdown supported)</label>
-              <textarea id="proj-notes" rows="3" placeholder="Document pinouts, rail voltages, test parameters, firmware repos..."></textarea>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <button type="submit" class="btn btn-primary">Create Project</button>
-            </div>
-          </form>
-        </details>
-
-        <!-- Projects Filter Tabs -->
-        <div class="filter-pill-bar" id="proj-filter-bar" style="margin-bottom: 16px;">
-          <button class="filter-pill active" data-status="All">All Projects</button>
-          <button class="filter-pill" data-status="in_progress">⚡ In Progress</button>
-          <button class="filter-pill" data-status="planning">📋 Planning</button>
-          <button class="filter-pill" data-status="completed">✓ Completed</button>
-        </div>
-
-        <!-- Projects Grid Container -->
-        <div id="projects-grid" class="projects-grid">
-          <div style="text-align: center; color: var(--text-muted); padding: 32px;">Loading engineering projects...</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- -----------------------------------------------------------------------
-         TAB 3: INVENTORY CATALOG (Objective 2: Aesthetic Overhaul)
-         ----------------------------------------------------------------------- -->
-    <section id="tab-inventory" class="tab-content">
-      <!-- Quick Stats Row -->
-      <div class="stats-bar">
-        <div class="stat-box">
-          <div class="stat-icon-wrap">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-total-parts" class="stat-number">0</div>
-            <div class="stat-caption">Total Components</div>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <div class="stat-icon-wrap" style="color: var(--success); background: var(--success-bg);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-in-stock" class="stat-number">0</div>
-            <div class="stat-caption">In Stock (>0)</div>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <div class="stat-icon-wrap" style="color: var(--warning); background: var(--warning-bg);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-low-stock" class="stat-number">0</div>
-            <div class="stat-caption">Low Stock (≤ 2)</div>
-          </div>
-        </div>
-
-        <div class="stat-box">
-          <div class="stat-icon-wrap" style="color: var(--purple); background: var(--purple-bg);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-          </div>
-          <div>
-            <div id="stat-categories" class="stat-number">0</div>
-            <div class="stat-caption">Categories</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Inventory Card -->
-      <div class="card">
-        <div class="card-title">
-          <span class="card-title-text">
-            <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-            </svg>
+<button class="btn btn-secondary btn-sm" id="btn-refresh-projects" type="button">
+<svg fill="none" height="13" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="13">
+<polyline points="23 4 23 10 17 10"></polyline>
+<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+</svg>
+<span>Refresh</span>
+</button>
+</div>
+<!-- Add Project Accordion -->
+<details id="details-new-project" style="margin-bottom: 20px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px;">
+<summary style="font-weight: 700; cursor: pointer; color: var(--accent); user-select: none; font-size: 14px;">+ Create New Engineering Project</summary>
+<form id="form-add-project" style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+<div>
+<label class="input-label" for="proj-name">Project Name *</label>
+<input id="proj-name" placeholder="e.g., Xiaozhi ESP32-P4 Voice Node" required="" type="text"/>
+</div>
+<div>
+<label class="input-label" for="proj-hw">Target Hardware Platform</label>
+<select id="proj-hw">
+<option value="ESP32-S3">ESP32-S3 (Dual Core LX7, AI, USB)</option>
+<option value="ESP32-P4">ESP32-P4 (RISC-V High Performance, Audio)</option>
+<option value="Raspberry Pi">Raspberry Pi (Pi 4, Pi 5, Zero 2W)</option>
+<option value="RP2040">RP2040 (Raspberry Pi Pico / Dual M0+)</option>
+<option value="STM32">STM32 (ARM Cortex-M)</option>
+<option value="Arduino">Arduino / ATmega328P</option>
+<option value="Custom">Custom / Mixed Architecture</option>
+</select>
+</div>
+<div>
+<label class="input-label" for="proj-status">Initial Status</label>
+<select id="proj-status">
+<option value="in_progress">In Progress</option>
+<option value="planning">Planning Phase</option>
+<option value="completed">Completed</option>
+</select>
+</div>
+<div style="grid-column: 1 / -1;">
+<label class="input-label" for="proj-desc">Project Objective &amp; Architecture Overview</label>
+<input id="proj-desc" placeholder="e.g., Handheld edge assistant with microphone, I2S DAC, and screen telemetry mirror" type="text"/>
+</div>
+<div style="grid-column: 1 / -1;">
+<label class="input-label" for="proj-notes">Technical Specifications &amp; Notes (Markdown supported)</label>
+<textarea id="proj-notes" placeholder="Document pinouts, rail voltages, test parameters, firmware repos..." rows="3"></textarea>
+</div>
+<div style="grid-column: 1 / -1;">
+<button class="btn btn-primary" type="submit">Create Project</button>
+</div>
+</form>
+</details>
+<!-- Projects Filter Tabs -->
+<div class="filter-pill-bar" id="proj-filter-bar" style="margin-bottom: 16px;">
+<button class="filter-pill active" data-status="All">All Projects</button>
+<button class="filter-pill" data-status="in_progress">⚡ In Progress</button>
+<button class="filter-pill" data-status="planning">📋 Planning</button>
+<button class="filter-pill" data-status="completed">✓ Completed</button>
+</div>
+<!-- Projects Grid Container -->
+<div class="projects-grid" id="projects-grid">
+<div style="text-align: center; color: var(--text-muted); padding: 32px;">Loading engineering projects...</div>
+</div>
+</div>
+</div><div class="
+section-panel" data-section="tasks"><div class="card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9 11l3 3L22 4"></path>
+<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+</svg>
+                Workbench Tasks &amp; Action Items
+              </span>
+<div class="inv-filter-tabs" id="widget-task-period-tabs" style="margin-bottom: 0;">
+<button class="inv-tab-pill active" data-period="daily">Daily</button>
+<button class="inv-tab-pill" data-period="weekly">Weekly</button>
+<button class="inv-tab-pill" data-period="all">All</button>
+</div>
+</div>
+<!-- Quick Add Task Input -->
+<div style="display: flex; gap: 8px; margin-bottom: 12px;">
+<input id="widget-new-task-input" placeholder="Quick add task... (e.g. 'Calibrate soldering iron thermocouple', 'Test I2S gain')" style="flex: 1; font-size: 12px;" type="text"/>
+<button class="btn btn-primary btn-sm" id="widget-btn-add-task" type="button">
+                + Add
+              </button>
+</div>
+<!-- Live Task List Container -->
+<div id="widget-tasks-list" style="max-height: calc(100vh - 360px); min-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px;">Loading tasks...</div>
+</div>
+</div></div><div class="
+section-panel" data-section="inventory">
+<!-- Quick Stats Row -->
+<div class="stats-bar">
+<div class="stat-box">
+<div class="stat-icon-wrap">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-total-parts">0</div>
+<div class="stat-caption">Total Components</div>
+</div>
+</div>
+<div class="stat-box">
+<div class="stat-icon-wrap" style="color: var(--success); background: var(--success-bg);">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-in-stock">0</div>
+<div class="stat-caption">In Stock (&gt;0)</div>
+</div>
+</div>
+<div class="stat-box">
+<div class="stat-icon-wrap" style="color: var(--warning); background: var(--warning-bg);">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+<line x1="12" x2="12" y1="9" y2="13"></line>
+<line x1="12" x2="12.01" y1="17" y2="17"></line>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-low-stock">0</div>
+<div class="stat-caption">Low Stock (≤ 2)</div>
+</div>
+</div>
+<div class="stat-box">
+<div class="stat-icon-wrap" style="color: var(--purple); background: var(--purple-bg);">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20">
+<rect height="7" width="7" x="3" y="3"></rect>
+<rect height="7" width="7" x="14" y="3"></rect>
+<rect height="7" width="7" x="14" y="14"></rect>
+<rect height="7" width="7" x="3" y="14"></rect>
+</svg>
+</div>
+<div>
+<div class="stat-number" id="stat-categories">0</div>
+<div class="stat-caption">Categories</div>
+</div>
+</div>
+</div>
+<!-- Main Inventory Card -->
+<div class="card">
+<div class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" ry="2" width="20" x="2" y="7"></rect>
+<path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+</svg>
             Component Inventory Catalog
           </span>
-          <button id="btn-refresh-inv" class="btn btn-secondary btn-sm" type="button">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-            </svg>
-            <span>Refresh</span>
-          </button>
-        </div>
-
-        <!-- Quick Filter Category Tabs (Objective 2) -->
-        <div class="inv-filter-tabs" id="inv-quick-filters">
-          <button class="inv-tab-pill active" data-cat="All">All Parts</button>
-          <button class="inv-tab-pill" data-cat="Microcontrollers">🎛️ Microcontrollers</button>
-          <button class="inv-tab-pill" data-cat="Sensors">📡 Sensors</button>
-          <button class="inv-tab-pill" data-cat="Power">⚡ Power & LDO</button>
-          <button class="inv-tab-pill" data-cat="Audio">🔊 Audio & DAC</button>
-          <button class="inv-tab-pill" data-cat="Displays">🖥️ Displays</button>
-          <button class="inv-tab-pill" data-cat="Passive">〰️ Passives</button>
-          <button class="inv-tab-pill alert" data-cat="LowStock">⚠️ Low Stock (≤ 2)</button>
-          <button class="inv-tab-pill ok" data-cat="Abundant">✨ Abundant (≥ 10)</button>
-        </div>
-
-        <!-- Filter Search Row -->
-        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
-          <input type="text" id="inv-search" placeholder="Search components by name, specs, location, or notes..." style="flex: 1; min-width: 260px;" />
-        </div>
-
-        <!-- Add Component Drawer -->
-        <details style="margin-bottom: 20px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px;">
-          <summary style="font-weight: 700; cursor: pointer; color: var(--accent); user-select: none; font-size: 14px;">+ Add New Component to Stock</summary>
-          <form id="form-add-inventory" style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
-            <div>
-              <label class="input-label" for="inv-name">Component Name *</label>
-              <input type="text" id="inv-name" required placeholder="e.g., Waveshare ESP32-S3-Zero" />
-            </div>
-            <div>
-              <label class="input-label" for="inv-qty">Stock Quantity</label>
-              <input type="number" id="inv-qty" value="1" min="0" />
-            </div>
-            <div>
-              <label class="input-label" for="inv-category">Category</label>
-              <select id="inv-category">
-                <option value="Microcontrollers">Microcontrollers</option>
-                <option value="Sensors">Sensors</option>
-                <option value="Audio">Audio & DAC</option>
-                <option value="Displays">Displays & Screens</option>
-                <option value="Passive">Passives (R, C, L)</option>
-                <option value="Semiconductors">Semiconductors</option>
-                <option value="Power">Power & Regulators</option>
-                <option value="Connectors">Connectors</option>
-                <option value="General">General</option>
-              </select>
-            </div>
-            <div>
-              <label class="input-label" for="inv-location">Storage Location</label>
-              <input type="text" id="inv-location" placeholder="e.g., Bin B-4, Drawer 2" />
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <label class="input-label" for="inv-notes">Technical Notes / Specs</label>
-              <input type="text" id="inv-notes" placeholder="e.g., 3.3V logic, I2S DAC connected, verified pinout" />
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <button type="submit" class="btn btn-primary">Save Component</button>
-            </div>
-          </form>
-        </details>
-
-        <!-- Inventory Table with Steppers & Indicators -->
-        <div class="table-container">
-          <table class="workbench-table">
-            <thead>
-              <tr>
-                <th>Component</th>
-                <th style="min-width: 140px;">Quantity & Adjust</th>
-                <th>Stock Level</th>
-                <th>Category</th>
-                <th>Storage Bin</th>
-                <th>Technical Specs</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="inventory-tbody">
-              <tr>
-                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading inventory...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- -----------------------------------------------------------------------
-         TAB 4: LAB NOTEBOOK & LOGS (Objective 2: Aesthetic Overhaul)
-         ----------------------------------------------------------------------- -->
-    <section id="tab-logs" class="tab-content">
-      <div class="grid-2">
-        <!-- New Log Entry Form -->
-        <div class="card">
-          <h2 class="card-title">
-            <span class="card-title-text">
-              <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
+<button class="btn btn-secondary btn-sm" id="btn-refresh-inv" type="button">
+<svg fill="none" height="13" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="13">
+<polyline points="23 4 23 10 17 10"></polyline>
+<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+</svg>
+<span>Refresh</span>
+</button>
+</div>
+<!-- Quick Filter Category Tabs (Objective 2) -->
+<div class="inv-filter-tabs" id="inv-quick-filters">
+<button class="inv-tab-pill active" data-cat="All">All Parts</button>
+<button class="inv-tab-pill" data-cat="Microcontrollers">🎛️ Microcontrollers</button>
+<button class="inv-tab-pill" data-cat="Sensors">📡 Sensors</button>
+<button class="inv-tab-pill" data-cat="Power">⚡ Power &amp; LDO</button>
+<button class="inv-tab-pill" data-cat="Audio">🔊 Audio &amp; DAC</button>
+<button class="inv-tab-pill" data-cat="Displays">🖥️ Displays</button>
+<button class="inv-tab-pill" data-cat="Passive">〰️ Passives</button>
+<button class="inv-tab-pill alert" data-cat="LowStock">⚠️ Low Stock (≤ 2)</button>
+<button class="inv-tab-pill ok" data-cat="Abundant">✨ Abundant (≥ 10)</button>
+</div>
+<!-- Filter Search Row -->
+<div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+<input id="inv-search" placeholder="Search components by name, specs, location, or notes..." style="flex: 1; min-width: 260px;" type="text"/>
+</div>
+<!-- Add Component Drawer -->
+<details style="margin-bottom: 20px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px;">
+<summary style="font-weight: 700; cursor: pointer; color: var(--accent); user-select: none; font-size: 14px;">+ Add New Component to Stock</summary>
+<form id="form-add-inventory" style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+<div>
+<label class="input-label" for="inv-name">Component Name *</label>
+<input id="inv-name" placeholder="e.g., Waveshare ESP32-S3-Zero" required="" type="text"/>
+</div>
+<div>
+<label class="input-label" for="inv-qty">Stock Quantity</label>
+<input id="inv-qty" min="0" type="number" value="1"/>
+</div>
+<div>
+<label class="input-label" for="inv-category">Category</label>
+<select id="inv-category">
+<option value="Microcontrollers">Microcontrollers</option>
+<option value="Sensors">Sensors</option>
+<option value="Audio">Audio &amp; DAC</option>
+<option value="Displays">Displays &amp; Screens</option>
+<option value="Passive">Passives (R, C, L)</option>
+<option value="Semiconductors">Semiconductors</option>
+<option value="Power">Power &amp; Regulators</option>
+<option value="Connectors">Connectors</option>
+<option value="General">General</option>
+</select>
+</div>
+<div>
+<label class="input-label" for="inv-location">Storage Location</label>
+<input id="inv-location" placeholder="e.g., Bin B-4, Drawer 2" type="text"/>
+</div>
+<div style="grid-column: 1 / -1;">
+<label class="input-label" for="inv-notes">Technical Notes / Specs</label>
+<input id="inv-notes" placeholder="e.g., 3.3V logic, I2S DAC connected, verified pinout" type="text"/>
+</div>
+<div style="grid-column: 1 / -1;">
+<button class="btn btn-primary" type="submit">Save Component</button>
+</div>
+</form>
+</details>
+<!-- Inventory Table with Steppers & Indicators -->
+<div class="table-container">
+<table class="workbench-table">
+<thead>
+<tr>
+<th>Component</th>
+<th style="min-width: 140px;">Quantity &amp; Adjust</th>
+<th>Stock Level</th>
+<th>Category</th>
+<th>Storage Bin</th>
+<th>Technical Specs</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="inventory-tbody">
+<tr>
+<td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading inventory...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div><div class="
+section-panel" data-section="logs">
+<div class="grid-2">
+<!-- New Log Entry Form -->
+<div class="card">
+<h2 class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+</svg>
               Record Bench Note / Reading
             </span>
-          </h2>
-
-          <form id="form-add-log">
-            <div class="input-group">
-              <label class="input-label" for="log-type">Entry Type</label>
-              <select id="log-type">
-                <option value="reading">⚡ Multimeter / Sensor Reading</option>
-                <option value="oscilloscope">📈 Oscilloscope Trace / Signal</option>
-                <option value="text">📝 General Technical Note</option>
-                <option value="schematic">🔬 Circuit Note / Pinout</option>
-                <option value="issue">⚠️ Bug / Hardware Failure</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label class="input-label" for="log-content">Content (Markdown & Measurement Chips auto-extracted)</label>
-              <textarea id="log-content" required placeholder="Record test results, voltages (e.g. 3.3V), frequencies (e.g. 100kHz), currents (e.g. 150mA)..."></textarea>
-            </div>
-
-            <div class="input-group">
-              <label class="input-label" for="log-tags">Tags (comma-separated)</label>
-              <input type="text" id="log-tags" placeholder="e.g., esp32-s3, i2s, 3v3-rail, inmp441" />
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                <polyline points="7 3 7 8 15 8"></polyline>
-              </svg>
-              <span>Record Bench Note</span>
-            </button>
-          </form>
-        </div>
-
-        <!-- History & Telemetry Timeline -->
-        <div class="card">
-          <div class="card-title">
-            <span class="card-title-text">
-              <svg class="card-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 14 14"></polyline>
-              </svg>
-              Telemetry Timeline & Bench Notes
+</h2>
+<form id="form-add-log">
+<div class="input-group">
+<label class="input-label" for="log-type">Entry Type</label>
+<select id="log-type">
+<option value="reading">⚡ Multimeter / Sensor Reading</option>
+<option value="oscilloscope">📈 Oscilloscope Trace / Signal</option>
+<option value="text">📝 General Technical Note</option>
+<option value="schematic">🔬 Circuit Note / Pinout</option>
+<option value="issue">⚠️ Bug / Hardware Failure</option>
+</select>
+</div>
+<div class="input-group">
+<label class="input-label" for="log-content">Content (Markdown &amp; Measurement Chips auto-extracted)</label>
+<textarea id="log-content" placeholder="Record test results, voltages (e.g. 3.3V), frequencies (e.g. 100kHz), currents (e.g. 150mA)..." required=""></textarea>
+</div>
+<div class="input-group">
+<label class="input-label" for="log-tags">Tags (comma-separated)</label>
+<input id="log-tags" placeholder="e.g., esp32-s3, i2s, 3v3-rail, inmp441" type="text"/>
+</div>
+<button class="btn btn-primary" type="submit">
+<svg fill="none" height="15" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="15">
+<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+<polyline points="17 21 17 13 7 13 7 21"></polyline>
+<polyline points="7 3 7 8 15 8"></polyline>
+</svg>
+<span>Record Bench Note</span>
+</button>
+</form>
+</div>
+<!-- History & Telemetry Timeline -->
+<div class="card">
+<div class="card-title">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 14 14"></polyline>
+</svg>
+              Telemetry Timeline &amp; Bench Notes
             </span>
-            <div style="display: flex; gap: 8px;">
-              <button id="btn-export-logs" class="btn btn-secondary btn-sm" type="button">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <span>Export Markdown</span>
+<div style="display: flex; gap: 8px;">
+<button class="btn btn-secondary btn-sm" id="btn-export-logs" type="button">
+<svg fill="none" height="13" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="13">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+<polyline points="7 10 12 15 17 10"></polyline>
+<line x1="12" x2="12" y1="15" y2="3"></line>
+</svg>
+<span>Export Markdown</span>
+</button>
+</div>
+</div>
+<!-- Log Type Filters -->
+<div class="inv-filter-tabs" id="log-filter-tabs" style="margin-bottom: 14px;">
+<button class="inv-tab-pill active" data-type="All">All Logs</button>
+<button class="inv-tab-pill" data-type="reading">⚡ Readings</button>
+<button class="inv-tab-pill" data-type="oscilloscope">📈 Scope Traces</button>
+<button class="inv-tab-pill" data-type="schematic">🔬 Schematics</button>
+<button class="inv-tab-pill" data-type="issue">⚠️ Bugs</button>
+<button class="inv-tab-pill" data-type="text">📝 Notes</button>
+</div>
+<!-- Search Input -->
+<div style="margin-bottom: 14px;">
+<input id="log-search" placeholder="Search logs by keyword or tag..." type="text"/>
+</div>
+<!-- Log Feed Container -->
+<div class="log-feed" id="log-list">
+<div style="color: var(--text-muted); text-align: center; padding: 24px;">Loading lab notes...</div>
+</div>
+</div>
+</div>
+</div><div class="
+section-panel" data-section="vault"><div class="card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+</svg>
+                Obsidian Vault &amp; Daily Digest Sync
+              </span>
+<button class="btn btn-primary btn-xs" id="btn-sync-vault" title="Sync chat logs, generate AI summaries, and verify markdown integrity" type="button">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12">
+<polyline points="23 4 23 10 17 10"></polyline>
+<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+</svg>
+                Sync Vault Now
               </button>
-            </div>
-          </div>
-
-          <!-- Log Type Filters -->
-          <div class="inv-filter-tabs" id="log-filter-tabs" style="margin-bottom: 14px;">
-            <button class="inv-tab-pill active" data-type="All">All Logs</button>
-            <button class="inv-tab-pill" data-type="reading">⚡ Readings</button>
-            <button class="inv-tab-pill" data-type="oscilloscope">📈 Scope Traces</button>
-            <button class="inv-tab-pill" data-type="schematic">🔬 Schematics</button>
-            <button class="inv-tab-pill" data-type="issue">⚠️ Bugs</button>
-            <button class="inv-tab-pill" data-type="text">📝 Notes</button>
-          </div>
-
-          <!-- Search Input -->
-          <div style="margin-bottom: 14px;">
-            <input type="text" id="log-search" placeholder="Search logs by keyword or tag..." />
-          </div>
-
-          <!-- Log Feed Container -->
-          <div id="log-list" class="log-feed">
-            <div style="color: var(--text-muted); text-align: center; padding: 24px;">Loading lab notes...</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- =========================================================================
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-card-subtle); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-bottom: 12px;">
+<div>
+<div style="font-size: 13px; font-weight: 600; color: var(--text-bright);">
+                  Vault Notes: <span id="vault-notes-count">51</span> · Summaries: <span id="vault-summaries-count">2</span>
+</div>
+<div id="vault-clean-status" style="font-size: 11.5px; color: #10b981; margin-top: 2px;">
+                  ✓ Summaries Verified (0 Errors • 404/401 Bug Resolved)
+                </div>
+</div>
+<span id="vault-last-sync-time" style="font-size: 11px; color: var(--text-muted);">Last sync: Today</span>
+</div>
+<div style="display: flex; gap: 8px;">
+<button class="btn btn-secondary btn-sm" id="btn-view-daily-digest" style="flex: 1;" type="button">
+                📖 View Today's Digest
+              </button>
+<button class="btn btn-secondary btn-sm" id="btn-clean-vault" style="flex: 1;" title="Scan and repair any markdown summary errors" type="button">
+                🛡️ Repair &amp; Re-summarize
+              </button>
+</div>
+</div>
+<!-- Obsidian Notes Explorer & Markdown Viewer -->
+<div class="card" style="margin-top: 14px;">
+  <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+    <span class="card-title-text">
+      <svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      Obsidian Markdown Notes &amp; Knowledge Vault
+    </span>
+    <input type="text" id="vault-search-input" placeholder="Search notes..." style="padding: 4px 10px; font-size: 11.5px; width: 180px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-base); color: var(--text-main);" />
+  </div>
+  <div style="display: flex; gap: 14px; margin-top: 10px; min-height: 380px;">
+    <!-- Notes List -->
+    <div id="vault-notes-list" style="flex: 1; max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid var(--border-subtle); padding-right: 10px;">
+      <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px;">Loading Obsidian notes...</div>
+    </div>
+    <!-- Note Previewer -->
+    <div id="vault-note-viewer" style="flex: 2; max-height: 480px; overflow-y: auto; padding: 10px 14px; background: var(--bg-card-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+      <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 40px;">Select a note from the list to preview markdown</div>
+    </div>
+  </div>
+</div>
+</div><div class="
+section-panel" data-section="optimizer"><div class="card token-optimizer-card" style="margin-top: 20px;">
+<div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+<span class="card-title-text">
+<svg class="card-title-icon" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+</svg>
+                Token Optimizer &amp; Strategy Agent
+              </span>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+<span class="metric-pill online" id="optimizer-status-pill" style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+<span class="status-dot" style="background: #10b981;"></span> Strategy: Multi-Tier Failover
+                </span>
+<a class="btn btn-accent btn-xs" href="/boost/boost" target="_blank" title="Open full dedicated System Booster Dashboard (/boost/boost)" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                  🚀 Booster UI
+                </a>
+<button class="btn btn-secondary btn-xs" id="btn-boost-system" title="Trigger instant token optimization boost (/boost/boost)" type="button">
+                  ⚡ Fast Boost
+                </button>
+<button class="btn btn-secondary btn-xs" id="btn-purge-cache" title="Purge query cache in memory" type="button">
+                  🧹 Purge Cache
+                </button>
+<button class="btn btn-secondary btn-xs" id="btn-audit-optimizer" title="Actively probe all AI tiers and verify optimization strategy health" type="button">
+                  🔍 Audit Strategy
+                </button>
+</div>
+</div>
+<!-- Animated Rocket Booster Banner -->
+<div class="optimizer-boost-banner" style="display: flex; gap: 14px; align-items: center; background: radial-gradient(circle at left, rgba(245,158,11,0.15) 0%, rgba(15,23,42,0.6) 80%); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
+  <div style="flex-shrink: 0; width: 56px; height: 56px; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.5); border: 1px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center;">
+    <video autoplay loop muted playsinline poster="/static/assets/icons8/animated/techny_rocket_poster.png" style="width: 100%; height: 100%; object-fit: contain;">
+      <source src="/static/assets/icons8/animated/techny_rocket.mp4" type="video/mp4; codecs=hvc1">
+      <source src="/static/assets/icons8/animated/techny_rocket.webm" type="video/webm">
+    </video>
+  </div>
+  <div style="flex: 1;">
+    <div style="font-size: 13px; font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 6px;">
+      <img src="/static/assets/icons8/icons/rocket_8Cpx9JrEbpOM.png" width="16" height="16" alt="Rocket">
+      <span>High-Velocity Token Booster Operational</span>
+      <span style="font-size: 10px; background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.4); padding: 1px 6px; border-radius: 6px;">/boost/boost</span>
+    </div>
+    <div style="font-size: 11.5px; color: #94a3b8; margin-top: 2px;">
+      Multi-tier LPU failover (Groq, Gemini Lite, OpenRouter, Local Rule Engine), prompt deduplication, and zero-latency caching active across all models.
+    </div>
+  </div>
+</div>
+<!-- Token Metrics 4-Box Grid -->
+<div class="token-metrics-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;">
+<div class="stat-mini-card" style="background: var(--bg-card-subtle); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); text-align: center;">
+<div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Tokens In</div>
+<div id="metric-tokens-in" style="font-size: 17px; font-weight: 700; color: var(--text-bright); margin-top: 2px;">0</div>
+</div>
+<div class="stat-mini-card" style="background: var(--bg-card-subtle); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); text-align: center;">
+<div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Tokens Out</div>
+<div id="metric-tokens-out" style="font-size: 17px; font-weight: 700; color: var(--text-bright); margin-top: 2px;">0</div>
+</div>
+<div class="stat-mini-card" style="background: var(--bg-card-subtle); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.3); text-align: center;">
+<div style="font-size: 11px; color: #10b981; text-transform: uppercase;">Tokens Saved</div>
+<div id="metric-tokens-saved" style="font-size: 17px; font-weight: 700; color: #10b981; margin-top: 2px;">0</div>
+</div>
+<div class="stat-mini-card" style="background: var(--bg-card-subtle); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); text-align: center;">
+<div style="font-size: 11px; color: var(--accent); text-transform: uppercase;">Avg Latency</div>
+<div id="metric-tokens-latency" style="font-size: 17px; font-weight: 700; color: var(--accent); margin-top: 2px;">-- ms</div>
+</div>
+</div>
+<!-- Active Tiers Visual Cascade -->
+<div class="optimizer-tiers-row" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; font-size: 11.5px;">
+<span class="tier-pill" style="padding: 4px 9px; border-radius: 6px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); color: var(--text-main);">
+<strong>T1: Groq Qwen-27b</strong> <span style="color: #10b981;">● Online</span> <span id="tier-lat-groq" style="color: var(--amber-neon); margin-left: 4px;"></span>
+</span>
+<span class="tier-pill" style="padding: 4px 9px; border-radius: 6px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); color: var(--text-main);">
+<strong>T2: Gemini Flash Lite</strong> <span style="color: #10b981;">● Online</span> <span id="tier-lat-gemini" style="color: var(--amber-neon); margin-left: 4px;"></span>
+</span>
+<span class="tier-pill" style="padding: 4px 9px; border-radius: 6px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); color: #10b981;">
+<strong>T3: OpenRouter Free</strong> <span style="color: #10b981;">● Online</span> <span id="tier-lat-openrouter" style="color: var(--amber-neon); margin-left: 4px;"></span>
+</span>
+<span class="tier-pill" style="padding: 4px 9px; border-radius: 6px; background: var(--bg-card-subtle); border: 1px solid var(--border-color); color: var(--text-main);">
+<strong>T4: Local Rules</strong> <span style="color: #10b981;">● Ready</span> <span style="color: var(--amber-neon); margin-left: 4px;">0.1ms</span>
+</span>
+</div>
+<!-- Audit Report Banner (Hidden by default, shown on audit) -->
+<div id="optimizer-audit-banner" style="display: none; padding: 10px 12px; border-radius: var(--radius-sm); background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 12px; margin-bottom: 8px;">
+<div style="font-weight: 600; color: var(--accent); margin-bottom: 4px;">⚡ Audit Report: <span id="audit-grade-badge">Grade A+ (All Tiers Verified)</span></div>
+<div id="audit-details-text" style="color: var(--text-muted);">Context pruning active, duplicate compression verified, multi-tier failover cascade operational.</div>
+</div>
+<!-- Interactive Prompt Compression & Optimization Sandbox -->
+<div style="background: var(--bg-card-subtle); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-top: 10px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+<span style="font-size: 11.5px; font-weight: 600; color: var(--text-bright);">Prompt Optimization Sandbox</span>
+<span id="optimizer-sandbox-savings" style="font-size: 11px; color: #10b981; font-weight: 600;">Test real-time compression</span>
+</div>
+<div style="display: flex; gap: 8px;">
+<input id="optimizer-sandbox-input" placeholder="Paste prompt to test live token reduction..." style="flex: 1; font-size: 12px;" type="text"/>
+<button class="btn btn-primary btn-xs" id="btn-run-sandbox-optimize" type="button">Optimize</button>
+</div>
+<div id="optimizer-sandbox-result" style="display: none; margin-top: 8px; font-size: 11.5px; font-family: var(--font-mono); color: var(--text-muted); background: var(--bg-app); padding: 8px; border-radius: 4px;">
+</div>
+</div>
+</div></div></div></div>
+<!-- =========================================================================
        KIOSK MODE CONTAINER (Desk Display)
        ========================================================================= -->
-  <div id="kiosk-container" class="kiosk-container">
-    <div class="kiosk-header">
-      <div class="kiosk-header-left">
-        <span class="kiosk-logo-dot"></span>
-        <span class="kiosk-header-title">BENCHTOP DESK DISPLAY</span>
-        <span id="kiosk-display-type" class="kiosk-tag">MARKDOWN</span>
-      </div>
-      <div class="kiosk-header-right">
-        <span id="kiosk-clock" class="kiosk-clock">00:00:00</span>
-      </div>
-    </div>
-
-    <div class="kiosk-body">
-      <h1 id="kiosk-display-title">Smart Workbench Ready</h1>
-      <div id="kiosk-display-body">
-        <p>Awaiting live broadcast commands or LLM intent routing results...</p>
-      </div>
-    </div>
-
-    <div class="kiosk-footer">
-      <span>ENDPOINT: /ws/kiosk</span>
-      <span id="kiosk-footer-ts">CONNECTED</span>
-      <span>SUBDOMAIN: workbench.ayushdubey.tech</span>
-    </div>
-  </div>
-
-  <!-- Wiring Guide Modal for 2.8" SPI TFT -->
-  <div id="modal-wiring-guide" class="modal-overlay" style="display: none;">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title">2.8" SPI TFT LCD (ILI9341 / ST7789) Wiring Guide</h3>
-        <button id="btn-close-wiring-guide" class="btn-icon-close" type="button">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p style="margin-bottom: 12px; color: var(--text-muted);">
+<div class="kiosk-container" id="kiosk-container">
+<div class="kiosk-header">
+<div class="kiosk-header-left">
+<span class="kiosk-logo-dot"></span>
+<span class="kiosk-header-title">BENCHTOP DESK DISPLAY</span>
+<span class="kiosk-tag" id="kiosk-display-type">MARKDOWN</span>
+</div>
+<div class="kiosk-header-right">
+<span class="kiosk-clock" id="kiosk-clock">00:00:00</span>
+</div>
+</div>
+<div class="kiosk-body">
+<h1 id="kiosk-display-title">Smart Workbench Ready</h1>
+<div id="kiosk-display-body">
+<p>Awaiting live broadcast commands or LLM intent routing results...</p>
+</div>
+</div>
+<div class="kiosk-footer">
+<span>ENDPOINT: /ws/kiosk</span>
+<span id="kiosk-footer-ts">CONNECTED</span>
+<span>SUBDOMAIN: workbench.ayushdubey.tech</span>
+</div>
+</div>
+<!-- Wiring Guide Modal for 2.8" SPI TFT -->
+<div class="modal-overlay" id="modal-wiring-guide" style="display:none !important;" style="display: none;">
+<div class="modal-card">
+<div class="modal-header">
+<h3 class="modal-title">2.8" SPI TFT LCD (ILI9341 / ST7789) Wiring Guide</h3>
+<button class="btn-icon-close" id="btn-close-wiring-guide" type="button">×</button>
+</div>
+<div class="modal-body">
+<p style="margin-bottom: 12px; color: var(--text-muted);">
           Wiring specification for the 2.8-inch SPI TFT display on Raspberry Pi 4B+ (SPI0 Bus):
         </p>
-        <div class="table-responsive">
-          <table class="data-table" style="font-size: 12px;">
-            <thead>
-              <tr>
-                <th>TFT Pin</th>
-                <th>Function</th>
-                <th>Pi 4B+ Pin</th>
-                <th>Pi GPIO / Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>VCC</strong></td><td>Power In</td><td><strong>Pin 1</strong></td><td>3.3V PWR (or 5V if module has onboard 3.3V LDO)</td></tr>
-              <tr><td><strong>GND</strong></td><td>Ground</td><td><strong>Pin 6</strong></td><td>GND (or pins 9, 14, 20, 25, 30, 34, 39)</td></tr>
-              <tr><td><strong>CS</strong></td><td>Chip Select</td><td><strong>Pin 24</strong></td><td>GPIO 8 (SPI0 CE0)</td></tr>
-              <tr><td><strong>RESET</strong></td><td>Hardware Reset</td><td><strong>Pin 18</strong></td><td>GPIO 24</td></tr>
-              <tr><td><strong>DC / RS</strong></td><td>Data / Command</td><td><strong>Pin 22</strong></td><td>GPIO 25</td></tr>
-              <tr><td><strong>SDI (MOSI)</strong></td><td>SPI Data In</td><td><strong>Pin 19</strong></td><td>GPIO 10 (SPI0 MOSI)</td></tr>
-              <tr><td><strong>SCK (SCLK)</strong></td><td>SPI Clock</td><td><strong>Pin 23</strong></td><td>GPIO 11 (SPI0 SCLK)</td></tr>
-              <tr><td><strong>LED (BL)</strong></td><td>Backlight</td><td><strong>Pin 17</strong></td><td>3.3V (or GPIO 18 for PWM dimming)</td></tr>
-              <tr><td><strong>SDO (MISO)</strong></td><td>SPI Data Out</td><td><strong>Pin 21</strong></td><td>GPIO 9 (SPI0 MISO, optional if no touch)</td></tr>
-            </tbody>
-          </table>
+<div class="table-responsive">
+<table class="data-table" style="font-size: 12px;">
+<thead>
+<tr>
+<th>TFT Pin</th>
+<th>Function</th>
+<th>Pi 4B+ Pin</th>
+<th>Pi GPIO / Name</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>VCC</strong></td><td>Power In</td><td><strong>Pin 1</strong></td><td>3.3V PWR (or 5V if module has onboard 3.3V LDO)</td></tr>
+<tr><td><strong>GND</strong></td><td>Ground</td><td><strong>Pin 6</strong></td><td>GND (or pins 9, 14, 20, 25, 30, 34, 39)</td></tr>
+<tr><td><strong>CS</strong></td><td>Chip Select</td><td><strong>Pin 24</strong></td><td>GPIO 8 (SPI0 CE0)</td></tr>
+<tr><td><strong>RESET</strong></td><td>Hardware Reset</td><td><strong>Pin 18</strong></td><td>GPIO 24</td></tr>
+<tr><td><strong>DC / RS</strong></td><td>Data / Command</td><td><strong>Pin 22</strong></td><td>GPIO 25</td></tr>
+<tr><td><strong>SDI (MOSI)</strong></td><td>SPI Data In</td><td><strong>Pin 19</strong></td><td>GPIO 10 (SPI0 MOSI)</td></tr>
+<tr><td><strong>SCK (SCLK)</strong></td><td>SPI Clock</td><td><strong>Pin 23</strong></td><td>GPIO 11 (SPI0 SCLK)</td></tr>
+<tr><td><strong>LED (BL)</strong></td><td>Backlight</td><td><strong>Pin 17</strong></td><td>3.3V (or GPIO 18 for PWM dimming)</td></tr>
+<tr><td><strong>SDO (MISO)</strong></td><td>SPI Data Out</td><td><strong>Pin 21</strong></td><td>GPIO 9 (SPI0 MISO, optional if no touch)</td></tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top: 14px; font-size: 12px; color: var(--text-muted); background: var(--bg-card-subtle); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+<strong>To enable SPI on Raspberry Pi:</strong> Run <code>sudo raspi-config nonint do_spi 0</code>. Full driver and firmware daemon script available in <code>SOLDERING_DISPLAY_WIRING.md</code>.
         </div>
-        <div style="margin-top: 14px; font-size: 12px; color: var(--text-muted); background: var(--bg-card-subtle); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          <strong>To enable SPI on Raspberry Pi:</strong> Run <code>sudo raspi-config nonint do_spi 0</code>. Full driver and firmware daemon script available in <code>SOLDERING_DISPLAY_WIRING.md</code>.
-        </div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-primary btn-sm" id="btn-done-wiring-guide" type="button">Got it</button>
+</div>
+</div>
+</div>
+<!-- Toast Notification Container -->
+<div class="toast-container" id="toast-container"></div>
+<!-- Application Logic -->
+<script src="/static/workstation-bar.js?v=scifi_hud_v3"></script>
+<script src="/static/app.js?v=scifi_hud_v3"></script>
+<!-- =========================================================================
+       ALWAYS-VISIBLE BOTTOM RIGHT: DUAL DOCK (VOICE BUTTON + CHAT BUBBLE)
+       ========================================================================= -->
+<div class="wb-bottom-dock" id="wb-bottom-dock">
+<!-- 1. Dedicated Voice Button (Mic FAB) -->
+<button class="dock-fab dock-fab-voice" id="dock-voice-btn" onclick="toggleVoiceDockRecording()" title="Click or Hold to Speak (Groq Whisper Low-Latency)">
+<div class="voice-ripple-ring" id="voice-ripple-ring"></div>
+<svg fill="none" height="22" stroke="currentColor" stroke-width="2.3" viewbox="0 0 24 24" width="22">
+<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="23"></line>
+<line x1="8" x2="16" y1="23" y2="23"></line>
+</svg>
+<span class="voice-dock-badge" id="voice-dock-badge">VOICE</span>
+</button>
+<!-- 2. Chat Bubble Button (Chat FAB) -->
+<button class="dock-fab dock-fab-chat" id="dock-chat-btn" onclick="toggleChat()" title="Chat with Feynman AI Copilot">
+<span class="chat-fab-avatar">⚛️</span>
+<svg class="chat-fab-svg" fill="none" height="20" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24" width="20">
+<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+</svg>
+<span class="chat-fab-status-dot"></span>
+</button>
+</div>
+<!-- LIGHTWEIGHT FEYNMAN CHAT PANEL -->
+<div class="chat-panel" id="chat-panel">
+<div class="chat-header">
+<div class="chat-title-wrap">
+<div class="chat-avatar">⚛️</div>
+<div>
+<div class="chat-title">Richard Feynman</div>
+<div class="chat-subtitle">AI Workbench Copilot • <span class="chat-latency-badge" id="chat-latency-badge">⚡ Groq ~180ms</span></div>
+</div>
+</div>
+<div class="chat-header-actions">
+<button class="chat-action-btn" onclick="clearCurrentChat()" title="Clear Chat History">🗑</button>
+<button class="chat-action-btn" onclick="toggleChat()" title="Minimize">✕</button>
+</div>
+</div>
+<!-- Quick Prompt Pills for Workbench Speed -->
+<div class="chat-quick-pills">
+<button class="chat-pill" onclick="sendQuickPrompt('Show complete Raspberry Pi 40-pin header physical ground pins')">📟 RPi GND Pins</button>
+<button class="chat-pill" onclick="sendQuickPrompt('Show ESP32 DevKit V1 standard GPIO, I2C, SPI, and ADC pinout')">📟 ESP32 DevKit</button>
+<button class="chat-pill" onclick="sendQuickPrompt('Recommended solder temperatures for 60/40 leaded vs SAC305 lead-free')">🔥 Solder Temps</button>
+<button class="chat-pill" onclick="sendQuickPrompt('Explain how flowers and bees are flying sex organs of nature')">🐝 Bees &amp; Flowers</button>
+</div>
+<div class="chat-messages" id="chat-messages">
+<div class="chat-msg assistant">
+        Hello! I'm <strong>Richard Feynman</strong>—delighted to be at your workbench! Ask me about circuit schematics, pinouts, solder alloys, or the physics of nature!
       </div>
-      <div class="modal-footer">
-        <button id="btn-done-wiring-guide" class="btn btn-primary btn-sm" type="button">Got it</button>
-      </div>
-    </div>
-  </div>
+</div>
+<div class="typing-indicator" id="chat-typing" style="display: none;">
+<span></span><span></span><span></span>
+<span style="margin-left: 6px; font-size: 11px; color: #94a3b8;">Feynman is thinking...</span>
+</div>
+<div class="chat-input-area">
+<input class="chat-input" id="chat-input" onkeypress="if(event.key === 'Enter') sendChatMessage()" placeholder="Ask Feynman (e.g. Raspberry Pi GND pins)..." type="text"/>
+<button class="chat-btn" id="chat-mic-btn" onmousedown="startRecording()" onmouseleave="stopRecording()" onmouseup="stopRecording()" ontouchend="stopRecording()" ontouchstart="startRecording()" title="Click or Hold to talk">
+<svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17">
+<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="23"></line>
+<line x1="8" x2="16" y1="23" y2="23"></line>
+</svg>
+</button>
+<button class="chat-btn send-btn" onclick="sendChatMessage()" title="Send Message">
+<svg fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17">
+<line x1="22" x2="11" y1="2" y2="13"></line>
+<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+</svg>
+</button>
+</div>
+</div>
+<script>
+    let chatSessionId = 'wb_session_' + Math.floor(Math.random() * 100000);
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isVoiceRecording = false;
 
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="toast-container"></div>
+    function toggleChat() {
+      const panel = document.getElementById('chat-panel');
+      if (!panel) return;
+      panel.classList.toggle('active');
+      if (panel.classList.contains('active')) {
+        document.getElementById('chat-input')?.focus();
+      }
+    }
 
-  <!-- Application Logic -->
-  <script src="/static/app.js"></script>
+    function sendQuickPrompt(promptText) {
+      const input = document.getElementById('chat-input');
+      if (input) input.value = promptText;
+      sendChatMessage();
+    }
+
+    function clearCurrentChat() {
+      const msgs = document.getElementById('chat-messages');
+      if (!msgs) return;
+      chatSessionId = 'wb_session_' + Math.floor(Math.random() * 100000);
+      msgs.innerHTML = '<div class="chat-msg assistant">Chat cleared! Feynman is ready for new workbench questions.</div>';
+    }
+
+    function appendMessage(role, text) {
+      const msgs = document.getElementById('chat-messages');
+      if (!msgs) return;
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + role;
+      
+      // Simple format conversion for bold and newlines
+      const formatted = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br/>');
+      
+      div.innerHTML = formatted;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      
+      input.value = '';
+      appendMessage('user', text);
+      const typingEl = document.getElementById('chat-typing');
+      if (typingEl) typingEl.style.display = 'flex';
+      
+      const t0 = Date.now();
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({message: text, session_id: chatSessionId, device_id: 'web'})
+        });
+        const data = await res.json();
+        if (typingEl) typingEl.style.display = 'none';
+        
+        const dt = data.latency_ms || (Date.now() - t0);
+        const latencyEl = document.getElementById('chat-latency-badge');
+        if (latencyEl) latencyEl.textContent = `⚡ ${dt}ms`;
+        
+        appendMessage('assistant', data.response || 'Feynman received your message.');
+        
+        // Refresh soldering iframe so it mirrors any pinout/instructions in real-time
+        const sIframe = document.getElementById('soldering-iframe');
+        if (sIframe && sIframe.contentWindow) {
+          try { sIframe.contentWindow.postMessage('refresh_state', '*'); } catch(e){}
+        }
+      } catch (e) {
+        if (typingEl) typingEl.style.display = 'none';
+        appendMessage('assistant', 'Network Error: could not reach Feynman copilot.');
+      }
+    }
+
+    // Toggle Voice Recording from dedicated bottom-right button
+    async function toggleVoiceDockRecording() {
+      if (isVoiceRecording) {
+        stopVoiceRecording();
+      } else {
+        startVoiceRecording();
+      }
+    }
+
+    async function startVoiceRecording() {
+      const btn = document.getElementById('dock-voice-btn');
+      const badge = document.getElementById('voice-dock-badge');
+      const ripple = document.getElementById('voice-ripple-ring');
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        
+        mediaRecorder.onstart = () => {
+          isVoiceRecording = true;
+          if (btn) btn.classList.add('recording');
+          if (badge) badge.textContent = 'REC...';
+          if (ripple) ripple.classList.add('active');
+        };
+
+        mediaRecorder.start();
+      } catch(e) {
+        console.error("Mic access error:", e);
+        alert("Microphone access required for voice copilot.");
+      }
+    }
+
+    async function stopVoiceRecording() {
+      const btn = document.getElementById('dock-voice-btn');
+      const badge = document.getElementById('voice-dock-badge');
+      const ripple = document.getElementById('voice-ripple-ring');
+      
+      if (!mediaRecorder || !isVoiceRecording) return;
+      isVoiceRecording = false;
+      if (btn) btn.classList.remove('recording');
+      if (badge) badge.textContent = 'VOICE';
+      if (ripple) ripple.classList.remove('active');
+      
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'voice.webm');
+        formData.append('session_id', chatSessionId);
+        formData.append('device_id', 'web');
+        
+        // Ensure chat panel is open so user sees response
+        const panel = document.getElementById('chat-panel');
+        if (panel && !panel.classList.contains('active')) {
+          panel.classList.add('active');
+        }
+        
+        const typingEl = document.getElementById('chat-typing');
+        if (typingEl) typingEl.style.display = 'flex';
+        
+        const t0 = Date.now();
+        try {
+          const res = await fetch('/api/chat/voice', { method: 'POST', body: formData });
+          const data = await res.json();
+          if (typingEl) typingEl.style.display = 'none';
+          
+          const dt = data.latency_ms || (Date.now() - t0);
+          const latencyEl = document.getElementById('chat-latency-badge');
+          if (latencyEl) latencyEl.textContent = `⚡ ${dt}ms`;
+          
+          if (data.transcription) {
+            appendMessage('user', '🎤 ' + data.transcription);
+            appendMessage('assistant', data.response || 'Understood.');
+          } else {
+            appendMessage('assistant', 'Could not detect clear speech. Please try speaking closer to your mic!');
+          }
+        } catch (e) {
+          if (typingEl) typingEl.style.display = 'none';
+          appendMessage('assistant', 'Network error processing audio voice prompt.');
+        }
+      };
+      
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    }
+
+    // Input-bar microphone handlers (hold to talk)
+    function startRecording() {
+      startVoiceRecording();
+    }
+    function stopRecording() {
+      stopVoiceRecording();
+    }
+
+    // Initialize AOS & Lucide Icons
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AOS) {
+        AOS.init({
+          duration: 650,
+          easing: 'ease-out-cubic',
+          once: true,
+          offset: 40
+        });
+      }
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
+  <script src="/static/buy_now_bubble.js" defer></script>
 </body>
 </html>
