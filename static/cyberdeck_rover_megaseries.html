@@ -59,9 +59,10 @@
       --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       
       --header-height: 64px;
-      --sidebar-width: 320px;
+      --sidebar-width: 280px;
       --ease-hud: cubic-bezier(0.16, 1, 0.3, 1);
     }
+
 
     *, *::before, *::after {
       box-sizing: border-box;
@@ -3089,7 +3090,7 @@ ls -l /dev/input/by-id/*ESP32*</code></pre>
       <code>EVIOCGRAB</code> <code>ioctl</code> command, defined in <code>&lt;linux/input.h&gt;</code>:
     </p>
     <div class="math-block">
-      $$	ext{ioctl}(fd, 	ext{EVIOCGRAB}, 1) \implies 	ext{Exclusive Kernel Event Delivery}$$
+      $$\text{ioctl}(fd, \text{EVIOCGRAB}, 1) \implies \text{Exclusive Kernel Event Delivery}$$
     </div>
     <p>
       When an application issues <code>ioctl(fd, EVIOCGRAB, 1)</code> on an open event device file descriptor, the kernel's 
@@ -3364,7 +3365,7 @@ class S3HidGrabber:
       (<code>xiaozhi-pi.service</code>):
     </p>
     <div class="math-block">
-      $$	ext{MemoryHigh} = 380	ext{ MB} \quad (	ext{Throttling \&amp; Proactive Reclaim}), \quad 	ext{MemoryMax} = 450	ext{ MB} \quad (	ext{Hard Ceiling})$$
+      $$\text{MemoryHigh} = 380\text{ MB} \quad (\text{Throttling \&amp; Proactive Reclaim}), \quad \text{MemoryMax} = 450\text{ MB} \quad (\text{Hard Ceiling})$$
     </div>
     <p>
       When memory usage exceeds <code>MemoryHigh=380M</code>, the kernel slows down allocation requests and proactively reclaims page caches 
@@ -3506,7 +3507,7 @@ cat /sys/fs/cgroup/system.slice/xiaozhi-pi.service/memory.max</code></pre>
       jitter or asymmetric routing drops. We resolve this by manipulating Linux route metrics:
     </p>
     <div class="math-block">
-      $$	ext{Metric}_{	ext{RNDIS}} = 50 \quad &lt; \quad 	ext{Metric}_{	ext{WLAN}} = 600 \implies 	ext{Priority Preemption over USB}$$
+      $$\text{Metric}_{\text{RNDIS}} = 50 \quad &lt; \quad \text{Metric}_{\text{WLAN}} = 600 \implies \text{Priority Preemption over USB}$$
     </div>
     <p>
       In <code>nodes/pi4b-bridge/s3_internet_toggle.sh</code>, we establish an automated state toggle. When activated, the script dispatches 
@@ -3785,23 +3786,23 @@ class FloatingPTTWidget:
       clean acoustic transport profile:
     </p>
     <div class="math-block">
-      $$f_s = 16,000	ext{ Hz (16 kHz)}, \quad B = 16	ext{ bits (2 bytes/sample)}, \quad N_{	ext{ch}} = 1	ext{ (Mono Little-Endian)}$$
-      $$	ext{Bitrate}_{	ext{PCM}} = 16,000 	imes 2 	imes 1 = 32,000	ext{ bytes/sec (256 kbps)}$$
+      $$f_s = 16,000\text{ Hz (16 kHz)}, \quad B = 16\text{ bits (2 bytes/sample)}, \quad N_{\text{ch}} = 1\text{ (Mono Little-Endian)}$$
+      $$\text{Bitrate}_{\text{PCM}} = 16,000 \times 2 \times 1 = 32,000\text{ bytes/sec (256 kbps)}$$
     </div>
     <p>
-      At a 60 ms frame duration ($T_{	ext{frame}} = 0.060	ext{ s}$), each discrete acoustic packet comprises exactly:
+      At a 60 ms frame duration ($T_{\text{frame}} = 0.060\text{ s}$), each discrete acoustic packet comprises exactly:
     </p>
     <div class="math-block">
-      $$S_{	ext{frame}} = 16,000 	imes 0.060 = 960	ext{ samples} \implies L_{	ext{frame}} = 960 	imes 2 = 1920	ext{ bytes}$$
+      $$S_{\text{frame}} = 16,000 \times 0.060 = 960\text{ samples} \implies L_{\text{frame}} = 960 \times 2 = 1920\text{ bytes}$$
     </div>
     <p>
       Over the USB CDC serial connection between the ESP32-S3 and Raspberry Pi 4B, raw audio frames are demarcated using a lightweight 
       4-byte synchronization header:
     </p>
     <div class="math-block">
-      $$	ext{Header} = \left[ 0	ext{xAA}, \, 0	ext{x55}, \, 	ext{LEN\_LO} \, (0	ext{x80}), \, 	ext{LEN\_HI} \, (0	ext{x07}) 
-ight] \quad (1920 = 0	ext{x0780})$$
+      $$\text{Header} = \left[ 0\text{xAA}, \, 0\text{x55}, \, \text{LEN\_LO} \, (0\text{x80}), \, \text{LEN\_HI} \, (0\text{x07}) \right] \quad (1920 = 0\text{x0780})$$
     </div>
+
     <p>
       While uncompressed PCM is ideal for local USB transmission, cloud upload over constrained cellular uplinks requires compression. 
       To avoid heavy external C library dependencies on embedded systems, <code>shared/providers/asr_whisper_router.py</code> implements 
@@ -3889,7 +3890,7 @@ def create_ogg_opus_stream(opus_packets: list, sample_rate: int = 16000, channel
           <pre><code class="language-bash">cd /home/ayush/xiaozhi_dual_architecture/shared/providers
 python3 -c "
 import asr_whisper_router as asr
-pcm_dummy = b'  ' * 960  # 60ms of silence (1920 bytes)
+pcm_dummy = b'\x00\x00' * 960  # 60ms of silence (1920 bytes)
 wav_data = asr.pcm_to_wav(pcm_dummy * 10)  # 600ms buffer
 print('Generated WAV bytes:', len(wav_data))
 print('RIFF Header:', wav_data[:4])
@@ -3919,7 +3920,7 @@ print('RIFF Header:', wav_data[:4])
       running <code>whisper-large-v3-turbo</code> demonstrates unprecedented inference velocity:
     </p>
     <div class="math-block">
-      $$T_{	ext{Groq Turnaround}} = 542.4	ext{ ms} \quad 	ext{vs.} \quad T_{	ext{OpenAI Whisper}} = 1,420.8	ext{ ms} \quad (pprox 2.62	imes	ext{ speedup})$$
+      $$T_{\text{Groq Turnaround}} = 542.4\text{ ms} \quad \text{vs.} \quad T_{\text{OpenAI Whisper}} = 1,420.8\text{ ms} \quad (\approx 2.62\times\text{ speedup})$$
     </div>
     <p>
       In <code>shared/providers/asr_whisper_router.py</code>, we implement the <code>WhisperASRRouter</code> class. The router prioritizes 
@@ -4149,10 +4150,10 @@ OK</code></pre>
     </p>
     <p>
       In <code>shared/providers/llm_router.py</code>, we implement a pre-compiled regex intent interceptor that executes in 
-      <strong>under 0.5 milliseconds</strong> ($T &lt; 500\ \mu	ext{s}$):
+      <strong>under 0.5 milliseconds</strong> ($T &lt; 500\ \mu\text{s}$):
     </p>
     <div class="math-block">
-      $$	ext{Intent Match: } 	ext{Pattern} \cap 	ext{Utterance} \implies \Delta T pprox 0.12	ext{ ms}$$
+      $$\text{Intent Match: } \text{Pattern} \cap \text{Utterance} \implies \Delta T \approx 0.12\text{ ms}$$
     </div>
     <p>
       When the user says <em>"Switch to Groq mode and calculate the motor torque"</em>, the regex engine identifies the command prefix, 
@@ -4174,19 +4175,19 @@ OK</code></pre>
         <tbody>
           <tr>
             <td>"Switch to Groq" / "Use Llama"</td>
-            <td><code>r"(?:switch to|use|activate|brain to)\s+groq"</code></td>
+            <td><code>r"\b(?:switch to|use|activate|brain to)\s+groq\b"</code></td>
             <td><code>groq</code></td>
             <td>"Brain switched to Groq (llama-3.3-70b-versatile)."</td>
           </tr>
           <tr>
             <td>"Switch to Gemini"</td>
-            <td><code>r"(?:switch to|use|activate|brain to)\s+gemini"</code></td>
+            <td><code>r"\b(?:switch to|use|activate|brain to)\s+gemini\b"</code></td>
             <td><code>gemini</code></td>
             <td>"Brain switched to Google Gemini."</td>
           </tr>
           <tr>
             <td>"Switch to Grok"</td>
-            <td><code>r"(?:switch to|use|activate|brain to)\s+grok"</code></td>
+            <td><code>r"\b(?:switch to|use|activate|brain to)\s+grok\b"</code></td>
             <td><code>grok</code></td>
             <td>"Brain switched to xAI Grok."</td>
           </tr>
@@ -4622,7 +4623,7 @@ asyncio.run(query_tools())
       and registers a pending <code>asyncio.Future</code> in an internal dictionary:
     </p>
     <div class="math-block">
-      $$	ext{Pending Table: } 	ext{UUID} \mapsto 	ext{Future}[	ext{Response}], \quad 	au_{	ext{timeout}} = 15.0	ext{ s}$$
+      $$\text{Pending Table: } \text{UUID} \mapsto \text{Future}[\text{Response}], \quad \tau_{\text{timeout}} = 15.0\text{ s}$$
     </div>
     <p>
       When Node B finishes processing, it returns a JSON-RPC response carrying the matching ID. The incoming loop resolves the Future, 
@@ -4721,7 +4722,7 @@ Test 2 PASSED: Peer responded with analysis context.</code></pre>
       We engineer the <code>FederationMemoryDB</code> utilizing SQLite configured in <strong>Write-Ahead Logging (WAL)</strong> mode:
     </p>
     <div class="math-block">
-      $$	ext{PRAGMA journal\_mode = WAL;}, \quad 	ext{PRAGMA synchronous = NORMAL;}$$
+      $$\text{PRAGMA journal\_mode = WAL;}, \quad \text{PRAGMA synchronous = NORMAL;}$$
     </div>
     <p>
       Under standard rollback journaling, writers lock the entire database file, causing concurrent reader queries to fail with 
@@ -4830,7 +4831,7 @@ class FederationMemoryDB:
       In <code>xiaozhi_federation_mcp.py</code>, we enforce a strict, mathematically bounded invariant:
     </p>
     <div class="math-block">
-      $$	ext{Loop Invariant: } 	ext{turn\_count} \le 	ext{max\_turns} \quad (	ext{Strict Bound: } 	ext{max\_turns} \le 10)$$
+      $$\text{Loop Invariant: } \text{turn\_count} \le \text{max\_turns} \quad (\text{Strict Bound: } \text{max\_turns} \le 10)$$
     </div>
     <p>
       The dialogue supervisor guarantees that when <code>turn_count &gt;= max_turns</code>, the loop terminates unconditionally, 
@@ -4975,14 +4976,14 @@ Test 5 PASSED: 4-turn dialogue generated, persisted, and broadcast over WebSocke
       The linear velocity vector of each wheel contact patch is governed by the inverse kinematics transformation matrix:
     </p>
     <div class="math-block">
-      $$egin{bmatrix} w_0 \ (	ext{FL}) \ w_1 \ (	ext{FR}) \ w_2 \ (	ext{RL}) \ w_3 \ (	ext{RR}) \end{bmatrix} = 
-      egin{bmatrix} 
+      $$\begin{bmatrix} w_0 \ (\text{FL}) \ w_1 \ (\text{FR}) \ w_2 \ (\text{RL}) \ w_3 \ (\text{RR}) \end{bmatrix} = 
+      \begin{bmatrix} 
         1 &amp; 1 &amp; 1 \ 
         1 &amp; -1 &amp; -1 \ 
         1 &amp; -1 &amp; 1 \ 
         1 &amp; 1 &amp; -1 
       \end{bmatrix} 
-      egin{bmatrix} v_y \ v_x \ \omega_z \end{bmatrix}$$
+      \begin{bmatrix} v_y \ v_x \ \omega_z \end{bmatrix}$$
     </div>
     <p>
       Expanding this matrix yields four discrete wheel equations:
@@ -5156,10 +5157,10 @@ Spin+Fwd (x=0, y=100, z=100, spd=100): [100.0, 0.0, 100.0, 0.0]</code></pre>
       this model collapses completely due to <strong>Coulomb static friction (stiction)</strong>:
     </p>
     <div class="math-block">
-      $$F_{	ext{friction}} = egin{cases} F_{	ext{applied}} &amp; 	ext{if } |F_{	ext{applied}}| \le f_s = \mu_s N \quad (	ext{Stationary Stiction}) \ 	ext{sgn}(v) \, \mu_k N &amp; 	ext{if } |v| &gt; 0 \quad (	ext{Kinetic Dynamic Friction}) \end{cases}$$
+      $$F_{\text{friction}} = \begin{cases} F_{\text{applied}} &amp; \text{if } |F_{\text{applied}}| \le f_s = \mu_s N \quad (\text{Stationary Stiction}) \ \text{sgn}(v) \, \mu_k N &amp; \text{if } |v| &gt; 0 \quad (\text{Kinetic Dynamic Friction}) \end{cases}$$
     </div>
     <p>
-      Because $\mu_s pprox 1.3 	imes \mu_k$ across rubber rollers and synthetic laboratory carpet, the static torque required to initiate 
+      Because $\mu_s \approx 1.3 \times \mu_k$ across rubber rollers and synthetic laboratory carpet, the static torque required to initiate 
       rotation is drastically higher than the dynamic torque needed to maintain steady-state rolling.
     </p>
     <p>
@@ -5174,11 +5175,11 @@ Spin+Fwd (x=0, y=100, z=100, spd=100): [100.0, 0.0, 100.0, 0.0]</code></pre>
     </p>
     <ol>
       <li><strong>Breakaway Kick Impulse</strong>: Whenever a wheel transitions from rest (<code>was_stopped[i] == true</code>) to motion, 
-      the controller injects a high-energy breakaway pulse lasting <strong>180 ms</strong> ($18 	imes 10	ext{ ms}$ control loops), 
-      clamping the PWM duty cycle to $\ge 52,000$ ($pprox 79.3\%$ of full-scale 65,535). This generates instantaneous breakaway 
+      the controller injects a high-energy breakaway pulse lasting <strong>220 ms</strong> ($22 \times 10\text{ ms}$ control loops), 
+      clamping the PWM duty cycle to $\ge 52,000$ ($\approx 79.3\%$ of full-scale 65,535). This generates instantaneous breakaway 
       torque, shattering static friction bonds before immediately settling to the requested crawl speed.</li>
       <li><strong>Low-Speed 25 Hz Micro-Dither</strong>: For persistent crawl commands ($a &lt; 20\%$), the controller superimposes an alternating 
-      $\pm 1800$ count dither at 25 Hz ($100	ext{ Hz} / 4$). This high-frequency mechanical vibration keeps the roller interface in a perpetual 
+      $\pm 1800$ count dither at 25 Hz ($100\text{ Hz} / 4$). This high-frequency mechanical vibration keeps the roller interface in a perpetual 
       dynamic friction regime, enabling smooth sub-centimeter per second creeping without stick-slip shudder.</li>
     </ol>
 
@@ -5195,13 +5196,13 @@ Spin+Fwd (x=0, y=100, z=100, spd=100): [100.0, 0.0, 100.0, 0.0]</code></pre>
         <tbody>
           <tr>
             <td><code>min_duty</code></td>
-            <td>38,000 counts</td>
-            <td>Minimum active PWM floor (58.0%)</td>
+            <td>40,000 counts</td>
+            <td>Minimum active PWM floor (61.0%)</td>
             <td>Ensures steady kinetic drive once moving</td>
           </tr>
           <tr>
             <td><code>stiction_kick</code> duration</td>
-            <td>18 ticks (180 ms)</td>
+            <td>22 ticks (220 ms)</td>
             <td>Impulse burst window</td>
             <td>Sufficient time to overcome rotor and chassis inertia</td>
           </tr>
@@ -5301,7 +5302,7 @@ void driveRaw(uint8_t i, float speed) {
   <section id="mini-7-3" class="mini-chapter">
     <h3 class="mini-chapter-title">Mini-Chapter 7.3: Jerk-Gated IMU Dead-Reckoning Odometry</h3>
     <p>
-      In mobile robotics, estimating position $(x, y, 	heta)$ via wheel encoders is standard practice. On a Mecanum rover, however, 
+      In mobile robotics, estimating position $(x, y, \theta)$ via wheel encoders is standard practice. On a Mecanum rover, however, 
       wheel encoders are fundamentally deceptive: when the chassis pushes against a wall, climbs over a door threshold, or slips on a 
       loose rug, the wheels spin freely while the robot remains stationary. Integrating wheel revolutions produces catastrophic 
       "phantom odometry."
@@ -5311,7 +5312,7 @@ void driveRaw(uint8_t i, float speed) {
       accumulate quadratically into kilometers of drift within minutes:
     </p>
     <div class="math-block">
-      $$\Delta x(t) = rac{1}{2} a_{	ext{bias}} t^2 \implies 	ext{Quadratic Phantom Drift Explosion}$$
+      $$\Delta x(t) = \frac{1}{2} a_{\text{bias}} t^2 \implies \text{Quadratic Phantom Drift Explosion}$$
     </div>
     <p>
       In <code>rover rp2040 cpp/rover_rp2040/ahrs.h</code>, we solve this dilemma through <strong>Jerk-Gated Dead-Reckoning Odometry</strong>. 
@@ -5319,23 +5320,23 @@ void driveRaw(uint8_t i, float speed) {
       Exponential Moving Average (EMA) of the gravity vector:
     </p>
     <div class="math-block">
-      $$a_{	ext{EMA}}[k] = 0.88 \, a_{	ext{EMA}}[k-1] + 0.12 \, a[k]$$
+      $$a_{\text{EMA}}[k] = 0.88 \, a_{\text{EMA}}[k-1] + 0.12 \, a[k]$$
     </div>
     <p>
-      Subtracting the low-frequency gravity baseline isolates the high-pass dynamic linear jerk vector ($	ext{dynJerk}$):
+      Subtracting the low-frequency gravity baseline isolates the high-pass dynamic linear jerk vector ($\text{dynJerk}$):
     </p>
     <div class="math-block">
-      $$	ext{jerk}_x = a_x - a_{	ext{EMA}, x}, \quad 	ext{jerk}_y = a_y - a_{	ext{EMA}, y}, \quad 	ext{dynJerk} = \sqrt{	ext{jerk}_x^2 + 	ext{jerk}_y^2} \quad (	ext{in } g	ext{-units})$$
+      $$\text{jerk}_x = a_x - a_{\text{EMA}, x}, \quad \text{jerk}_y = a_y - a_{\text{EMA}, y}, \quad \text{dynJerk} = \sqrt{\text{jerk}_x^2 + \text{jerk}_y^2} \quad (\text{in } g\text{-units})$$
     </div>
     <p>
       Odometry displacement integration is permitted <strong>if and only if</strong> real physical motion is corroborated by inertial jerk:
     </p>
     <div class="math-block">
-      $$	ext{IsMoving} = (
-eg 	ext{Stationary}) \ \land \ (	ext{dynJerk} &gt; 0.045	ext{ g} \ \lor \ |\omega_z| &gt; 0.06	ext{ rad/s}) \ \land \ (	ext{Effort} \ge 12\%)$$
+      $$\text{IsMoving} = (\neg \text{Stationary}) \ \land \ (\text{dynJerk} &gt; 0.045\text{ g} \ \lor \ |\omega_z| &gt; 0.06\text{ rad/s}) \ \land \ (\text{Effort} \ge 12\%)$$
     </div>
+
     <p>
-      If the rover is pinned against an obstacle with wheels spinning at 100% throttle, $	ext{dynJerk}$ drops below 0.045 g. 
+      If the rover is pinned against an obstacle with wheels spinning at 100% throttle, $\text{dynJerk}$ drops below 0.045 g. 
       The odometry accumulator instantly clamps velocity integration to zero ($\Delta x = 0, \Delta y = 0$), completely preventing phantom drift.
     </p>
 
@@ -5437,9 +5438,9 @@ OK</code></pre>
       entrapment criteria:
     </p>
     <ol>
-      <li><strong>Boxed-In Condition</strong>: Front distance sensor detects $d_F &lt; 350	ext{ mm}$ while commanding forward motion.</li>
-      <li><strong>Oscillation Trap</strong>: 3 turn maneuvers executed within 6.0 seconds, or forward progress $&lt; 12	ext{ cm}$ over 3.0 seconds.</li>
-      <li><strong>Range-Rate Stall &amp; Jerk Discrepancy</strong>: Commanded effort $\ge 35\%$, distance sensor delta $|\Delta d_F| &lt; 12	ext{ mm}$ for over 900 ms, and $	ext{dynJerk} &lt; 0.03	ext{ g}$.</li>
+      <li><strong>Boxed-In Condition</strong>: Front distance sensor detects $d_F &lt; 350\text{ mm}$ while commanding forward motion.</li>
+      <li><strong>Oscillation Trap</strong>: 3 turn maneuvers executed within 6.0 seconds, or forward progress $&lt; 12\text{ cm}$ over 3.0 seconds.</li>
+      <li><strong>Range-Rate Stall &amp; Jerk Discrepancy</strong>: Commanded effort $\ge 35\%$, distance sensor delta $|\Delta d_F| &lt; 12\text{ mm}$ for over 900 ms, and $\text{dynJerk} &lt; 0.03\text{ g}$.</li>
     </ol>
     <p>
       Upon triggering, the engine transitions through a 12-state finite state machine (<code>AutoNavState</code>) defined in 
@@ -5613,14 +5614,14 @@ void evaluateAutonomyFSM(uint16_t dF, uint16_t dR, float dynJerk, uint32_t now_m
       <strong>20,000 Hz (20 kHz)</strong> with a 16-bit timer range ($0 - 65,535$):
     </p>
     <div class="math-block">
-      $$f_{	ext{PWM}} = 20,000	ext{ Hz} &gt; 20	ext{ kHz (Human Audible Limit)} \implies 	ext{Silent Operation}$$
+      $$f_{\text{PWM}} = 20,000\text{ Hz} &gt; 20\text{ kHz (Human Audible Limit)} \implies \text{Silent Operation}$$
     </div>
     <p>
       To prevent rapid throttle transitions from drawing excessive inductive current and dropping battery voltage below the 
       RP2040's 3.3V LDO brownout threshold, the firmware enforces an acceleration slew rate limiter:
     </p>
     <div class="math-block">
-      $$	ext{accel} = 25.0\% 	ext{ per } 10	ext{ ms tick} \implies 	ext{Max Slew Rate} = 2,500\%/	ext{s}$$
+      $$\text{accel} = 25.0\% \text{ per } 10\text{ ms tick} \implies \text{Max Slew Rate} = 2,500\%/\text{s}$$
     </div>
 
     <h4>Sensor Suite Evolution: Phasing Out Ultrasonic Sensors</h4>
@@ -5633,7 +5634,7 @@ void evaluateAutonomyFSM(uint16_t dF, uint16_t dR, float dynJerk, uint32_t now_m
     </p>
     <ul>
       <li><strong>5x VL53L0X ToF Sensors</strong>: Connected to the shared I2C1 bus (<code>GP2/GP3</code>) with individual XSHUT power pins (<code>GP6, GP7, GP16, GP17, GP18</code>). Addresses dynamically reprogrammed from <code>0x29</code> to <code>0x31..0x35</code> at boot.</li>
-      <li><strong>Option B 3-Mic Array</strong>: Equilateral triangle array ($d = 5.5	ext{ cm}$) elevated 16 cm on a silicone mast, capturing spatial audio via RP2040 PIO I2S on <code>GP28</code> and <code>GP29</code> with clock on <code>GP4/GP5</code>.</li>
+      <li><strong>Option B 3-Mic Array</strong>: Equilateral triangle array ($d = 5.5\text{ cm}$) elevated 16 cm on a silicone mast, capturing spatial audio via RP2040 PIO I2S on <code>GP28</code> and <code>GP29</code> with clock on <code>GP4/GP5</code>.</li>
     </ul>
 
     <div class="spec-table-wrap">
@@ -5711,7 +5712,7 @@ void evaluateAutonomyFSM(uint16_t dF, uint16_t dR, float dynJerk, uint32_t now_m
             <td><code>GP26 / ADC0</code></td>
             <td>Analog Input</td>
             <td>Battery Voltage Divider</td>
-            <td>200k / 100k divider ($V_{	ext{bat}} = V_{	ext{adc}} 	imes 3.0$)</td>
+            <td>200k / 100k divider ($V_{\text{bat}} = V_{\text{adc}} \times 3.0$)</td>
           </tr>
           <tr>
             <td><code>GP27</code></td>
@@ -5775,8 +5776,8 @@ void RoverMotors::step(uint32_t now) {
       <ol>
         <li>Connect an oscilloscope or logic analyzer probe to <code>GP9</code> (Motor FL Forward PWM).</li>
         <li>Send a 0 to 100% full-throttle step command via serial.</li>
-        <li>Measure the carrier waveform: confirm exactly $50.0\ \mu	ext{s}$ period ($T = 1 / 20,000	ext{ s}$), verifying 20 kHz silent switching.</li>
-        <li>Measure the ramp duration from 0% to 100% duty: confirm that the pulse width scales over exactly 4 ticks ($40	ext{ ms}$), validating the 25% per 10 ms slew rate clamp.</li>
+        <li>Measure the carrier waveform: confirm exactly $50.0\ \mu\text{s}$ period ($T = 1 / 20,000\text{ s}$), verifying 20 kHz silent switching.</li>
+        <li>Measure the ramp duration from 0% to 100% duty: confirm that the pulse width scales over exactly 4 ticks ($40\text{ ms}$), validating the 25% per 10 ms slew rate clamp.</li>
       </ol>
     
         <div class="lab-completion-wrap">
